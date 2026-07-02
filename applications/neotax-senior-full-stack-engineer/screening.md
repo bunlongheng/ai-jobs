@@ -16,6 +16,6 @@
 | Years of experience | 10+ |
 | GitHub | https://github.com/bunlongheng |
 | Portfolio | https://www.bunlongheng.com |
-| LinkedIn | n/a (add if you have one) |
+| LinkedIn | https://www.linkedin.com/in/bunlongheng/ |
 | References | Available upon request |
 | EEO (gender/race/veteran/disability) | Decline to self-identify |
