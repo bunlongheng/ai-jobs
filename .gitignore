@@ -1,0 +1,9 @@
+# Keep env / secrets local - never push, even to the private repo
+.env
+*.env
+.env.*
+*.key
+*.pem
+*secret*
+*credential*
+.DS_Store

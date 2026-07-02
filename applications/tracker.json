@@ -1,0 +1,13 @@
+{
+  "updated": "2026-07-02-0742",
+  "statuses": ["planned", "kit_ready", "applied", "interviewing", "offer", "rejected", "skipped"],
+  "applications": [
+    { "id": "neotax-senior-full-stack-engineer", "title": "Senior Full-Stack Engineer", "company": "Neo.Tax", "score": 88, "verdict": "priority", "status": "kit_ready", "source_run": "2026-07-02-0741", "url": "n/a", "applied_at": null, "kit_path": "~/.claude/jobhunt/applications/neotax-senior-full-stack-engineer/", "notes": "Priority - comp $190-210k clears target. Kit built 2026-07-02." },
+    { "id": "factored-senior-full-stack-python-react", "title": "Senior Full-Stack Engineer (Python & React)", "company": "Factored", "score": 82, "verdict": "apply", "status": "planned", "source_run": "2026-07-02-0741", "url": "https://dynamitejobs.com/company/factored/remote-job/senior-full-stack-engineer-python-react", "applied_at": null, "kit_path": null, "notes": "Verify salary clears $160k floor." },
+    { "id": "veeva-senior-frontend-fullstack", "title": "Senior Frontend Engineer (Full-Stack)", "company": "Veeva Systems", "score": 74, "verdict": "apply", "status": "planned", "source_run": "2026-07-02-0741", "url": "n/a", "applied_at": null, "kit_path": null, "notes": "Confirm true full-stack scope; salary unlisted." },
+    { "id": "healthcare-ai-platform-senior-ai-engineer", "title": "Senior AI Engineer", "company": "n/a (unnamed in aggregator)", "score": 74, "verdict": "apply", "status": "planned", "source_run": "2026-07-02-0741", "url": "n/a", "applied_at": null, "kit_path": null, "notes": "Company unnamed in source - verify legitimacy before applying." },
+    { "id": "drswarm-founding-fullstack-engineer", "title": "Founding Engineer (Full-Stack)", "company": "DrSwarm", "score": 73, "verdict": "apply", "status": "planned", "source_run": "2026-07-02-0741", "url": "n/a", "applied_at": null, "kit_path": null, "notes": "Founding/early-stage - verify cash comp vs equity." },
+    { "id": "memora-founding-engineer", "title": "Founding Engineer", "company": "Memora", "score": 64, "verdict": "skip", "status": "skipped", "source_run": "2026-07-02-0741", "url": "n/a", "applied_at": null, "kit_path": null, "notes": "Below 70 threshold." },
+    { "id": "turing-senior-js-react-ai-training", "title": "Senior JavaScript/React Engineer - AI Training", "company": "Turing", "score": 55, "verdict": "skip", "status": "skipped", "source_run": "2026-07-02-0741", "url": "https://www.linkedin.com/jobs/view/remote-senior-javascript-react-engineer-ai-training-us-based-at-turing-4408248248", "applied_at": null, "kit_path": null, "notes": "Contract AI-training, off-target." }
+  ]
+}

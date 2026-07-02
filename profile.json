@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "updated": "2026-07-02",
+  "identity": {
+    "name": "Bunlong Heng",
+    "email": "bheng.code@gmail.com",
+    "phone": "978-677-0861",
+    "site": "https://www.bunlongheng.com",
+    "github": "bunlongheng",
+    "linkedin": "",
+    "location": "Dallas, TX",
+    "resume_pdf": "/Users/bheng/Sites/bheng/public/docs/Bunlong Heng's Resume - FullStack.pdf"
+  },
+  "targets": {
+    "titles": [
+      "Senior Full Stack Engineer",
+      "Staff Full Stack Engineer",
+      "Senior Software Engineer",
+      "Staff Software Engineer"
+    ],
+    "seniority": ["Senior", "Staff"],
+    "remote": "remote-only",
+    "locations": ["Remote (US)"],
+    "comp_min_base_usd": 160000,
+    "comp_target_base_usd": 200000,
+    "_confirm": []
+  },
+  "must_haves": [
+    "Fully remote (US)",
+    "Senior or Staff full-stack IC scope",
+    "Modern stack: React/Next/Node/TypeScript"
+  ],
+  "deal_breakers": [
+    "Any required on-site or hybrid office days",
+    "Junior or mid-level only",
+    "Primarily non-technical / pure people-management"
+  ],
+  "stack": {
+    "frontend": ["React", "Next.js", "TypeScript", "Tailwind", "Vue.js"],
+    "backend": ["Node.js", "Express", "Laravel", "Python", "Django"],
+    "cloud": ["AWS", "Vercel", "Cloudflare", "Docker", "Kubernetes", "Terraform", "Nginx"],
+    "security": ["Auth0", "IAM", "SAML 2.0", "OpenID Connect", "OWASP", "WAF", "Zero Trust", "PenTest+", "CEH"],
+    "data": ["PostgreSQL", "MySQL", "DynamoDB", "RDS", "Supabase", "Snowflake", "BigQuery"],
+    "observability": ["Datadog", "CloudWatch", "Sentry"],
+    "ai": ["Prompt Engineering", "MCP", "RAG", "Vector Search", "Agent Orchestration"]
+  },
+  "certs": [
+    "AWS Certified Solutions Architect - Associate (2025)",
+    "AWS Certified Developer - Associate (2025)",
+    "AWS Certified Cloud Practitioner (2025)",
+    "CompTIA PenTest+ (2020)",
+    "Certified Ethical Hacker / CEH (2020)"
+  ],
+  "highlights": [
+    "Led Auth0 web/mobile auth integration across all Thryv applications (SAML 2.0, custom assertions).",
+    "Architected the Advanced Campaign Editor (ACE) React app for the Thryv Business Center team.",
+    "Improved dashboard TTFB from 5s to 0.5s via Cube Store pre-aggregation caching.",
+    "Integrated AI-driven natural language search to generate Cube Cloud queries.",
+    "Drove OWASP Top 10 compliance and CASA security assessments for the Command Center.",
+    "10+ years full-stack across telecom (Benu/Comcast/Telenet/Liberty Global) and SaaS."
+  ],
+  "apply_answers": {
+    "full_name": "Bunlong Heng",
+    "email": "bheng.code@gmail.com",
+    "phone": "978-677-0861",
+    "location": "Dallas, TX",
+    "work_authorization": "US citizen",
+    "requires_sponsorship": "No, not now or in the future",
+    "willing_to_relocate": "No - seeking fully remote (US)",
+    "remote_ok": "Yes - remote only",
+    "earliest_start": "2 weeks from offer acceptance",
+    "notice_period": "2 weeks",
+    "desired_base_salary_usd": "160000-200000",
+    "years_experience": "10+",
+    "github": "https://github.com/bunlongheng",
+    "portfolio": "https://www.bunlongheng.com",
+    "linkedin": "n/a",
+    "resume_pdf": "/Users/bheng/Sites/bheng/public/docs/Bunlong Heng's Resume - FullStack.pdf",
+    "references": "Available upon request",
+    "cover_letter_default": "always",
+    "eeo": { "gender": "decline to self-identify", "race": "decline to self-identify", "veteran": "decline to self-identify", "disability": "decline to self-identify" }
+  },
+  "sources": {
+    "indeed": {
+      "type": "connector",
+      "enabled": true,
+      "how": "Claude UI -> Search & Tools -> Add connectors -> Indeed -> sign in. Native job-search/job-detail tools.",
+      "note": "First-party Anthropic connector (claude.com/connectors/indeed). ToS-clean."
+    },
+    "linkedin": {
+      "type": "manual",
+      "enabled": true,
+      "how": "Paste LinkedIn job URLs into /job-search, or forward LinkedIn saved-search email alerts. No scraping.",
+      "note": "User chose skip-live-scraping to avoid ToS/account-ban risk. Do NOT wire a cookie-based LinkedIn MCP."
+    }
+  },
+  "scoring": {
+    "weights": {
+      "title_seniority_match": 25,
+      "stack_overlap": 25,
+      "remote_comp_fit": 20,
+      "domain_relevance": 15,
+      "company_quality": 15
+    },
+    "apply_threshold": 70,
+    "notes": "Score 0-100. Below apply_threshold = skip. 70-84 = tailor + apply. 85+ = priority, add referral scan."
+  }
+}
