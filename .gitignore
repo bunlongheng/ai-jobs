@@ -1,9 +1,20 @@
-# Keep env / secrets local - never push, even to the private repo
-.env
-*.env
-.env.*
-*.key
-*.pem
-*secret*
-*credential*
+# transient / bulky - regenerable per run
+*.png
+applications/**/*.pdf
+applications/**/*.html
+applications/**/apply-preview.png
+applications/**/apply-result.png
+security_code.txt
+applications/**/security_code.txt
+
+# logged-in browser session (never commit)
+chrome-profile/
+
+# python / node cruft
+__pycache__/
+*.pyc
+node_modules/
 .DS_Store
+
+# per-run job snapshots keep only the latest
+jobs/2*.json

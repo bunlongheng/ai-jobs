@@ -1,13 +1,167 @@
 {
-  "updated": "2026-07-02-0742",
-  "statuses": ["planned", "kit_ready", "applied", "interviewing", "offer", "rejected", "skipped"],
+  "updated": "2026-07-15",
+  "statuses": [
+    "planned",
+    "kit_ready",
+    "applied",
+    "interviewing",
+    "offer",
+    "rejected",
+    "skipped"
+  ],
   "applications": [
-    { "id": "neotax-senior-full-stack-engineer", "title": "Senior Full-Stack Engineer", "company": "Neo.Tax", "score": 88, "verdict": "priority", "status": "kit_ready", "source_run": "2026-07-02-0741", "url": "n/a", "applied_at": null, "kit_path": "~/.claude/jobhunt/applications/neotax-senior-full-stack-engineer/", "notes": "Priority - comp $190-210k clears target. Kit built 2026-07-02." },
-    { "id": "factored-senior-full-stack-python-react", "title": "Senior Full-Stack Engineer (Python & React)", "company": "Factored", "score": 82, "verdict": "apply", "status": "planned", "source_run": "2026-07-02-0741", "url": "https://dynamitejobs.com/company/factored/remote-job/senior-full-stack-engineer-python-react", "applied_at": null, "kit_path": null, "notes": "Verify salary clears $160k floor." },
-    { "id": "veeva-senior-frontend-fullstack", "title": "Senior Frontend Engineer (Full-Stack)", "company": "Veeva Systems", "score": 74, "verdict": "apply", "status": "planned", "source_run": "2026-07-02-0741", "url": "n/a", "applied_at": null, "kit_path": null, "notes": "Confirm true full-stack scope; salary unlisted." },
-    { "id": "healthcare-ai-platform-senior-ai-engineer", "title": "Senior AI Engineer", "company": "n/a (unnamed in aggregator)", "score": 74, "verdict": "apply", "status": "planned", "source_run": "2026-07-02-0741", "url": "n/a", "applied_at": null, "kit_path": null, "notes": "Company unnamed in source - verify legitimacy before applying." },
-    { "id": "drswarm-founding-fullstack-engineer", "title": "Founding Engineer (Full-Stack)", "company": "DrSwarm", "score": 73, "verdict": "apply", "status": "planned", "source_run": "2026-07-02-0741", "url": "n/a", "applied_at": null, "kit_path": null, "notes": "Founding/early-stage - verify cash comp vs equity." },
-    { "id": "memora-founding-engineer", "title": "Founding Engineer", "company": "Memora", "score": 64, "verdict": "skip", "status": "skipped", "source_run": "2026-07-02-0741", "url": "n/a", "applied_at": null, "kit_path": null, "notes": "Below 70 threshold." },
-    { "id": "turing-senior-js-react-ai-training", "title": "Senior JavaScript/React Engineer - AI Training", "company": "Turing", "score": 55, "verdict": "skip", "status": "skipped", "source_run": "2026-07-02-0741", "url": "https://www.linkedin.com/jobs/view/remote-senior-javascript-react-engineer-ai-training-us-based-at-turing-4408248248", "applied_at": null, "kit_path": null, "notes": "Contract AI-training, off-target." }
+    {
+      "id": "neotax-senior-full-stack-engineer",
+      "title": "Senior Full-Stack Engineer",
+      "company": "Neo.Tax",
+      "score": 88,
+      "verdict": "priority",
+      "status": "applied",
+      "source_run": "2026-07-02-0741",
+      "url": "n/a",
+      "kit_path": "~/.claude/jobhunt/applications/neotax-senior-full-stack-engineer/",
+      "notes": "Applied via assisted bot; master resume + tailored cover letter uploaded.",
+      "applied_at": "2026-07-14"
+    },
+    {
+      "id": "factored-senior-full-stack-python-react",
+      "title": "Senior Full-Stack Engineer (Python & React)",
+      "company": "Factored",
+      "score": 82,
+      "verdict": "apply",
+      "status": "planned",
+      "source_run": "2026-07-02-0741",
+      "url": "https://dynamitejobs.com/company/factored/remote-job/senior-full-stack-engineer-python-react",
+      "applied_at": null,
+      "kit_path": null,
+      "notes": "Verify salary clears $160k floor."
+    },
+    {
+      "id": "veeva-senior-frontend-fullstack",
+      "title": "Senior Frontend Engineer (Full-Stack)",
+      "company": "Veeva Systems",
+      "score": 74,
+      "verdict": "apply",
+      "status": "planned",
+      "source_run": "2026-07-02-0741",
+      "url": "n/a",
+      "applied_at": null,
+      "kit_path": null,
+      "notes": "Confirm true full-stack scope; salary unlisted."
+    },
+    {
+      "id": "healthcare-ai-platform-senior-ai-engineer",
+      "title": "Senior AI Engineer",
+      "company": "n/a (unnamed in aggregator)",
+      "score": 74,
+      "verdict": "apply",
+      "status": "planned",
+      "source_run": "2026-07-02-0741",
+      "url": "n/a",
+      "applied_at": null,
+      "kit_path": null,
+      "notes": "Company unnamed in source - verify legitimacy before applying."
+    },
+    {
+      "id": "drswarm-founding-fullstack-engineer",
+      "title": "Founding Engineer (Full-Stack)",
+      "company": "DrSwarm",
+      "score": 73,
+      "verdict": "apply",
+      "status": "planned",
+      "source_run": "2026-07-02-0741",
+      "url": "n/a",
+      "applied_at": null,
+      "kit_path": null,
+      "notes": "Founding/early-stage - verify cash comp vs equity."
+    },
+    {
+      "id": "memora-founding-engineer",
+      "title": "Founding Engineer",
+      "company": "Memora",
+      "score": 64,
+      "verdict": "skip",
+      "status": "skipped",
+      "source_run": "2026-07-02-0741",
+      "url": "n/a",
+      "applied_at": null,
+      "kit_path": null,
+      "notes": "Below 70 threshold."
+    },
+    {
+      "id": "turing-senior-js-react-ai-training",
+      "title": "Senior JavaScript/React Engineer - AI Training",
+      "company": "Turing",
+      "score": 55,
+      "verdict": "skip",
+      "status": "skipped",
+      "source_run": "2026-07-02-0741",
+      "url": "https://www.linkedin.com/jobs/view/remote-senior-javascript-react-engineer-ai-training-us-based-at-turing-4408248248",
+      "applied_at": null,
+      "kit_path": null,
+      "notes": "Contract AI-training, off-target."
+    },
+    {
+      "id": "weather-company-lead-swe-met-tech",
+      "company": "The Weather Company",
+      "title": "Lead Software Engineer, Meteorological Technologies",
+      "status": "kit_ready",
+      "score": 71,
+      "location": "Andover, MA (Hybrid)",
+      "url": "https://www.indeed.com/viewjob?jk=f5a124e93d02a9b7",
+      "kit_path": "applications/weather-company-lead-swe-met-tech",
+      "flags": [
+        "hybrid vs remote-only default (user approved)",
+        "base floor under min"
+      ]
+    },
+    {
+      "id": "reddit-staff-software-engineer-content-platform",
+      "title": "reddit-staff-software-engineer-content-platform",
+      "company": "",
+      "score": null,
+      "status": "kit_ready",
+      "auto_outcome": "rejected_by_site",
+      "apply_log": "applications/reddit-staff-software-engineer-content-platform/apply-log.json"
+    },
+    {
+      "id": "vanta-senior-fullstack-software-engineer-grc",
+      "title": "vanta-senior-fullstack-software-engineer-grc",
+      "company": "",
+      "score": null,
+      "status": "kit_ready",
+      "auto_outcome": "not_confirmed",
+      "apply_log": "applications/vanta-senior-fullstack-software-engineer-grc/apply-log.json"
+    },
+    {
+      "id": "twilio-staff-software-engineer-l4-data-platform",
+      "title": "twilio-staff-software-engineer-l4-data-platform",
+      "company": "",
+      "score": null,
+      "status": "applied",
+      "auto_outcome": "submitted",
+      "apply_log": "applications/twilio-staff-software-engineer-l4-data-platform/apply-log.json",
+      "applied_at": "2026-07-15",
+      "notes": "Bot filled 37/37 headless, user ticked hear-about + clicked Submit. Confirmed \"Thanks for applying\"."
+    },
+    {
+      "id": "discord-staff-software-engineer-platform-security",
+      "title": "Staff Software Engineer, Platform Security",
+      "company": "Discord",
+      "score": 86,
+      "status": "applied",
+      "applied_at": "2026-07-15",
+      "auto_outcome": "submitted",
+      "notes": "Bot filled 22/22 headless incl 2 tailored essays, user submitted + entered Greenhouse security code xHpyeC7R. Confirmed received."
+    },
+    {
+      "id": "webflow-staff-software-engineer-developer-productivity",
+      "title": "Staff Software Engineer, Developer Productivity",
+      "company": "Webflow",
+      "score": 77,
+      "status": "applied",
+      "applied_at": "2026-07-15",
+      "auto_outcome": "submitted"
+    }
   ]
 }

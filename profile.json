@@ -8,7 +8,7 @@
     "site": "https://www.bunlongheng.com",
     "github": "bunlongheng",
     "linkedin": "https://www.linkedin.com/in/bunlongheng/",
-    "location": "Dallas, TX",
+    "location": "Pelham, NH",
     "resume_pdf": "/Users/bheng/Sites/bheng/public/docs/Bunlong Heng's Resume - FullStack.pdf"
   },
   "targets": {
@@ -18,9 +18,14 @@
       "Senior Software Engineer",
       "Staff Software Engineer"
     ],
-    "seniority": ["Senior", "Staff"],
+    "seniority": [
+      "Senior",
+      "Staff"
+    ],
     "remote": "remote-only",
-    "locations": ["Remote (US)"],
+    "locations": [
+      "Remote (US)"
+    ],
     "comp_min_base_usd": 160000,
     "comp_target_base_usd": 200000,
     "_confirm": []
@@ -33,16 +38,68 @@
   "deal_breakers": [
     "Any required on-site or hybrid office days",
     "Junior or mid-level only",
-    "Primarily non-technical / pure people-management"
+    "Primarily non-technical / pure people-management",
+    "Java as a primary language",
+    "Angular / AngularJS",
+    "C# / .NET",
+    "Contract / contractor / temporary roles"
   ],
   "stack": {
-    "frontend": ["React", "Next.js", "TypeScript", "Tailwind", "Vue.js"],
-    "backend": ["Node.js", "Express", "Laravel", "Python", "Django"],
-    "cloud": ["AWS", "Vercel", "Cloudflare", "Docker", "Kubernetes", "Terraform", "Nginx"],
-    "security": ["Auth0", "IAM", "SAML 2.0", "OpenID Connect", "OWASP", "WAF", "Zero Trust", "PenTest+", "CEH"],
-    "data": ["PostgreSQL", "MySQL", "DynamoDB", "RDS", "Supabase", "Snowflake", "BigQuery"],
-    "observability": ["Datadog", "CloudWatch", "Sentry"],
-    "ai": ["Prompt Engineering", "MCP", "RAG", "Vector Search", "Agent Orchestration"]
+    "frontend": [
+      "React",
+      "Next.js",
+      "TypeScript",
+      "Tailwind",
+      "Vue.js"
+    ],
+    "backend": [
+      "Node.js",
+      "Express",
+      "Laravel",
+      "Python",
+      "Django"
+    ],
+    "cloud": [
+      "AWS",
+      "Vercel",
+      "Cloudflare",
+      "Docker",
+      "Kubernetes",
+      "Terraform",
+      "Nginx"
+    ],
+    "security": [
+      "Auth0",
+      "IAM",
+      "SAML 2.0",
+      "OpenID Connect",
+      "OWASP",
+      "WAF",
+      "Zero Trust",
+      "PenTest+",
+      "CEH"
+    ],
+    "data": [
+      "PostgreSQL",
+      "MySQL",
+      "DynamoDB",
+      "RDS",
+      "Supabase",
+      "Snowflake",
+      "BigQuery"
+    ],
+    "observability": [
+      "Datadog",
+      "CloudWatch",
+      "Sentry"
+    ],
+    "ai": [
+      "Prompt Engineering",
+      "MCP",
+      "RAG",
+      "Vector Search",
+      "Agent Orchestration"
+    ]
   },
   "certs": [
     "AWS Certified Solutions Architect - Associate (2025)",
@@ -63,10 +120,10 @@
     "full_name": "Bunlong Heng",
     "email": "bheng.code@gmail.com",
     "phone": "978-677-0861",
-    "location": "Dallas, TX",
+    "location": "Pelham, NH",
     "work_authorization": "US citizen",
     "requires_sponsorship": "No, not now or in the future",
-    "willing_to_relocate": "No - seeking fully remote (US)",
+    "willing_to_relocate": "No - remote or local (Pelham NH / Boston area) only",
     "remote_ok": "Yes - remote only",
     "earliest_start": "2 weeks from offer acceptance",
     "notice_period": "2 weeks",
@@ -78,7 +135,22 @@
     "resume_pdf": "/Users/bheng/Sites/bheng/public/docs/Bunlong Heng's Resume - FullStack.pdf",
     "references": "Available upon request",
     "cover_letter_default": "always",
-    "eeo": { "gender": "decline to self-identify", "race": "decline to self-identify", "veteran": "decline to self-identify", "disability": "decline to self-identify" }
+    "eeo": {
+      "gender": "Male",
+      "race": "Asian",
+      "veteran": "I am not a protected veteran",
+      "disability": "decline to self-identify",
+      "ethnicity_options": [
+        "Southeast Asian",
+        "Asian"
+      ],
+      "orientation": "Heterosexual",
+      "transgender": "No"
+    },
+    "work_arrangement": "Remote only",
+    "security_clearance": "None",
+    "current_company": "Thryv",
+    "current_title": "Technical Engineering Manager"
   },
   "sources": {
     "indeed": {
@@ -104,5 +176,36 @@
     },
     "apply_threshold": 70,
     "notes": "Score 0-100. Below apply_threshold = skip. 70-84 = tailor + apply. 85+ = priority, add referral scan."
+  },
+  "tech_exclude": [
+    "java",
+    "angular",
+    "angularjs",
+    "c#",
+    "c sharp",
+    ".net",
+    "dotnet"
+  ],
+  "employment_exclude": [
+    "contract",
+    "contractor",
+    "c2c",
+    "corp-to-corp",
+    "corp to corp",
+    "1099",
+    "temporary",
+    "temp-to-hire",
+    "w2 contract"
+  ],
+  "education": {
+    "school": "University of Massachusetts Lowell",
+    "degree": "Bachelor's Degree",
+    "field": "Computer Science",
+    "start_month": "September",
+    "start_year": "2011",
+    "end_month": "September",
+    "end_year": "2014",
+    "grad_year": "2014",
+    "still_student": false
   }
 }

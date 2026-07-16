@@ -18,7 +18,7 @@ expect on your back end. I also led our Auth0 and SAML 2.0 integration and drove
 OWASP Top 10 compliance, so I bring security instincts along with the full-stack
 work.
 
-I work remotely from Dallas, I'm a US citizen needing no sponsorship, and I can
+I work remotely from Pelham, NH, I'm a US citizen needing no sponsorship, and I can
 start two weeks after an offer. Your $190-210k range fits what I'm looking for.
 I'd welcome a conversation about how I can help Neo.Tax ship.
 

@@ -1,155 +1,3161 @@
 {
-  "run": "2026-07-02-0741",
-  "query": "senior full stack web developer, fullstack engineer, web engineer, AI web engineer",
-  "source_note": "Indeed connector not enabled this session; sourced via live web search fallback. Enable the Indeed connector for fresher, structured pulls with direct apply URLs.",
-  "count": 7,
+  "run": "2026-07-13-1125",
+  "query": "targets.titles x ATS+LinkedIn+Indeed",
+  "count": 125,
   "jobs": [
     {
-      "id": "neotax-senior-full-stack-engineer",
-      "source": "web",
-      "title": "Senior Full-Stack Engineer",
-      "company": "Neo.Tax",
-      "location": "Remote (US, Pacific hours)",
-      "remote": true,
-      "salary": "$190k-$210k + equity",
-      "url": "n/a",
-      "posted": "n/a",
-      "description_excerpt": "7+ yrs TypeScript/Node + React front end, data ingestion pipelines on the back.",
-      "score": 88,
-      "score_breakdown": { "title_seniority_match": 25, "stack_overlap": 22, "remote_comp_fit": 20, "domain_relevance": 11, "company_quality": 10 },
+      "company": "Coinbase",
+      "ats": "greenhouse",
+      "title": "Senior Staff Software Engineer - Blockchain Platform",
+      "location": "Remote - USA",
+      "url": "https://www.coinbase.com/careers/positions/7366208?gh_jid=7366208",
+      "remote_flag": false,
+      "posted": "2026-06-18T19:48:03-04:00",
+      "loc_note": "US remote",
+      "pre_score": 4,
+      "id": "coinbase-senior-staff-software-engineer-blockchain-platform",
+      "score": 90,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 20,
+        "remote_comp_fit": 16,
+        "domain_relevance": 15,
+        "company_quality": 14
+      },
       "verdict": "priority",
       "reasons": [
-        "Exact title + seniority match; TS/Node/React is your core stack.",
-        "Comp $190-210k clears your $200k target; fully remote US.",
-        "Data-pipeline SaaS aligns with your Snowflake/Cube/data experience."
+        "senior/staff IC title",
+        "2 stack term(s) in title",
+        "strong-brand company"
       ],
       "flags": []
     },
     {
-      "id": "factored-senior-full-stack-python-react",
-      "source": "web",
-      "title": "Senior Full-Stack Engineer (Python & React)",
-      "company": "Factored",
+      "source": "indeed",
+      "title": "Full Stack Senior Software Developer",
+      "company": "Optum",
+      "location": "Remote in Eden Prairie, MN",
+      "salary": "$91,700 - $163,700 a year",
+      "url": "https://www.indeed.com/viewjob?jk=706807ad34e1847c",
+      "posted": "n/a",
+      "id": "optum-full-stack-senior-software-developer",
+      "score": 88,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 18,
+        "domain_relevance": 15,
+        "company_quality": 14
+      },
+      "verdict": "priority",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "salary ~$163k >= min"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Senior Full Stack Data Engineer",
+      "company": "Optum",
+      "location": "Remote in Eden Prairie, MN",
+      "salary": "Full-time",
+      "url": "https://www.indeed.com/viewjob?jk=4c8004a61ef0799f",
+      "posted": "n/a",
+      "id": "optum-senior-full-stack-data-engineer",
+      "score": 86,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 15,
+        "company_quality": 14
+      },
+      "verdict": "priority",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "strong-brand company"
+      ],
+      "flags": []
+    },
+    {
+      "company": "Coinbase",
+      "ats": "greenhouse",
+      "title": "Senior Staff Software Engineer, Data Platform",
+      "location": "Remote - USA",
+      "url": "https://www.coinbase.com/careers/positions/7711287?gh_jid=7711287",
+      "remote_flag": false,
+      "posted": "2026-06-23T19:49:36-04:00",
+      "loc_note": "US remote",
+      "pre_score": 4,
+      "id": "coinbase-senior-staff-software-engineer-data-platform",
+      "score": 86,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 15,
+        "company_quality": 14
+      },
+      "verdict": "priority",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "strong-brand company"
+      ],
+      "flags": []
+    },
+    {
+      "company": "Discord",
+      "ats": "greenhouse",
+      "title": "Staff Software Engineer, Platform Security",
+      "location": "San Francisco Bay Area or Remote",
+      "url": "https://job-boards.greenhouse.io/discord/jobs/8177912002",
+      "remote_flag": false,
+      "posted": "2026-06-03T11:48:11-04:00",
+      "loc_note": "US remote",
+      "pre_score": 4,
+      "id": "discord-staff-software-engineer-platform-security",
+      "score": 86,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 15,
+        "company_quality": 14
+      },
+      "verdict": "priority",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "strong-brand company"
+      ],
+      "flags": []
+    },
+    {
+      "company": "Reddit",
+      "ats": "greenhouse",
+      "title": "Staff Software Engineer - Content Platform",
+      "location": "Remote - United States",
+      "url": "https://job-boards.greenhouse.io/reddit/jobs/8004045",
+      "remote_flag": false,
+      "posted": "2026-06-30T10:28:19-04:00",
+      "loc_note": "US remote",
+      "pre_score": 4,
+      "id": "reddit-staff-software-engineer-content-platform",
+      "score": 86,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 15,
+        "company_quality": 14
+      },
+      "verdict": "priority",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "strong-brand company"
+      ],
+      "flags": []
+    },
+    {
+      "company": "Twilio",
+      "ats": "greenhouse",
+      "title": "Staff Software Engineer (L4) Data Platform",
+      "location": "Remote - US",
+      "url": "https://job-boards.greenhouse.io/twilio/jobs/7782805",
+      "remote_flag": false,
+      "posted": "2026-07-09T14:29:17-04:00",
+      "loc_note": "US remote",
+      "pre_score": 4,
+      "id": "twilio-staff-software-engineer-l4-data-platform",
+      "score": 86,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 15,
+        "company_quality": 14
+      },
+      "verdict": "priority",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "strong-brand company"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Senior Software Engineer - Full stack (Angular/Java) (Remote)",
+      "company": "Home Depot / THD",
+      "location": "Remote in Atlanta, GA",
+      "salary": "$90,000 - $180,000 a year",
+      "url": "https://www.indeed.com/viewjob?jk=f7acce88de00e812",
+      "posted": "n/a",
+      "id": "home-depot-thd-senior-software-engineer-full-stack-angular-j",
+      "score": 85,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 20,
+        "remote_comp_fit": 18,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title",
+        "2 stack term(s) in title",
+        "salary ~$180k >= min"
+      ],
+      "flags": [
+        "excluded tech: \\bjava\\b, \\bangular(?:js)?\\b, \\bangular(?:js)?\\b"
+      ]
+    },
+    {
+      "source": "indeed",
+      "title": "Senior Software Engineer - AI / ML",
+      "company": "Everforth",
       "location": "Remote",
-      "remote": true,
+      "salary": "Full-time",
+      "url": "https://www.indeed.com/pagead/clk?mo=r&ad=-6NYlbfkN0C-ZO3Pz7i-WMOnhr3Kwc2jb7fQY67NlgW8Lj9VUhPk319oLWkzJlzWgBpf83H1ExTKlUu5sIiJnuVGlVcdbgmBPgn4TQuQPckCwtRNBrFkvTF4pPT9UlmsF17U671d4h-wqCW_kA1nr0jKehQqAIq93oQX5k_VjCwzWUltd1xKJAYNTXZ145QOK3cJhBrlpjzisIqY7cU3um6DadIm8WvLBKv9EycretDRHPqcwEWYB_NCktxCyY8SyFho4cxnxhPd_CBjwUqSd5lPPs_CIRt-41CEJVRzfKFFok3XJTfEhy0ve57anOPLfvU72wdytpAKDnOaC-uLgaKqOiTuHgDeSEul0v0jUUKyp_i1Lm_pG-x175TqB1JCT7vsmqU808dRE-k9l0kf2gzq_JseiGU8hwvp62T9gG5KdWr9dKDy7ZFdlQHz2Yew4A2nQfca61ul4pfTkvKUkxj0F7gSpt3r0g3mg4HEU_vkMBpUSDbboYdJa5D_ZEpIocv-Xms0bxcuUKaKKqD-kBayZnf6saPWE-HbF4l55oQhgxskYuMvbcqjZZ_QWVc5V3LITvCKTbeCt0haLwMQrEmeBWocp30RIzmjNry8HiI19LZ8tua1cumL8lRehlVB33WEUuE0KgToZYZPfr_2k38Bn8_mhjnGYGA9vOaCBjA-IoKI3qSYcTBexl0sW2eN7SswvMAGoItmPmF0t9miRwYQIvpb8sxQX1J4xgHHAy_Qr2SWfY8HA0y3Vk4oiwywwRainc6u-7qIq52qKYbuUiAEkJlvvnj29nsGyPJRMmj5CPg4s4NEn8zzfQRSmFP4IkEJ5ePyTMN3C-40jYVMuVjLV3LCp2f64INQmfH5Hqo=&xkcb=SoB96_M3huKqDewB5J0AbzkdCdPP&p=10&camk=C3EPSzFlQw9EMNccS_jJrw==&vjs=3",
+      "posted": "n/a",
+      "id": "everforth-senior-software-engineer-ai-ml",
+      "score": 85,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 20,
+        "remote_comp_fit": 16,
+        "domain_relevance": 15,
+        "company_quality": 9
+      },
+      "verdict": "priority",
+      "reasons": [
+        "senior/staff IC title",
+        "2 stack term(s) in title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Staff Software Engineer - Enterprise Data Warehouse (Remote)",
+      "company": "Home Depot / THD",
+      "location": "Remote in Atlanta, GA",
+      "salary": "$120,000 - $190,000 a year",
+      "url": "https://www.indeed.com/viewjob?jk=290b9aca77616d74",
+      "posted": "n/a",
+      "id": "home-depot-thd-staff-software-engineer-enterprise-data-wareh",
+      "score": 84,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 18,
+        "domain_relevance": 15,
+        "company_quality": 14
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "salary ~$190k >= min",
+        "strong-brand company"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Senior Full Stack Engineer (React Native, TypeScript, Node.js)",
+      "company": "EPAM Systems, Inc.",
+      "location": "Remote",
       "salary": "n/a",
-      "url": "https://dynamitejobs.com/company/factored/remote-job/senior-full-stack-engineer-python-react",
-      "posted": "2026-05",
-      "description_excerpt": "5+ yrs full-stack, Python (FastAPI/Django/Flask) + React/TS, production LLM integration (Claude, OpenAI, Gemini).",
+      "url": "https://www.indeed.com/viewjob?jk=595da27da8d66bd7",
+      "posted": "n/a",
+      "id": "epam-systems-inc-senior-full-stack-engineer-react-native-typ",
+      "score": 83,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 25,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "4 stack term(s) in title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Senior Full Stack Engineer (TypeScript, Node.js)",
+      "company": "EPAM Systems, Inc.",
+      "location": "Remote",
+      "salary": "On call",
+      "url": "https://www.indeed.com/viewjob?jk=2f34096038aaf6fe",
+      "posted": "n/a",
+      "id": "epam-systems-inc-senior-full-stack-engineer-typescript-node-",
       "score": 82,
-      "score_breakdown": { "title_seniority_match": 24, "stack_overlap": 23, "remote_comp_fit": 13, "domain_relevance": 13, "company_quality": 9 },
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 24,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
       "verdict": "apply",
       "reasons": [
-        "React/TS + Python/Django directly matches your stack.",
-        "Production LLM integration maps to your MCP/RAG/agent work.",
-        "Salary not listed - confirm it clears $160k floor before applying."
+        "senior/staff IC title",
+        "3 stack term(s) in title"
       ],
-      "flags": ["salary unlisted - verify comp"]
+      "flags": []
     },
     {
-      "id": "veeva-senior-frontend-fullstack",
-      "source": "web",
-      "title": "Senior Frontend Engineer (Full-Stack)",
-      "company": "Veeva Systems",
-      "location": "Remote (US)",
-      "remote": true,
-      "salary": "n/a",
-      "url": "n/a",
+      "source": "indeed",
+      "title": "Senior Full Stack Software Engineer",
+      "company": "Optum",
+      "location": "Remote in Minnetonka, MN",
+      "salary": "$91,700 - $163,700 a year",
+      "url": "https://www.indeed.com/viewjob?jk=c30d6a080ba3a942",
       "posted": "n/a",
-      "description_excerpt": "Strong TypeScript + full-stack; energized by building a new SaaS product 0 to 1.",
-      "score": 74,
-      "score_breakdown": { "title_seniority_match": 18, "stack_overlap": 18, "remote_comp_fit": 14, "domain_relevance": 10, "company_quality": 14 },
+      "id": "optum-senior-full-stack-software-engineer",
+      "score": 81,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 18,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
       "verdict": "apply",
       "reasons": [
-        "Established public SaaS company - strong stability/reputation.",
-        "0-to-1 product build fits your architect background.",
-        "Titled 'Frontend' - confirm true full-stack scope, salary unlisted."
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "salary ~$163k >= min"
       ],
-      "flags": ["frontend-titled - verify full-stack scope", "salary unlisted"]
+      "flags": []
     },
     {
-      "id": "healthcare-ai-platform-senior-ai-engineer",
-      "source": "web",
-      "title": "Senior AI Engineer",
-      "company": "n/a (unnamed in aggregator)",
-      "location": "Remote (US)",
-      "remote": true,
-      "salary": "$180k-$220k",
-      "url": "n/a",
+      "source": "indeed",
+      "title": "Senior Full stack Engineer",
+      "company": "Abbott Laboratories",
+      "location": "Remote in Abbott Park, IL",
+      "salary": "$86,700 - $173,300 a year",
+      "url": "https://www.indeed.com/viewjob?jk=6e85ee4c9b9accfe",
       "posted": "n/a",
-      "description_excerpt": "LLM product surfaces; sibling roles use React, PostgreSQL, AWS. 5+ yrs, US work auth.",
-      "score": 74,
-      "score_breakdown": { "title_seniority_match": 19, "stack_overlap": 18, "remote_comp_fit": 17, "domain_relevance": 13, "company_quality": 7 },
+      "id": "abbott-laboratories-senior-full-stack-engineer",
+      "score": 81,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 18,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
       "verdict": "apply",
       "reasons": [
-        "Comp $180-220k clears target; remote US.",
-        "LLM product + React/AWS matches your AI + cloud profile.",
-        "Company not named in source - must verify before applying."
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "salary ~$173k >= min"
       ],
-      "flags": ["company unnamed in source - verify legitimacy"]
+      "flags": []
     },
     {
-      "id": "drswarm-founding-fullstack-engineer",
-      "source": "web",
-      "title": "Founding Engineer (Full-Stack)",
-      "company": "DrSwarm",
-      "location": "Remote (US or LATAM, Pacific overlap)",
-      "remote": true,
-      "salary": "n/a",
-      "url": "n/a",
-      "posted": "2026-06",
-      "description_excerpt": "AI workflow automation for healthcare; Next.js, React/TS, Django, Postgres, Docker, AWS, LLM APIs.",
-      "score": 73,
-      "score_breakdown": { "title_seniority_match": 17, "stack_overlap": 24, "remote_comp_fit": 12, "domain_relevance": 13, "company_quality": 7 },
-      "verdict": "apply",
-      "reasons": [
-        "Near-perfect stack overlap: Next.js/React/TS/Django/AWS/LLM.",
-        "Founding role = equity-heavy, early-stage risk; comp unlisted.",
-        "AI healthcare automation is strong domain fit."
-      ],
-      "flags": ["founding/early-stage - equity risk, verify cash comp"]
-    },
-    {
-      "id": "memora-founding-engineer",
-      "source": "web",
-      "title": "Founding Engineer",
-      "company": "Memora",
+      "source": "indeed",
+      "title": "Senior Full Stack Developer",
+      "company": "By Light Professional IT Services LLC",
       "location": "Remote",
-      "remote": true,
       "salary": "n/a",
-      "url": "n/a",
+      "url": "https://www.indeed.com/viewjob?jk=4b2049417fd8feba",
       "posted": "n/a",
-      "description_excerpt": "8+ yrs production; NestJS/TypeScript, React + TanStack Query, PostgreSQL, AWS.",
-      "score": 64,
-      "score_breakdown": { "title_seniority_match": 17, "stack_overlap": 20, "remote_comp_fit": 12, "domain_relevance": 8, "company_quality": 7 },
-      "verdict": "skip",
+      "id": "by-light-professional-it-services-llc-senior-full-stack-deve",
+      "score": 81,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 15,
+        "company_quality": 9
+      },
+      "verdict": "apply",
       "reasons": [
-        "Good TS/React/AWS overlap but generic 'Founding Engineer' title.",
-        "No comp, unclear product domain, early-stage unknown.",
-        "Below your 70 apply threshold."
+        "senior/staff IC title",
+        "1 stack term(s) in title"
       ],
-      "flags": ["below threshold", "salary unlisted"]
+      "flags": []
     },
     {
-      "id": "turing-senior-js-react-ai-training",
-      "source": "linkedin",
-      "title": "Senior JavaScript/React Engineer - AI Training",
-      "company": "Turing",
-      "location": "Remote (US-based)",
-      "remote": true,
-      "salary": "n/a",
-      "url": "https://www.linkedin.com/jobs/view/remote-senior-javascript-react-engineer-ai-training-us-based-at-turing-4408248248",
+      "source": "indeed",
+      "title": "Staff Software Engineer - AI Trainer",
+      "company": "DataAnnotation",
+      "location": "Remote in Modesto, CA",
+      "salary": "Full-time\u2002+2",
+      "url": "https://www.indeed.com/pagead/clk?mo=r&ad=-6NYlbfkN0CnM4TERr6XuVBW3VTRACvDXDx9S3Pbn6a0SwhkmoLTiOqa4FYe6FMbyXDbt4jiKxxpbVVeRHjZNktLFZT5_Nvj_7D8xpqxg001lXTprBklvexYrD1jyRNNBdoGTeWj4p80Us7aKYRW1lGA3L-HqDvrims4TUBAZbTO0zuc176nf3LRC-k5KXr0XQDYq2spYxMQlBhsZZ-VLKq6XSv_CuzZ1BC34nW8hiArVtfrVa5P9_0-6HR489aCIvcP0P7Jlv8R3_1LnT0qWZZTZZchGOGzJY8RKBalsR0b2c5aRZKU4GAzmzPEKq87R5xz2-3d3cp6211PVkbPe2YX9A35RQFBT2D7wUXMFHCWZNdR11FvDUG43jNhXRTNBtzZy5-WlnpMm-3jMRbfG1qPEu2RbNQHElwOgmgrMpFrhwreCWO2osduaV8Vg91s99GgNDp9taLXsl6n6cXl7A74fuK1UfjkV1rAWfob3WZbmOZkMSoXqiMedvFm_bBdF6XCGjWfe-oZwdlqRGKqB4o5bBe0jeZTIjk55758_dHgrym8EPQFcGl0sujsmHC97dFlDTUkDY5ItJ8ji_ZIKiNiRKqzm5uPeAWewj9ln20K8qja6vHsGCtXPS2KRt_nMUZKqO29f-Unv61F8bGcySQrasG6PP4riXyLACycIH9y9uBVz_l6iI8hsJCEtqemr-rSRMj5lI5YWxSJAeUjy-Kr_XNkpjjXO-WIvw-jFIjjWQS6hRM8AzFV9g97GVeDwYgnSX94zOWsIFzrhxhdgVPyPUvJiBsyJq8_liP8JVZ4Cxhb9SS78R4yK4YudUQvudHj-ki5S8lku5Ydjm4H8YiEty4Mq2jNZ_R9425qIXd_ptmRZCoEYNhNwTSwiYKfxFhOY8q5Xxyb13fLEpLw4o7jpCvO4GVbSH8NHYnEtp7M4k6sq_A76onsbVu7Pt0NiCVrXdeCPMU37DOwGYTAzmfjng8M2Yl5cCfuzKzolUg=&xkcb=SoC96_M3huKpBdzblZ0LbzkdCdPP&p=0&camk=C3EPSzFlQw-tXFQtLvFgvA==&vjs=3",
       "posted": "n/a",
-      "description_excerpt": "AI-training / model-eval engagement via Turing marketplace; JS/React.",
-      "score": 55,
-      "score_breakdown": { "title_seniority_match": 15, "stack_overlap": 14, "remote_comp_fit": 12, "domain_relevance": 7, "company_quality": 7 },
+      "id": "dataannotation-staff-software-engineer-ai-trainer",
+      "score": 81,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 15,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Remote Sr or Staff Engineer ($150-$240k) Ruby, Rails, Agentic AI",
+      "company": "Everforth",
+      "location": "Remote in Jacksonville, FL 32202",
+      "salary": "Full-time",
+      "url": "https://www.indeed.com/pagead/clk?mo=r&ad=-6NYlbfkN0C-ZO3Pz7i-WMOnhr3Kwc2jb7fQY67NlgW8Lj9VUhPk30gAp6HDCbpt--035jplsK6gDSnBbxRci-VAfLcoqLVWGJfDeBeeF85E-Xi6wc5vgjEi-1RdlIepo9leJH98_uH3dUiBsWoyounS7snyyH7DpHezogCCrH6HKl5HRGZXuq2u7BI1V8NLnhTMubyA44cOYZ8OQLrEZreaeUaZYkHQW6csM-moFdaaWjxsDHaMq5hlHXzAqGD8zduz7F6RSq7W2-j0itF644FJTpzsZGgWnEQKXwQ6otQFtYLE6p4p8Vr9MGEN5ab1_Fl3SUKWIVKqZHAbq1nQ_HgQxki-N3sMvfDd1UxMgFcfc1CRd6NOepBWFCaj3dq4GR9WM6Z9Wflkzc5ycVs0yIIrAYXIfrm9GT7p79FIlub1_LVrdV0tHbmofwLggyTz48ukmfBxVKO5o4XVk4HHDBU8AcVkrOSuGkQaubadE3Y5LkVduXbZB49k-77MBhqIcgzPHn-WwxebhlCB7JVxpmBNA7TsyTDfPxdkYftAbVscX6NCIJewbiMGSVmdtbcaLPGrOU3VjwnzM_skNomBDe4MA6TCSRJX0wak59L_BTE4yvVKNy-i28_qySkjvgAGBYXMA6LzlaEfNdgljKvdkm8VxfJsdcLdJS-rd31UUOYyJFXhCbawj_0zXUPNXpsR63HxS_F1wu6A_JAU87Ui_QXtOtZeSlujoIAXsBRl_HK5xGUojJMWyNTemPQHH4IORFjOlb13-nHBk43vn-bFyGBjO933HpW77Bfs05fRnwr1zI8r7Qrlc8NBNCB4xTtiCCW1jx6tKSUhAA2r9bFRVsXriDYEKw7L&xkcb=SoAg6_M3huKqDewB5J0ObzkdCdPP&p=4&camk=C3EPSzFlQw9kw8ElAydlkQ==&vjs=3",
+      "posted": "n/a",
+      "id": "everforth-remote-sr-or-staff-engineer-150-240k-ruby-rails-ag",
+      "score": 81,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 15,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Remote Sr/Staff SW Engineer ($150-$240k) Agentic AI, Ruby, Rails",
+      "company": "Everforth",
+      "location": "Remote in Chicago, IL 60608",
+      "salary": "Full-time",
+      "url": "https://www.indeed.com/pagead/clk?mo=r&ad=-6NYlbfkN0C-ZO3Pz7i-WMOnhr3Kwc2jb7fQY67NlgW8Lj9VUhPk319oLWkzJlzWgBpf83H1ExTDX7FueNtKHuHc99USPOsE194WFPvYrlXh_cNBE-T8zita-nsQ0dDgWXiDhDkfXMySgRfLELep_4-Yv4RLAjkdsUzfc9zs88OxletCZdZfbsftk56H9sCznyMddJlJo4BfBzWTxIH-S0c9-ZNt3b54WWU-rmVieMuc5nRT2KN-_MekvMLwRu-oq_eQgmbf0Ln0iNDIp6diQV650O4O7AePfvCUDpL5f2UW_2uClMvS4zZixZEFATIKMVM4eByW8nbUV6ueEYlyKgA8aw_9OkLkEdjBTDic0j-lkmnhxG3T6VS_Ew3uWswMA4rBH01TTorDbYk7EHCgrCnFSpfrQAw-uuiF_RFv0czo284izhIwgkNqKEEIdLm1QEp6K62g_BG8fEP3ItrGGzhmC87kgQCyOO7GEKOVqFVyeeaP3WUxn4OMcdEolVBFeAwi2MFJNKiEIhkQjmeCQL3DcT7ZXuQItNHB3H0Dfuh6aoYctQFK-z_ZWO9LE3Ywq1Bneuj5s_W3KlLBFOWtqi8Oh5G1RkGVo3cF7Tr62052EbKqaNP6C4XxM0IWHYRepdTFkbKQYG-sp8KUcdgp9GihK3Yx8btibdcYYDoZRikgLkrVEArxnQVaLTqSP6SYehVoBGNjXzsYH2etG-08J_GEEH3gUENGMpJAi5X5Fhr1eUDsE6gS4ipWjRhC2nu4pN-QHvuwlbPT4iAyhllTA9FtYl2C0xbk8btdDAEvQkmOkf9XcEXWUDWdRYnWUY_koK1asAIqNzMj01rMzA0eDSfRmiY_Jb5m&xkcb=SoDg6_M3huKqDewB5J0DbzkdCdPP&p=7&camk=C3EPSzFlQw9EMNccS_jJrw==&vjs=3",
+      "posted": "n/a",
+      "id": "everforth-remote-sr-staff-sw-engineer-150-240k-agentic-ai-ru",
+      "score": 81,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 15,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Lead Platform Engineer",
+      "company": "Rise Technical Recruitment Limited",
+      "location": "Remote",
+      "salary": "Full-time",
+      "url": "https://www.indeed.com/pagead/clk?mo=r&ad=-6NYlbfkN0A1TqbH9HyVIoHoSSwS57OrbIBFj-0eZTPMY3bNP8iJZUyKyC74e5VB8TVoIb44jx_soVfAjvUQdhSNQAhVwWGaa8Ym-_1k-7woA8AzARd7J5fIl2CHLPhs8DVhBHkTf8-Ox84PfDwWHIdc061dGFnWi1GbU6juESNH60n_vd8hnC_L4W3eGqWSQrA61UJNZemG8YLfZYP4k32RjI6hdF5fJdfEiXH5VodiFB9RAZeezDB48ofD0oW-aYmBtu3R5F-lvMGTaWQPbDkvsKEUPHrYuGLB5APesZRCp5jSWmfQ89eyTYFOM2nqBb5VoVa_R-AiHziuN0iJldFG_IpFSg53Jl75bR_hyT2BLCHdPXhXQjCvKfVhW_wPs0JwfnxVoc9DrdmrHyo-X1OAIp73lOwsN5P5IJ3GpsWPVdMKq1nKHr0rbkS-3Fk91DeZMXjtgIyGBx8x16-cxkckOa_ph36jqILH37-4OWurdOkxx1B5nS6ZPRJJBMYgWSBuMvArk7DS6v3hwrncphjdleP_TfOKrtOOKItx83cgk_SM0ZagyTji0zKD4vAQaprR6gyyHf4WmrqFRo2TJEnxailCnAd4UjpTF-1NLBN39Wo1Hm2ns0N7bfOm5ufgMr01wsp3RpvVHPpvZNQ_uvNM8PLQxrWCE-yT1okcmEBsxJmkDQYLAo7BCvTNvHCGpmj36B3cJxqZbBLBLV2iCq_d8gnvmHYBeLtIpI8QKXFAdLXXNwybcP2wja2vbiSRX1keXlqTN2sjR8ONi3PjyTnmuA-jkyvlOK5dnJBzO4tEXCbVLwot6qqLwbcd7ZdYDSn4aGKEQJMEq9tPaK6HKNhPpsB7Idw-eTlfnTeDZNnRbC3stUv3LqFMtgEp7-2m3hFD530h2UA=&xkcb=SoDz6_M3huKqDewB5J0HbzkdCdPP&p=11&camk=UoKtGZLa3XLxE_S-sWaFRg==&vjs=3",
+      "posted": "n/a",
+      "id": "rise-technical-recruitment-limited-lead-platform-engineer",
+      "score": 81,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 15,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Remote Sr/Staff Engineer ($150-$240k) Agentic AI, Ruby, Rails",
+      "company": "Everforth",
+      "location": "Remote in Philadelphia, PA 19140",
+      "salary": "Full-time",
+      "url": "https://www.indeed.com/pagead/clk?mo=r&ad=-6NYlbfkN0C-ZO3Pz7i-WMOnhr3Kwc2jb7fQY67NlgW8Lj9VUhPk319oLWkzJlzWgBpf83H1ExTDX7FueNtKHvVebU5zSrSzpYs5n-rZJj9IcEallyyQ_kVVKwjYR1veHXexaaeHV7-mfI2gyti7bExVMQAW0kVSFTqyIUEfVS5Z2da6lNgZSnS863sHjMdp7kASmvQ8iBA0_oQREoQAWpwGxC6YYP687TYl0-5aTo9XjCRita2u4972bsB1jturt8JmpOwt7FpWQb2x579ve-L2VtMl-puESIwJE88Y57Dn-RciXRku9YB-RDxELX93hg86eKnh0BI-6UDlmRuyxjrOVSoNHNdA9yYDAGbFBeDFkMj3bqpT-GU-bvXRfXIIcnJKPHM-98HgHAAy7gi_Jfd2qtOpthsxAZouTRvKyuUVGSwY6GValmqBo6TzRO1pLzYkPdrfEupwa88YgcwyG5Nhe3QHjRQ269oV_zla0GxEuHSbWqMr6uJ7hSeSyBWAr0zyJYSfk2AyHjfVMD6nGA5ff5JET7NLcn83URzeZJExhROS_9M0lWXa9frTgu7Wx8d2hFMnGsFDDrEf1dZ9VdPYmr6RLHAs5XZ0fjx9R2ahCuBAr3Tsi9tw19JVhJXJK3zTxp6NuEEp5zdDuO9JD2I5f60gfa6_1zTWkFeEDwEKP21jdLYXegjp-uasX6Z7JkkGRupExAoE_imWinVgrbhto0m1FwtMDmS_6uvyjhZ_oH8VMHwWQ74C57fwEGZ-tTyqsNTA6g_CpIBFqgQE8kp7Na6PEjAoS-vigWfyuAjv_5zJYPMo4sivJ4vnC4LGIRZZYAB4ijSScdOEjjfC4X73Grt1vbSN&xkcb=SoBH6_M3huKqDewB5J0GbzkdCdPP&p=12&camk=C3EPSzFlQw9EMNccS_jJrw==&vjs=3",
+      "posted": "n/a",
+      "id": "everforth-remote-sr-staff-engineer-150-240k-agentic-ai-ruby-",
+      "score": 81,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 15,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Remote Staff/Sr Engineer ($150-$240k) Agents, AI, Ruby, Rails",
+      "company": "Everforth",
+      "location": "Remote in San Diego, CA 92123",
+      "salary": "Full-time",
+      "url": "https://www.indeed.com/pagead/clk?mo=r&ad=-6NYlbfkN0C-ZO3Pz7i-WMOnhr3Kwc2jb7fQY67NlgW8Lj9VUhPk319oLWkzJlzWgBpf83H1ExTDX7FueNtKHt43HI0ciJuQKhl3VVk2605LnOFlkczQ5mvTaPhIgShX5SnrTL4CuBSOFJuPxR8QfErkgBQ-GsAnwiNTWh_2iLv6geDqSmB2SYdo1jalvpC_aOwrL3gslmjEe2p1EG5nvVqiky76DGEr6IIKBc9zwMJm0pzSv1eAr-_k2xY6ugWCaxjqZVJl_l-kln33iBmD3lFB3um46u0Xk5tObDrkjQr1YQo1NVb-g2kMPzCCcmbJdro-E7BrWSC4Zxi9FmuGLwxpHKrKTsHUKmlBYvJfdssEASgKf2BF9a8IVcMUqeRZVWFaxYyY9D0XwEXSYGufyDOl0IUaZBvTaDVLezR3eH1AkblG4crJcK9CnBVoaJ0FW8yZWmZ-LkHP6apkUTEU8knLN-P_K0sONuwkl3SI8NrVmeYbaE1rHANLukYPBaoQ-2HNFlckyqf2CufhEESl-1_TqSxd072ZtyIVxOxtAdS8dBjpv4k_oMVE3xpqktOOd0YG9W5H-A1GH9Wmx6y5090j-vJKQskeHib2kntcFYjmpOj3CtXLzJJRKZGTehP_Z14SZJ3Xt4jme3ChoittNFz67G2kx9aHeAcEcRsKtGgBno5U74Yl2IoW0EU1lvhIptDQXTvjQym3xMqnU1-dRVLrnrn_USEA2ATsDQpMIvucahKpcVtR5szX00W3uMW2xxxKmtTCpF4AZMbrPJYhZrUlToYLIxv09tv1yZujFDIoIDSie3w99ht_P5bspXe4neK1pivA6l7Rc-aA0Q1OCCLe55eNk_oY8TU5Yy2gpI8=&xkcb=SoDa6_M3huKqDewB5J0FbzkdCdPP&p=13&camk=C3EPSzFlQw9EMNccS_jJrw==&vjs=3",
+      "posted": "n/a",
+      "id": "everforth-remote-staff-sr-engineer-150-240k-agents-ai-ruby-r",
+      "score": 81,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 15,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Senior Vice President, Full-Stack Engineer",
+      "company": "The Bank of New York Mellon Corporation",
+      "location": "Remote in Pittsburgh, PA",
+      "salary": "Full-time",
+      "url": "https://www.indeed.com/viewjob?jk=a022210a60197555",
+      "posted": "n/a",
+      "id": "the-bank-of-new-york-mellon-corporation-senior-vice-presiden",
+      "score": 79,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "strong-brand company"
+      ],
+      "flags": []
+    },
+    {
+      "company": "Dropbox",
+      "ats": "greenhouse",
+      "title": "Staff Fullstack Software Engineer, Core Performance",
+      "location": "Remote - US: All locations",
+      "url": "https://jobs.dropbox.com/listing/7421149?gh_jid=7421149",
+      "remote_flag": false,
+      "posted": "2026-07-02T13:48:16-04:00",
+      "loc_note": "US remote",
+      "pre_score": 7,
+      "id": "dropbox-staff-fullstack-software-engineer-core-performance",
+      "score": 79,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "strong-brand company"
+      ],
+      "flags": []
+    },
+    {
+      "company": "Stripe",
+      "ats": "greenhouse",
+      "title": "Staff Full Stack Engineer, Identity",
+      "location": "Remote",
+      "url": "https://stripe.com/jobs/search?gh_jid=7895467",
+      "remote_flag": false,
+      "posted": "2026-06-26T17:05:39-04:00",
+      "loc_note": "generic remote - verify US",
+      "pre_score": 6,
+      "id": "stripe-staff-full-stack-engineer-identity",
+      "score": 79,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "strong-brand company"
+      ],
+      "flags": []
+    },
+    {
+      "company": "Vanta",
+      "ats": "ashby",
+      "title": "Senior Fullstack Software Engineer, GRC",
+      "location": "Remote U.S.",
+      "url": "https://jobs.ashbyhq.com/vanta/1513e1ac-5dca-4acb-a99d-8b5461115651",
+      "remote_flag": true,
+      "posted": "2025-03-13T22:25:56.507+00:00",
+      "loc_note": "US remote",
+      "pre_score": 6,
+      "id": "vanta-senior-fullstack-software-engineer-grc",
+      "score": 79,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "strong-brand company"
+      ],
+      "flags": []
+    },
+    {
+      "company": "Vanta",
+      "ats": "ashby",
+      "title": "Senior Fullstack Engineer, Emerging Products",
+      "location": "Remote U.S.",
+      "url": "https://jobs.ashbyhq.com/vanta/e54ab450-192f-40f3-8029-37a44f2c09b1",
+      "remote_flag": true,
+      "posted": "2026-04-23T17:39:44.789+00:00",
+      "loc_note": "US remote",
+      "pre_score": 5,
+      "id": "vanta-senior-fullstack-engineer-emerging-products",
+      "score": 79,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "strong-brand company"
+      ],
+      "flags": []
+    },
+    {
+      "company": "Reddit",
+      "ats": "greenhouse",
+      "title": "Staff Software Engineer, DevPlatform",
+      "location": "Remote - United States",
+      "url": "https://job-boards.greenhouse.io/reddit/jobs/8049901",
+      "remote_flag": false,
+      "posted": "2026-07-07T18:59:52-04:00",
+      "loc_note": "US remote",
+      "pre_score": 4,
+      "id": "reddit-staff-software-engineer-devplatform",
+      "score": 79,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "strong-brand company"
+      ],
+      "flags": []
+    },
+    {
+      "company": "Twilio",
+      "ats": "greenhouse",
+      "title": "Staff, Software Engineer (L4) - Email",
+      "location": "Remote - US",
+      "url": "https://job-boards.greenhouse.io/twilio/jobs/7967685",
+      "remote_flag": false,
+      "posted": "2026-07-09T20:12:57-04:00",
+      "loc_note": "US remote",
+      "pre_score": 4,
+      "id": "twilio-staff-software-engineer-l4-email",
+      "score": 79,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "strong-brand company"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Senior Full Stack Software Engineer",
+      "company": "Imgix",
+      "location": "Remote in San Francisco, CA 94105",
+      "salary": "$180,000 - $210,000 a year",
+      "url": "https://www.indeed.com/viewjob?jk=47a1f424451beb52",
+      "posted": "n/a",
+      "id": "imgix-senior-full-stack-software-engineer",
+      "score": 78,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 20,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "salary ~$210k >= target"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Staff Software Engineer, Full-Stack (Launch)",
+      "company": "Owner.com",
+      "location": "Remote",
+      "salary": "$220,000 - $240,000 a year",
+      "url": "https://www.indeed.com/viewjob?jk=025e4ea57023c453",
+      "posted": "n/a",
+      "id": "owner-com-staff-software-engineer-full-stack-launch",
+      "score": 78,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 20,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "salary ~$240k >= target"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Staff Full Stack Engineer",
+      "company": "Netchain Technology LLC",
+      "location": "Remote in San Francisco, CA",
+      "salary": "$180,000 - $220,000 a year",
+      "url": "https://www.indeed.com/viewjob?jk=25e0f27750a24b6c",
+      "posted": "n/a",
+      "id": "netchain-technology-llc-staff-full-stack-engineer",
+      "score": 78,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 20,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "salary ~$220k >= target"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Senior / Staff Full-Stack Product Engineer",
+      "company": "Clear Street",
+      "location": "Remote",
+      "salary": "$200,000 - $350,000 a year",
+      "url": "https://www.indeed.com/viewjob?jk=336382dafe294267",
+      "posted": "n/a",
+      "id": "clear-street-senior-staff-full-stack-product-engineer",
+      "score": 78,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 20,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "salary ~$350k >= target"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Staff Full Stack Engineer",
+      "company": "Assured",
+      "location": "Remote in Palo Alto, CA",
+      "salary": "$210,000 - $270,000 a year",
+      "url": "https://www.indeed.com/viewjob?jk=470e491794daef0d",
+      "posted": "n/a",
+      "id": "assured-staff-full-stack-engineer",
+      "score": 78,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 20,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "salary ~$270k >= target"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Staff Software Engineer, Full Stack",
+      "company": "SmarterDx",
+      "location": "Remote",
+      "salary": "$230,000 - $250,000 a year",
+      "url": "https://www.indeed.com/viewjob?jk=558cf365309d15a2",
+      "posted": "n/a",
+      "id": "smarterdx-staff-software-engineer-full-stack",
+      "score": 78,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 20,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "salary ~$250k >= target"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Staff Software Engineer (Frontend Developer)",
+      "company": "Lockheed Martin Corporation",
+      "location": "Remote in King of Prussia, PA",
+      "salary": "n/a",
+      "url": "https://www.indeed.com/viewjob?jk=b01297417a0ff4b0",
+      "posted": "n/a",
+      "id": "lockheed-martin-corporation-staff-software-engineer-frontend",
+      "score": 77,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 16,
+        "domain_relevance": 15,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Staff Software Engineer \u2013 Developer Experience",
+      "company": "General Motors",
+      "location": "Remote in Warren, MI",
+      "salary": "n/a",
+      "url": "https://www.indeed.com/viewjob?jk=5494726b0070fd57",
+      "posted": "n/a",
+      "id": "general-motors-staff-software-engineer-developer-experience",
+      "score": 77,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 16,
+        "domain_relevance": 15,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Staff\u00a0Security\u00a0Software\u00a0Engineer",
+      "company": "General Motors",
+      "location": "Remote",
+      "salary": "Full-time",
+      "url": "https://www.indeed.com/viewjob?jk=a89861642fac1c68",
+      "posted": "n/a",
+      "id": "general-motors-staff-security-software-engineer",
+      "score": 77,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 16,
+        "domain_relevance": 15,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Senior Software Developer (Agentic Development)",
+      "company": "TherapyNotes.com",
+      "location": "Remote in Philadelphia, PA",
+      "salary": "Full-time",
+      "url": "https://www.indeed.com/pagead/clk?mo=r&ad=-6NYlbfkN0AfEq5j7saNRG5aU_mvVTuWOB9eeCeHIli2OtKfZJ_lU68CQK3WO6fr1U8P9BG_8N2MhaGUtj2kz1cGhiRJCPZR4-FTtJq5aUy42k66aUDfG-jeElTJaJF_uhS-sSFhT8XjUynnZ9RdOuIClMgX3_QeGQ1eZ8ZugnnoExqs4lHbErqyM-6Q02fDFGQmMjBUFAjGIWIqY0UhCavNklPl2MD_BUM4GUxL4B0qTAHA7qoUW3lvSWPDOsrPzMPATr56hIQJOl9nFDfZbhjo8l5ZS4Af2-vOtCqJZYaD0BOpw7Ubfkxepw3OBsef3Tph3NyD_6o_wIC3McWA10jEe4me49C9vWsLc3A1ij6Ypb3pyuf-gTiT9jQcXScuHnl4LpmDMwoHEdDyDsRGSpXRB402uzwq-hjTRQ_yxZRyMYc2aSamb4iQpVgGfCU2bm1ufUPjdn_RivgIPOHNciUHJ3VdoVbt7qUab3pcqhUg2Xi6GKfla7BVPa3J2x-6bsT4CFNFQu-86xvYkmUaqfc5Kj7CB0AYN3zUy2AG2o4ozVJFVj8vSf4Z8eDxEiz0ZWF-S2v6ho-2BpI8V2SQuA_gKGc4ryJArfIFhU3FswCmCL_2VlgI5Rte3p12cvmmQA1LhAKFAdijXWRC4MHmqf8g5BMoSVL91z7WJYcwGa09nv1vQ_H3tUlNXQszZq4wMMbCBYzrWoTYdWkKdPDHXeM5JQQsam5yD7_VHFKpQSZGV2JDwSVlHZJTrdrzKaJQW_QWDqRTl8-ZaeaKiF7C-w==&xkcb=SoAz6_M3huKqDewB5J0KbzkdCdPP&p=0&camk=C3EPSzFlQw-JWkl1H7Zuog==&vjs=3",
+      "posted": "n/a",
+      "id": "therapynotes-com-senior-software-developer-agentic-developme",
+      "score": 77,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 16,
+        "domain_relevance": 15,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Senior Software Developer",
+      "company": "TherapyNotes.com",
+      "location": "Remote in Philadelphia, PA",
+      "salary": "Full-time",
+      "url": "https://www.indeed.com/pagead/clk?mo=r&ad=-6NYlbfkN0AfEq5j7saNRG5aU_mvVTuWOB9eeCeHIli2OtKfZJ_lU68CQK3WO6fr1U8P9BG_8N0zlqZgHOPcOXs--p60Ifdo85rwionnhnO-Uuqsjl3s_6NybKIQz1XMlbjEofQE8SKNvNvDK7V1k4LsAFGip4ekRUGmIKVDtC1I6-27o7yZNhj-yxDhRxA8QKllN62wR-9UqXoUxfxyFpxopTIYPC8_ocbueNEtSBm-gx2QKlu2PI1MBLkFAq5s6BXvF7OpYVIMOqaSwrOFCi8UxyKgOtK1MsQcyJS0VtyLAPUfRiquhlHiYrPTipVuGulUNNkAKGML0cT8k9LxiD86JdL1-UL9oM2MUTZBt7v6WWl7Y5oQbWlTS5hsAGX354eK2CayQHpJ5xd3KQSAcGSX-n28SzJQzE3b6JM83QKu1WjVLoQRB89aWx5i9hK9Ng4FGFFjshZNZu2X6c4NHaFglhAuVJr1sZLOm775fLuOQE1h1_5c6byeG61wLMa9w3vg-iA8PtxPoEaPL0Os534ykpb7q5x9dMsWYOaVYY3o6DUz2xHJXoK-hNHYp0dW75DR75RBlFTS4_sBy_RGrjGFryBwp3P20RD9dJRIuSrZm4F019-EA43H3QQyQVLC7InLcpohOi0MN5VFD5B5C9ax170htBy3A4Hm_eWwaP012c_hR0F6ruJhFk9TITebuGlhYq_nuDfGVshWyoG8nDXtXS0zhyMsvscRuntPvuoSoLhSCqKLuiUb8DsVJvU4SR2pdEvkOfPlk7oVVI-kRw==&xkcb=SoCu6_M3huKqDewB5J0JbzkdCdPP&p=1&camk=C3EPSzFlQw-JWkl1H7Zuog==&vjs=3",
+      "posted": "n/a",
+      "id": "therapynotes-com-senior-software-developer",
+      "score": 77,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 16,
+        "domain_relevance": 15,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Senior Software Engineer",
+      "company": "Stellar AI",
+      "location": "Remote",
+      "salary": "Part-time",
+      "url": "https://www.indeed.com/pagead/clk?mo=r&ad=-6NYlbfkN0CAW0No0YOPX53sBjqBVtnvTgxOT7TKn7rSM1H7xb10b0iklTqV6PtCK4kFf6UgUI6_gXOuaGSp_W4_vP4OzJKLKGeGEQsXet7Qb_oxcdMibxxi0fSguVvyROp30YMMKJ6NV4LkVtYO_fvmVKfAKhxJP80_gIkJUka5r6ZP8aDOT7XCLagkyZNbfG1iiPmfwc60MQxrdNY2h-yC2wQCwuUUuzIYCWwt14L07MY6QyegcmB5khYE418t_J7Rsx7VxKsQTXUfmEPFpUxwIAK1nYuAJPlBpUivNPSQm073ZgrUTCfVdvvoqKfjtSw6NoFDVs0rB7_DGlLNTsxwfnDDqzKwcfSpMQdcwgMXkj_5QRLuOXyHidIA6WZfrmsYvUdjEkNvPl1M5yctvHpbe0_8G0DZYSOM9KkzO-50Saye76qQyDht6qqU_dO5NTp4vjhV402Iue0PmITSNfuLi9V3RrCEptdbPWu_50aSg1N1RZpaKAhIoLnISRseWKjuKS_QRzABO1xpYCaQh5qIXo8TW7Wvwjpg5WQqT9y1NbreXVThkbEj-0SP3AKVQp1wruyvBANLkwDwtNm8AVUVz5Tbhg2Uhzp7wBc88arfNnbP3KJDtxCnnHveb9851pCYUzAaKYUcDSyM00Q-ZGs9l6X-yStR223wejCVRkYPmNO74WYsjhPsj4Aui1HteYt2SQgt2tNBZp7rhCHVvg97VgvbqZZhlK8GH4le2Upo8SVuqOyC2zGr_jfqlW5YZuVm3Rdx7JvSTJ7eXM5j8_xrULKe75GNaK17_2Zt8bkXuLibwr2eS87mZZL7yjCbWYM2DLnb2taWPdzM1JU70M3_6y733CRa&xkcb=SoAa6_M3huKqDewB5J0IbzkdCdPP&p=2&camk=UoKtGZLa3XKLe7Ej-upZsA==&vjs=3",
+      "posted": "n/a",
+      "id": "stellar-ai-senior-software-engineer",
+      "score": 77,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 16,
+        "domain_relevance": 15,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Sr. Software Engineer - Big Data, Data Lake",
+      "company": "Foureyes",
+      "location": "Remote",
+      "salary": "Full-time",
+      "url": "https://www.indeed.com/pagead/clk?mo=r&ad=-6NYlbfkN0BQ7eY-1BBX3AXhC_YQTVrJ1NsM-LUUYvMl0iVXxLGTbCF19tLIv_rTeApyzlBvT62LbtFHUz4PfOnGUec0tMmxDDKxbIL9Mf6gNFyqitoJd08VL8NVsgrk3G05agPRtxt4MRwfRhfgEC6sIlvLPLjOXetc7fkfp_42t4_-I5krqshRMCdJ4vWq73bdiLTxGS0F6ENkOGMSQc3jRaXof9uOXfEPPATMOkeJJDHLscDcxpCBYa8wGffS-gdamYlkMDwy8dcNcwFu76PPDpy7OyTFx340DcB2PinmSYrmoTaYYWVkRoPaWegUOmKawajgYZEs1U6z6Ddx87iV364ETkSY3fuCGKeXqQQXYIqBszIUZ3-YiJZBJD2CVJ9LbiYHE-_4Z0qHFfG0DCRLboAUart5P77ws6pHV9SuY73Kw66gVukTSQRKTjNdt1asgTne99HlC00sRP7Gb7VLmTnUrYgJ3PTwByFq7W9C6lZBaxFgJmHYvkt20lbTcGnWkmG3_3TjBloen69IIpc4sa8TXwNfY29zuyEvpWEIkr7YAcUFaieXugZPr-esV0JQJmZfXZzq-G0OTvBmbSgjLZE2zCTH2pbATuajYdE0xuAVTUjU4u9KhbahIadrmgY6ifzLi8p9y8M1v9hr6MoL9YYbsb__nJldtgdN3ukfoI83Gv3GtFagRW8woaNoUBki3vsN1KeblCBkNnys0okJyqyZs5te-Ghze4rHq8R6PbItCMtbDObSCg4j7mdSjAzp7LLhSPMx8y2W7FI5rfo6oBK1qGQQ&xkcb=SoC96_M3huKqDewB5J0NbzkdCdPP&p=5&camk=C3EPSzFlQw8j4SvDMRC0Ng==&vjs=3",
+      "posted": "n/a",
+      "id": "foureyes-sr-software-engineer-big-data-data-lake",
+      "score": 77,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 16,
+        "domain_relevance": 15,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "REMOTE Sr Software Engineer - SaaS Startup",
+      "company": "Everforth",
+      "location": "Remote in Minneapolis, MN 55404",
+      "salary": "Full-time",
+      "url": "https://www.indeed.com/pagead/clk?mo=r&ad=-6NYlbfkN0C-ZO3Pz7i-WMOnhr3Kwc2jb7fQY67NlgW8Lj9VUhPk319oLWkzJlzWgBpf83H1ExTDX7FueNtKHsDx19UMOHeG3bnphUemD4jjy-feiX0gmEOhqfPB-ChOA2mVtqL4ean-eZfoRSEAN1q8NYrLV4ycHIa1KwnC7A1we_FJoD31qU45vg8c0k5DX4CqI-QijY2cUmFIhI8Ahbf0S5CrTTMTm9s9k53ZkfUlPg5OJLYtGKb-GtHGXi97NebiCamhkjHHFNnaflq_mSTriSnecKdZ1vmW_qxxrmASNzfU10q_LXz0wnhPTbY0mhFHK1oXQUBOyBqztLHP8CQFP0zuPWqC7gukQBnrdxqkVaU_duRvjEswBR6wU6iql1AAjfk0qR0ZvVztT9afuB4M_rX0ZotJITCr0HOO1vzcsKVD04kZg054yTCoW-B2uKEfATbPODD2Gn3LGWI5ekuft6TEGOR3krhfq9z_dOOk2CYYc0XEI3osWTddFPTQfC8meLCu6pUXLT3Cx-7XEN1e3PEbUSpOsWOSjwflzEjrHYntmfkj5wNBSPH3GniR3GjYg308MQr8c4gsCSit5q_t-LCVhwTx50L3OUr-te_0vFn46bUAMsmtWw09kfCXKU2eeEXgbzZUVxlAu9Gpu4O3f1AOFLdZg_32l6L-lW-F3oXjhWYfXSFUXckvSRriYDgeZQXT2dOxyyyEvHRvqY6mRlVNoTE16uRTC2cZeDqpIRRF7ZUS5Xs9tHwxL2Y5O_7u27FBfMH-lnh7tUBEzKzBUkaTEuLtcXyvAFX-ptjcLy_K2MixQLUThtLMlKqdMf-PGUHjr6-3uPqDrBSl8yb3fAWF6rHRM2WRPmjy3w0=&xkcb=SoBU6_M3huKqDewB5J0CbzkdCdPP&p=8&camk=C3EPSzFlQw9EMNccS_jJrw==&vjs=3",
+      "posted": "n/a",
+      "id": "everforth-remote-sr-software-engineer-saas-startup",
+      "score": 77,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 16,
+        "domain_relevance": 15,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Senior .NET Developer / Cincinnati, OH/ONLY USC and GC Candidates - REMOTE",
+      "company": "Hudson Manpower",
+      "location": "Remote in Cincinnati, OH",
+      "salary": "Full-time",
+      "url": "https://www.indeed.com/pagead/clk?mo=r&ad=-6NYlbfkN0AYOynFbhyN0kcD3fmfE6SEZ9WpDcMz7Jf_HaiUSoGRfdvQlfInr7z-USpvWVk5VhH_5jmjai0dQsNFVv4vIqLKV5yViZJZ6lp45eXzF1iFR3UhpeZtBaGtP3SjXuqyzZNb9rWna02x07E5snOmCh7BNbIdfaF3KQRAsBWzHUgZ4z33WAcdgi_I8ARcf6m4a8agNkfOy0Drmtf3l62aIuUok66W_qdY6pNb_JI4cDANYEZzKPbJPmig4mcNWe1dCBDI9-oOlm9gQ_eLdscJEooEYPD8EdswHldOz9I7bHkYNLNJrluZ_0sLEMHwxa71Zxv90ic9q7iZvx5793ilquU6NXgMl34qa9gIdNxnSyq2kT8r1Dg7bfP9ef4-gp0XQKeYlmFSPvieWiwbGHRjEEYgOZRa3RkEljxngrSBAy3oNmzbEwnMH-6nd69YrhEja0WeuSOzQ-Fqb977ilctgK4aJrsOrKl4H_Y3uTXl4NRZ20_7Muzaf5AeOX-WWpOkBIEpPySE8Pn1PRgsNrl85OwaAFipUKstX5ZtRHdAMcAmXSto4f2O0TgdlTc9aBtYR-FaLjg31cLBp0PnrtEJDfn3R4YcVwOKkP3e3nztGMzNwUymECp9PnQxaOmz6BFYXQke7hkWiU69C56JqCK7emeiR85nyhxErqNE8v5mAjz-HiI4RNLLvTqDG5RNnYKwaI4auA7eXSn4gxpCLgMjoLaPOoP4phiQdW3eoC-XVEDQLmN8CgMVrPIlaMEufGA3gigfA7H-YaSs5-JFTnDsSue4K_Zc9wI6TKDXuo86QNw0uVSgrB4QFlwa9PVftwIBDHIrgtLtT-3hTq48ORgT6V9GOrJXzx_JqdM=&xkcb=SoDJ6_M3huKqDewB5J0BbzkdCdPP&p=9&camk=C3EPSzFlQw8t_41clQjpOg==&vjs=3",
+      "posted": "n/a",
+      "id": "hudson-manpower-senior-net-developer-cincinnati-oh-only-usc-",
+      "score": 77,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 16,
+        "domain_relevance": 15,
+        "company_quality": 9
+      },
       "verdict": "skip",
       "reasons": [
-        "AI-training/eval contract work, not product full-stack engineering.",
-        "Narrow JS/React scope; typically hourly contract via marketplace.",
-        "Below threshold and off your build/architect target."
+        "senior/staff IC title"
       ],
-      "flags": ["contract/marketplace role", "below threshold"]
+      "flags": [
+        "excluded tech: \\.net\\b"
+      ]
+    },
+    {
+      "company": "Webflow",
+      "ats": "greenhouse",
+      "title": "Staff Software Engineer, Developer Productivity",
+      "location": "CA Remote (BC & ON only); U.S. Remote",
+      "url": "https://job-boards.greenhouse.io/webflow/jobs/7832069",
+      "remote_flag": false,
+      "posted": "2026-07-10T09:17:01-04:00",
+      "loc_note": "US remote",
+      "pre_score": 4,
+      "id": "webflow-staff-software-engineer-developer-productivity",
+      "score": 77,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 16,
+        "domain_relevance": 15,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Staff Engineer - Full Stack | Luma",
+      "company": "Dotmatics",
+      "location": "Remote in Boston, MA",
+      "salary": "$96,862 - $196,574 a year",
+      "url": "https://www.indeed.com/viewjob?jk=28416fa42cf15795",
+      "posted": "n/a",
+      "id": "dotmatics-staff-engineer-full-stack-luma",
+      "score": 76,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 18,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "salary ~$196k >= min"
+      ],
+      "flags": []
+    },
+    {
+      "company": "Coinbase",
+      "ats": "greenhouse",
+      "title": "Senior Staff Software Engineer, Core Automation",
+      "location": "Remote - USA",
+      "url": "https://www.coinbase.com/careers/positions/7580292?gh_jid=7580292",
+      "remote_flag": false,
+      "posted": "2026-06-26T12:23:42-04:00",
+      "loc_note": "US remote",
+      "pre_score": 4,
+      "id": "coinbase-senior-staff-software-engineer-core-automation",
+      "score": 75,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "strong-brand company"
+      ],
+      "flags": []
+    },
+    {
+      "company": "Discord",
+      "ats": "greenhouse",
+      "title": "Staff Software Engineer - Consumer Revenue",
+      "location": "Remote (U.S.)",
+      "url": "https://job-boards.greenhouse.io/discord/jobs/8460867002",
+      "remote_flag": false,
+      "posted": "2026-06-16T16:05:32-04:00",
+      "loc_note": "US remote",
+      "pre_score": 4,
+      "id": "discord-staff-software-engineer-consumer-revenue",
+      "score": 75,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "strong-brand company"
+      ],
+      "flags": []
+    },
+    {
+      "company": "Dropbox",
+      "ats": "greenhouse",
+      "title": "Principal Software Engineer, Core Sharing & Collaboration",
+      "location": "Remote - US: All locations",
+      "url": "https://jobs.dropbox.com/listing/8006972?gh_jid=8006972",
+      "remote_flag": false,
+      "posted": "2026-07-02T13:48:16-04:00",
+      "loc_note": "US remote",
+      "pre_score": 4,
+      "id": "dropbox-principal-software-engineer-core-sharing-collaborati",
+      "score": 75,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "strong-brand company"
+      ],
+      "flags": []
+    },
+    {
+      "company": "Reddit",
+      "ats": "greenhouse",
+      "title": "Staff Software Engineer, Community Builders",
+      "location": "Remote - United States",
+      "url": "https://job-boards.greenhouse.io/reddit/jobs/7875645",
+      "remote_flag": false,
+      "posted": "2026-05-14T13:59:42-04:00",
+      "loc_note": "US remote",
+      "pre_score": 4,
+      "id": "reddit-staff-software-engineer-community-builders",
+      "score": 75,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "strong-brand company"
+      ],
+      "flags": []
+    },
+    {
+      "company": "Twilio",
+      "ats": "greenhouse",
+      "title": "Senior / Staff Applied Research Software Engineer - Emerging Tech",
+      "location": "Remote - US",
+      "url": "https://job-boards.greenhouse.io/twilio/jobs/7993959",
+      "remote_flag": false,
+      "posted": "2026-07-09T14:09:25-04:00",
+      "loc_note": "US remote",
+      "pre_score": 4,
+      "id": "twilio-senior-staff-applied-research-software-engineer-emerg",
+      "score": 75,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "strong-brand company"
+      ],
+      "flags": []
+    },
+    {
+      "company": "Vanta",
+      "ats": "ashby",
+      "title": "Staff Engineer, Product Engineering",
+      "location": "Remote U.S.",
+      "url": "https://jobs.ashbyhq.com/vanta/115b6bba-f545-4026-a44a-326a1e42c7fc",
+      "remote_flag": true,
+      "posted": "2025-12-16T15:25:00.865+00:00",
+      "loc_note": "US remote",
+      "pre_score": 4,
+      "id": "vanta-staff-engineer-product-engineering",
+      "score": 75,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "strong-brand company"
+      ],
+      "flags": []
+    },
+    {
+      "company": "Discord",
+      "ats": "greenhouse",
+      "title": "Senior Software Engineer, Front-End Infrastructure",
+      "location": "San Francisco Bay Area or Remote (U.S.)",
+      "url": "https://job-boards.greenhouse.io/discord/jobs/8599753002",
+      "remote_flag": false,
+      "posted": "2026-06-18T16:23:36-04:00",
+      "loc_note": "US remote",
+      "pre_score": 3,
+      "id": "discord-senior-software-engineer-front-end-infrastructure",
+      "score": 75,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "strong-brand company"
+      ],
+      "flags": []
+    },
+    {
+      "company": "Dropbox",
+      "ats": "greenhouse",
+      "title": "Senior Infrastructure Software Engineer, Identity & Auth Engineering",
+      "location": "Remote - US: Select locations",
+      "url": "https://jobs.dropbox.com/listing/7923159?gh_jid=7923159",
+      "remote_flag": false,
+      "posted": "2026-07-02T13:48:16-04:00",
+      "loc_note": "US remote",
+      "pre_score": 3,
+      "id": "dropbox-senior-infrastructure-software-engineer-identity-aut",
+      "score": 75,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "strong-brand company"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Senior Full Stack Engineer",
+      "company": "Einstellen.io",
+      "location": "Remote in San Francisco Bay Area, CA",
+      "salary": "Full-time\u2002+1",
+      "url": "https://www.indeed.com/pagead/clk?mo=r&ad=-6NYlbfkN0DKvbAptoWn9F0tVL2_Q05_6hmCdbPwCLZfvb4j61S8sJLauGKfMu8VzHjc31ZV1giX-7cTRmpuToNKvnyeMS4dIzw4WZTtxAHtOw6Vk5m2ygEzkRGZCqR6f1q58kSG_N4LPpGzYHMTFho4J6XwPoUxucGEkgtniKKk0w9-P7oceTIPcutMQ69BWQfvRhPE8DFGnYM_P9H5eRBq1Lk7iXNRGd8MByiU8LnV2r_qeoUWhG-d57-tT0ow2-HpOYXupZiJ8rm4xzC1h0VFOQJ_YHoB1dN4cYTri-irJe-Ww-3UswDy9DU-BuA84oBFPQ67nmkhLGzMWUFR5d2quoqAtAjsuYtxUYC1wHjK-dDcoIAkgcKW0rNvmX3eZXL-NrWF9x-ChS502sCFlle-7QsxaIWfb84aaP6rhcTSWhLhduKA_RHtqstm0fZGM4J5gWAkLPXT-2B6jfUnZT2aOv0SJlzPtn8tKSvVSvgtr-UORyFYKN0MfwQ2qMBDkKoNPnHksVtHozbKlKabGyWRs7XO9rAwV14ZFb-2y1NMghGbHKbMkurhsDPo1hE5NxW0EvlNxQ1-JZCp_50pkDcbPIG9XQzrsy28cVN8XPnFJ92IH4Yr0X4nModzvSGykaZ_JCnKdcIRRe2OG9g7qYkh3JJHEAefY4fSJUafgjR31qs5BZFYpB30VLzZyjyE50JaYsXpP1_Z76IMHEjWXjb0VjZDhObxAwFzvXRcmRPNZ08pKUngfI3txNwjqWbutPu_ITQFDoyjsLwv-Tu6N3IodacAOPMUGdRUq7o3ZNHqx1ro_tl7zNlhnmQYF-yaNQuQuiEY3JA1hd6KIxRvHeNR2S5PCkKg&xkcb=SoCZ6_M3huKr1pwENZ0KbzkdCdPP&p=0&camk=C3EPSzFlQw-T1hoTaMoHxg==&vjs=3",
+      "posted": "n/a",
+      "id": "einstellen-io-senior-full-stack-engineer",
+      "score": 74,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Senior Full Stack Engineer",
+      "company": "National Facilities Direct Corp",
+      "location": "Remote",
+      "salary": "Full-time",
+      "url": "https://www.indeed.com/pagead/clk?mo=r&ad=-6NYlbfkN0CM5XsZoShA_dFMQSptBmbNMqwr5KXBouJWW4QRpcf8OyTTyaWKc4Lo467Ox718ucONjPaEXfQ4UAJ4F862KirQkTOZiTGJk72IwbbQIiBwhp8tBnOU5OM1vkOvNkjAFVJzdio4cFf6AgY88Q8PGHvbEV8fA-GRQhguwSbp6hCU-8OrewwvI0N6U7-_dSuIH6WHeVtet011vwDmHdx_j7qtAj1ipN7ZjS3NrE8QSQcSTT_aBqqOFbEMeql_ys0R1SMnp8IUuHC3jeZOvrRetyDoQD4WrKnhqvYxFSRPjvUiLSCISu4wf8HmBs9eXKN1FU8bLNG81hNR6PgTaUHUAe18evx0OrP76xT4NsrFbsbMHUbAY-a1dMJGPpIM1OJffOLwjkvAfeMbSiXJzy6naaaBVZkTUIOzKsCcJHGwSO3QJkJ4Q8ct7Mahof7apIMlDEVcksQXiBtCKbyFfw2XpuQDVI-ceIQQGBpgkHn-XQhZViee0pwmwVadf8ww5sYo9wrNKm4S31-RSodMrlX99k4VJ9Plw7jtqqsVIxcoHRDz_AqKctIDSu5aL9hHjsYDHQDW4cTgLYglICla8idzeYWO3wO9NR30425Bnr20uJW25WqrOa3ahSXx_rsQuuxntk7t-s_S56LeR-uQsLGCFw7cO_5kG3ROFMqIGfEDvRsrOUNMv0evt8nRtAyqajIVb6Eas2JkVAHvigVMzUEFr60dIOmqFeV7EedY8M0b2DaXXSujt3txXZANAxFZtZ84QS54D9R9ma8k3rBGDyP-AnhzCrQOFm79qQLjAjLsxfaZxi0Wf2FEG7tKgKsBck7QKvzaSvrsne43rg==&xkcb=SoAE6_M3huKr1pwENZ0JbzkdCdPP&p=1&camk=C3EPSzFlQw9GqwvtNSrElg==&vjs=3",
+      "posted": "n/a",
+      "id": "national-facilities-direct-corp-senior-full-stack-engineer",
+      "score": 74,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Senior Full Stack Engineer",
+      "company": "Versant Media",
+      "location": "Remote in Orlando, FL 32819",
+      "salary": "Full-time",
+      "url": "https://www.indeed.com/viewjob?jk=82bd622b5093a1e0",
+      "posted": "n/a",
+      "id": "versant-media-senior-full-stack-engineer",
+      "score": 74,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "linkedin",
+      "title": "Staff Software Engineer, Agent Platform",
+      "company": "Replit",
+      "location": "Foster City, CA",
+      "url": "https://www.linkedin.com/jobs/view/staff-software-engineer-agent-platform-at-replit-4411248108",
+      "posted": "2026-07-10",
+      "salary": "n/a",
+      "id": "replit-staff-software-engineer-agent-platform",
+      "score": 74,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 4,
+        "domain_relevance": 15,
+        "company_quality": 14
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "strong-brand company"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "indeed",
+      "title": "Staff Software Engineer - Machine Learning",
+      "company": "General Motors",
+      "location": "Remote",
+      "salary": "$134,000 - $235,900 a year",
+      "url": "https://www.indeed.com/viewjob?jk=438f8ec98fdb6ef1",
+      "posted": "n/a",
+      "id": "general-motors-staff-software-engineer-machine-learning",
+      "score": 74,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 20,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "salary ~$235k >= target"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Staff Performance Software Engineer",
+      "company": "NinjaOne",
+      "location": "Remote",
+      "salary": "$200,000 - $300,000 a year",
+      "url": "https://www.indeed.com/viewjob?jk=58be0a503b09b9d8",
+      "posted": "n/a",
+      "id": "ninjaone-staff-performance-software-engineer",
+      "score": 74,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 20,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "salary ~$300k >= target"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Staff Software Engineer - DPDK",
+      "company": "PlayStation Global",
+      "location": "Remote",
+      "salary": "$180,000 - $270,400 a year",
+      "url": "https://www.indeed.com/viewjob?jk=f3978a719574ecf6",
+      "posted": "n/a",
+      "id": "playstation-global-staff-software-engineer-dpdk",
+      "score": 74,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 20,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "salary ~$270k >= target"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Staff Software Engineer - Forecast Engine",
+      "company": "ServiceNow",
+      "location": "Remote in Santa Clara, CA 95054",
+      "salary": "$166,500 - $291,400 a year",
+      "url": "https://www.indeed.com/viewjob?jk=18ad78d0193a0101",
+      "posted": "n/a",
+      "id": "servicenow-staff-software-engineer-forecast-engine",
+      "score": 74,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 20,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "salary ~$291k >= target"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Staff Software Engineer, Full-Stack",
+      "company": "Owner.com",
+      "location": "Remote",
+      "salary": "Full-time",
+      "url": "https://www.indeed.com/viewjob?jk=4f0c36c43b1dbd8b",
+      "posted": "n/a",
+      "id": "owner-com-staff-software-engineer-full-stack",
+      "score": 74,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Staff Software Engineer - Full Stack (Library of Congress)",
+      "company": "Ad Hoc",
+      "location": "Remote",
+      "salary": "Full-time",
+      "url": "https://www.indeed.com/viewjob?jk=ecf3bd7137ac71e0",
+      "posted": "n/a",
+      "id": "ad-hoc-staff-software-engineer-full-stack-library-of-congres",
+      "score": 74,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Staff Full Stack Software Engineer",
+      "company": "Cloudera",
+      "location": "Remote in Austin, TX",
+      "salary": "Full-time",
+      "url": "https://www.indeed.com/viewjob?jk=621dbc468d8ad82e",
+      "posted": "n/a",
+      "id": "cloudera-staff-full-stack-software-engineer",
+      "score": 74,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Staff Full Stack Engineer",
+      "company": "Chamber Cardio",
+      "location": "Remote in Washington, DC",
+      "salary": "Full-time",
+      "url": "https://www.indeed.com/viewjob?jk=0014cf3d8a88780d",
+      "posted": "n/a",
+      "id": "chamber-cardio-staff-full-stack-engineer",
+      "score": 74,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "linkedin",
+      "title": "SENIOR SOFTWARE ENGINEER - Payroll & AI",
+      "company": "The Home Depot",
+      "location": "Pierre, SD",
+      "url": "https://www.linkedin.com/jobs/view/senior-software-engineer-payroll-ai-at-the-home-depot-4438345417",
+      "posted": "2026-07-10",
+      "salary": "n/a",
+      "id": "the-home-depot-senior-software-engineer-payroll-ai",
+      "score": 74,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 4,
+        "domain_relevance": 15,
+        "company_quality": 14
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "strong-brand company"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "company": "Ramp",
+      "ats": "ashby",
+      "title": "Senior Software Engineer | GTM Platform, Frontend",
+      "location": "New York, NY (HQ)",
+      "url": "https://jobs.ashbyhq.com/ramp/1540a41f-d88f-4c89-9b08-5b9fade1ee81",
+      "remote_flag": true,
+      "posted": "2026-02-26T21:56:47.552+00:00",
+      "loc_note": "US remote",
+      "pre_score": 3,
+      "id": "ramp-senior-software-engineer-gtm-platform-frontend",
+      "score": 74,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 4,
+        "domain_relevance": 15,
+        "company_quality": 14
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "strong-brand company"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "company": "Ramp",
+      "ats": "ashby",
+      "title": "Senior Software Engineer | GTM Platform, Backend",
+      "location": "New York, NY (HQ)",
+      "url": "https://jobs.ashbyhq.com/ramp/428f41e2-48e8-409d-b5e3-8053f7fc7a27",
+      "remote_flag": true,
+      "posted": "2026-05-13T23:29:57.643+00:00",
+      "loc_note": "US remote",
+      "pre_score": 3,
+      "id": "ramp-senior-software-engineer-gtm-platform-backend",
+      "score": 74,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 4,
+        "domain_relevance": 15,
+        "company_quality": 14
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "strong-brand company"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "indeed",
+      "title": "Senior Full Stack Engineer",
+      "company": "Agile Defense",
+      "location": "Remote",
+      "salary": "$125,000 - $145,000 a year",
+      "url": "https://www.indeed.com/viewjob?jk=4fd17e365f0d1ce2",
+      "posted": "n/a",
+      "id": "agile-defense-senior-full-stack-engineer",
+      "score": 72,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 14,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title"
+      ],
+      "flags": [
+        "salary ~$145k below $160k min"
+      ]
+    },
+    {
+      "source": "indeed",
+      "title": "Vice President, Full Stack Engineer",
+      "company": "The Bank of New York Mellon Corporation",
+      "location": "Remote in New York, NY",
+      "salary": "$189,592 a year",
+      "url": "https://www.indeed.com/viewjob?jk=f80eaf1b5192f0fc",
+      "posted": "n/a",
+      "id": "the-bank-of-new-york-mellon-corporation-vice-president-full-",
+      "score": 71,
+      "score_breakdown": {
+        "title_seniority_match": 15,
+        "stack_overlap": 16,
+        "remote_comp_fit": 18,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "apply",
+      "reasons": [
+        "1 stack term(s) in title",
+        "salary ~$189k >= min",
+        "strong-brand company"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Staff Software Engineer, C++ (Patching)",
+      "company": "NinjaOne",
+      "location": "Remote",
+      "salary": "Full-time",
+      "url": "https://www.indeed.com/viewjob?jk=a419acf0372492e1",
+      "posted": "n/a",
+      "id": "ninjaone-staff-software-engineer-c-patching",
+      "score": 70,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Senior Staff Software Engineer",
+      "company": "RB Global",
+      "location": "Remote in Chicago, IL",
+      "salary": "Full-time",
+      "url": "https://www.indeed.com/viewjob?jk=04d1125d106651b9",
+      "posted": "n/a",
+      "id": "rb-global-senior-staff-software-engineer",
+      "score": 70,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Senior Software Engineer - CyberLife",
+      "company": "Penn Mutual",
+      "location": "Remote",
+      "salary": "Full-time",
+      "url": "https://www.indeed.com/pagead/clk?mo=r&ad=-6NYlbfkN0AA38dJfsIrLkB_22BfuVKwRgvR8TDv3WS4s3iP4olYxvujYmU1Agbn_FCLBpcsAHfJqoEY9oKRS9ZTEPda1AghE42zA1Rx5SceF8mi43x1Xw8cLdMP4jaE1fsCN_eDAIp47-qEca7hDMLXYqrbrBXGWB0FMOow2gpnGJyidQJZPr0BoRwU8nGuTUbsSa8FAlFJBXJ2H8Z3hdnGEl-jHJ8XMxAn_MwmV2DWNIB-5FmNp6F8c--PP5ZdEqpCuvHo2DtPeLzHpp8X_N4VMnrrlpR_PCQPntDGOR8z4qQVLJltf93BXJ8zWbZPkQhBQNrFiJVwpg95PCQl8tip5bKY46UtVDqbcO-UyLSWhWhJjdmRKuuYU2RMPGeULrMJtihg_sODJ-2du7yC8mExzkBOV3dSdaTgo3OEiT4RTmBgPkIPOKTv_oxdfDrqXbwlpIcTNhnuy_kF_GjqzHuajEAPWYzZfQ4ZyLCpMvSSXxYAojPlgHtZc3uKuII-3JfrRd-d3ZV9XCczRSdAlxyN0PdGv0_pqSoYz50BSY6wmr5V2imTkGQJf6iWUIfXQxyxe43dKbQ9P-U3f43MD0uiezMnmzP5FhtjS16GGPgmt0Vj2XP6bjT1he7ZSQaC66kHQfnAyy_phXc1IHBD2-H3lkUTw1xbQblX1JrY2cu2SYrlrI5RGIMt8YYzPQdX9cp9k0s5-AUwfT3_t6cBMSTAohPpRuknzcsoIhKq81MNOQqxEubjedMx7K3XI2iE_qgVIwUkEvObTCmyqndZy_tZYXYZ1mlO09RtFeuCZlazBVhDNPbrtL-4sCTe7MvfLKWU7l913UO9O9_xL1vxs10rhWNWTp9YmxDwk8_MBRgPkdrzV1HqFr7hsLIHn2QO&xkcb=SoCU6_M3huKqDewB5J0PbzkdCdPP&p=3&camk=nUmJqO2E8rg5KATuAlJFCQ==&vjs=3",
+      "posted": "n/a",
+      "id": "penn-mutual-senior-software-engineer-cyberlife",
+      "score": 70,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Sr. Software Integration Engineer",
+      "company": "SHR Talent",
+      "location": "Remote in Nashville, TN 37203",
+      "salary": "Contract",
+      "url": "https://www.indeed.com/pagead/clk?mo=r&ad=-6NYlbfkN0DuqWkpKZaXNgZuYzRMqi13Dljsj-O_VC4bEQj7hg9rKhI7eWNBV7Bq-VWUsZHJB2fEJH_Wbck_FBGFFKcbOTknaSCUII68I9OLbwJQvflMDzI-8QVRCyceCkhEq8O-KXUTgQbFTb_rPKjo0nSktAWhMXnZHzKOGV30URs4boGoAPAI_kUdTOLKbKiwx6V2qsqPVY-V4Ms80IjwQDAD5yUThby0CI5sAvy5CYTaKpDjJE_xueybSMXaXl9DceIUU5xNcZdEoS6NO6BzIU_45khuRH9DkstyRqoxKjCbSYM6haJGpY3jrNvu-MU6Z1YrMYbEqsmu3sgqtuzsXQdjr2amrxHBMwKXkXfkp02uD-4b2VKsmsJzP7TzsqDY0O_zRIsm7H3CyBzceI4azR00iYKAVcx9WdNN8PNZx4KcuNpDtv0_pecT5eX68M_EMqI9qeqlhHDpSeXFrZ6j__XzjPkkEZB4_2EDZc43rsnzkWATwyiFaIypMo37PoZSfQie0wcybnmwrAJbwasrvu25_J19hmc7lPWiAi_60SMagDXGTU2hxn8-STMSCEsm486dyXz3_29z9DR9S8RfnpvRhV5wF4LN1ff78mAijGUw_D9ijdYCQoHT4uUPMzqV_udO9wFoV8yiuZtV7FY9PCbnZURsM6-a0tvlYC5luTmQWqh9ZmRywAyNvhbQAMRI1G6rAljqVx3DyPtDLdF_VzjL5BDX47Nt_nsfH2hd6sPlT8Wjsn8skT7dg_-tOitvJuefvU2lJWSRpmcq8ENmDI6M8QBH4bRR07MYzykseL3LK9InDu6bD38hbfgn61frMb0NA5M0aTKCFTfC2g==&xkcb=SoAJ6_M3huKqDewB5J0MbzkdCdPP&p=6&camk=H-lBaXMUocL-ojuaM-cFdA==&vjs=3",
+      "posted": "n/a",
+      "id": "shr-talent-sr-software-integration-engineer",
+      "score": 70,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Senior Backend Engineer",
+      "company": "Everforth",
+      "location": "Remote in Salt Lake City, UT 84116",
+      "salary": "Full-time",
+      "url": "https://www.indeed.com/pagead/clk?mo=r&ad=-6NYlbfkN0C-ZO3Pz7i-WMOnhr3Kwc2jb7fQY67NlgW8Lj9VUhPk319oLWkzJlzWgBpf83H1ExTDX7FueNtKHgqj_cS2FoKPh5Oo5LOlU62f5k07Zt7sCGjf_azLyEhKy1MA1FvKWR-hL83jMtXKhRJVLZn69wVA2k-bziGoufupbTmMKXMvfUTtILn5NQKQJAgiOY7oS3ufC1e_aE-jOxMS0xTA6BvnIKW7dh7RS7Jl8g_z5ZFq56gM0hnhP1lxC8ckj0a8VYIVlc9VRumCmL_JF52du1J1WCZSc64bnexSzf1-0EOEC48UD8qvdJ9zsNkZwu20g9pxMLxaAzPFOwxDFzm-493mhK_C4bfl8BJPaHoXY2C7GgKZELDU0fy5DS6ZQO3iatJMcqeD9qbJoF-mXuELUbpRnnGLL-bY1ajaIkNJiYT5uuUpiKhZglh73HorElwPYXtu4LexStqkTHq7qjmIeD7StFUSeMr0M0xWeOPNE4Kz-K4M9d4XqYjVHZ-b0Tv_ntlot0mmQVX2cYwSxB-D4yau7iH57tUuND0gMy7BzHq8taXaNTdF-HqFq1l2wSKhJNpAoUI6lRoVrs4imXN2l7adu7Swm-zic1pcuKjsTvkHoGLVsGI1_gi9-kQS6PDtS083OOg75SHISBNu7yMPiJyuOkhivqIBHfr55IEBu4lBzgsJsfCIM_SgdbQigfgG1EKcTFIffNc0IWf8pqbLcByGwKfxYy1DQ8fax3632b-bAHSEiUwM682NjNGLyn2X4rsV5crhjG6RPCApQ3cDt8lA2Co_mY0nJ2T6H0niBWi_9orAyso_IP9VsJMtQs83o-MPar1Q5LO00N_QccTC4ucnod4fZPLabVQ=&xkcb=SoBu6_M3huKqDewB5J0EbzkdCdPP&p=14&camk=C3EPSzFlQw9EMNccS_jJrw==&vjs=3",
+      "posted": "n/a",
+      "id": "everforth-senior-backend-engineer",
+      "score": 70,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "apply",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Full-Stack Engineer",
+      "company": "ElevenLabs",
+      "location": "Remote in Boston, MA",
+      "salary": "n/a",
+      "url": "https://www.indeed.com/viewjob?jk=2cc5d86e55755b36",
+      "posted": "n/a",
+      "id": "elevenlabs-full-stack-engineer",
+      "score": 69,
+      "score_breakdown": {
+        "title_seniority_match": 15,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "skip",
+      "reasons": [
+        "1 stack term(s) in title",
+        "strong-brand company"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Staff+ Software Engineer, Public Sector",
+      "company": "Anthropic",
+      "location": "Hybrid work",
+      "salary": "$405,000 - $485,000 a year",
+      "url": "https://www.indeed.com/viewjob?jk=1d0f7655760b35d0",
+      "posted": "n/a",
+      "id": "anthropic-staff-software-engineer-public-sector",
+      "score": 67,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 8,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title",
+        "salary ~$485k >= target",
+        "strong-brand company"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "indeed",
+      "title": "Staff+ Software Engineer, Identity & Access Controls",
+      "company": "Anthropic",
+      "location": "Hybrid work",
+      "salary": "$320,000 - $485,000 a year",
+      "url": "https://www.indeed.com/viewjob?jk=642f45847b852712",
+      "posted": "n/a",
+      "id": "anthropic-staff-software-engineer-identity-access-controls",
+      "score": 67,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 8,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title",
+        "salary ~$485k >= target",
+        "strong-brand company"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "company": "Linear",
+      "ats": "ashby",
+      "title": "Senior / Staff Fullstack Engineer",
+      "location": "Europe",
+      "url": "https://jobs.ashbyhq.com/linear/d3bc1ced-3ce4-4086-a050-555055dbb1ff",
+      "remote_flag": true,
+      "posted": "2021-04-27T20:13:45.158+00:00",
+      "loc_note": "generic remote - verify US",
+      "pre_score": 6,
+      "id": "linear-senior-staff-fullstack-engineer",
+      "score": 67,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title",
+        "strong-brand company"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "indeed",
+      "title": "Full Stack Engineer",
+      "company": "AHEAD",
+      "location": "Remote",
+      "salary": "$160,000 - $190,000 a year",
+      "url": "https://www.indeed.com/viewjob?jk=b7b8ac508f0df5cf",
+      "posted": "n/a",
+      "id": "ahead-full-stack-engineer",
+      "score": 66,
+      "score_breakdown": {
+        "title_seniority_match": 15,
+        "stack_overlap": 16,
+        "remote_comp_fit": 18,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "1 stack term(s) in title",
+        "salary ~$190k >= min"
+      ],
+      "flags": []
+    },
+    {
+      "source": "indeed",
+      "title": "Full-Stack JS Engineer",
+      "company": "Symfa Inc.",
+      "location": "Remote",
+      "salary": "n/a",
+      "url": "https://www.indeed.com/viewjob?jk=52027c766edbc1ba",
+      "posted": "n/a",
+      "id": "symfa-inc-full-stack-js-engineer",
+      "score": 64,
+      "score_breakdown": {
+        "title_seniority_match": 15,
+        "stack_overlap": 16,
+        "remote_comp_fit": 16,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "1 stack term(s) in title"
+      ],
+      "flags": []
+    },
+    {
+      "source": "linkedin",
+      "title": "Staff Software Engineer - Fern",
+      "company": "Postman",
+      "location": "San Francisco Bay Area",
+      "url": "https://www.linkedin.com/jobs/view/staff-software-engineer-fern-at-postman-4426393349",
+      "posted": "2026-07-01",
+      "salary": "n/a",
+      "id": "postman-staff-software-engineer-fern",
+      "score": 63,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title",
+        "strong-brand company"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Staff Software Engineer, Product",
+      "company": "Replit",
+      "location": "Foster City, CA",
+      "url": "https://www.linkedin.com/jobs/view/staff-software-engineer-product-at-replit-4411246143",
+      "posted": "2026-07-11",
+      "salary": "n/a",
+      "id": "replit-staff-software-engineer-product",
+      "score": 63,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title",
+        "strong-brand company"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "company": "Linear",
+      "ats": "ashby",
+      "title": "Senior / Staff Product Engineer",
+      "location": "Europe",
+      "url": "https://jobs.ashbyhq.com/linear/069c4628-88d7-4e4d-b393-c996fc7f3076",
+      "remote_flag": true,
+      "posted": "2022-01-22T08:49:37.626+00:00",
+      "loc_note": "generic remote - verify US",
+      "pre_score": 4,
+      "id": "linear-senior-staff-product-engineer",
+      "score": 63,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title",
+        "strong-brand company"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "company": "OpenAI",
+      "ats": "ashby",
+      "title": "Senior Staff Software Engineer, Gov",
+      "location": "Washington, DC / Seattle / San Francisco",
+      "url": "https://jobs.ashbyhq.com/openai/a90cdb7c-1c33-4fca-9a96-26c236006f14",
+      "remote_flag": true,
+      "posted": "2025-10-17T16:59:57.134+00:00",
+      "loc_note": "US remote",
+      "pre_score": 4,
+      "id": "openai-senior-staff-software-engineer-gov",
+      "score": 63,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title",
+        "strong-brand company"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "company": "Replit",
+      "ats": "ashby",
+      "title": "Staff Software Engineer, Money",
+      "location": "Foster City, CA",
+      "url": "https://jobs.ashbyhq.com/replit/14b3aef3-f926-4db9-8c31-af8ba848fbd8",
+      "remote_flag": true,
+      "posted": "2025-12-18T04:45:47.531+00:00",
+      "loc_note": "generic remote - verify US",
+      "pre_score": 4,
+      "id": "replit-staff-software-engineer-money",
+      "score": 63,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title",
+        "strong-brand company"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "company": "Replit",
+      "ats": "ashby",
+      "title": "Principal Software Engineer, Money Infrastructure",
+      "location": "Foster City, CA",
+      "url": "https://jobs.ashbyhq.com/replit/bb52f792-58c2-41ab-954d-555c821fe3fe",
+      "remote_flag": true,
+      "posted": "2026-01-12T21:10:53.868+00:00",
+      "loc_note": "generic remote - verify US",
+      "pre_score": 4,
+      "id": "replit-principal-software-engineer-money-infrastructure",
+      "score": 63,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title",
+        "strong-brand company"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Senior Full Stack Engineer",
+      "company": "Unwrap",
+      "location": "Santa Barbara, CA",
+      "url": "https://www.linkedin.com/jobs/view/senior-full-stack-engineer-at-unwrap-4318508310",
+      "posted": "2025-10-22",
+      "salary": "n/a",
+      "id": "unwrap-senior-full-stack-engineer",
+      "score": 62,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Senior Full Stack Engineer",
+      "company": "Enzo Health",
+      "location": "Lehi, UT",
+      "url": "https://www.linkedin.com/jobs/view/senior-full-stack-engineer-at-enzo-health-4410207866",
+      "posted": "2026-05-04",
+      "salary": "n/a",
+      "id": "enzo-health-senior-full-stack-engineer",
+      "score": 62,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Senior Full Stack Software Engineer",
+      "company": "Mariana Minerals",
+      "location": "Moab, UT",
+      "url": "https://www.linkedin.com/jobs/view/senior-full-stack-software-engineer-at-mariana-minerals-4407937721",
+      "posted": "2026-05-01",
+      "salary": "n/a",
+      "id": "mariana-minerals-senior-full-stack-software-engineer",
+      "score": 62,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Senior Software Engineer (Full Stack)",
+      "company": "Healia Health",
+      "location": "Columbus, OH",
+      "url": "https://www.linkedin.com/jobs/view/senior-software-engineer-full-stack-at-healia-health-4428439114",
+      "posted": "2026-06-17",
+      "salary": "n/a",
+      "id": "healia-health-senior-software-engineer-full-stack",
+      "score": 62,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Senior Full-Stack Engineer",
+      "company": "Udext",
+      "location": "Chicago, IL",
+      "url": "https://www.linkedin.com/jobs/view/senior-full-stack-engineer-at-udext-4436779988",
+      "posted": "2026-06-08",
+      "salary": "n/a",
+      "id": "udext-senior-full-stack-engineer",
+      "score": 62,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Staff Fullstack Engineer",
+      "company": "Dispatch",
+      "location": "San Francisco, CA",
+      "url": "https://www.linkedin.com/jobs/view/staff-fullstack-engineer-at-dispatch-4423561474",
+      "posted": "2026-06-04",
+      "salary": "n/a",
+      "id": "dispatch-staff-fullstack-engineer",
+      "score": 62,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Staff Full Stack Software Engineer",
+      "company": "Divergent",
+      "location": "Torrance, CA",
+      "url": "https://www.linkedin.com/jobs/view/staff-full-stack-software-engineer-at-divergent-4433034032",
+      "posted": "2026-06-26",
+      "salary": "n/a",
+      "id": "divergent-staff-full-stack-software-engineer",
+      "score": 62,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Staff Fullstack Engineer, Core Analytics",
+      "company": "Amplitude",
+      "location": "San Francisco Bay Area",
+      "url": "https://www.linkedin.com/jobs/view/staff-fullstack-engineer-core-analytics-at-amplitude-4385927102",
+      "posted": "2026-06-26",
+      "salary": "n/a",
+      "id": "amplitude-staff-fullstack-engineer-core-analytics",
+      "score": 62,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "indeed",
+      "title": "Full Stack Engineer",
+      "company": "HHAeXchange",
+      "location": "Remote",
+      "salary": "$80,000 - $120,000 a year",
+      "url": "https://www.indeed.com/viewjob?jk=18e8fe2344ea1b85",
+      "posted": "n/a",
+      "id": "hhaexchange-full-stack-engineer",
+      "score": 62,
+      "score_breakdown": {
+        "title_seniority_match": 15,
+        "stack_overlap": 16,
+        "remote_comp_fit": 14,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "1 stack term(s) in title"
+      ],
+      "flags": [
+        "salary ~$120k below $160k min"
+      ]
+    },
+    {
+      "source": "indeed",
+      "title": "Principal Full Stack Engineer",
+      "company": "Releady",
+      "location": "Hybrid work",
+      "salary": "Full-time",
+      "url": "https://www.indeed.com/viewjob?jk=f5a5e7cc624cf919",
+      "posted": "n/a",
+      "id": "releady-principal-full-stack-engineer",
+      "score": 62,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 16,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title",
+        "1 stack term(s) in title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Senior Software Engineer",
+      "company": "Safety Mojo",
+      "location": "Sandy, UT",
+      "url": "https://www.linkedin.com/jobs/view/senior-software-engineer-at-safety-mojo-4434271126",
+      "posted": "2026-06-28",
+      "salary": "n/a",
+      "id": "safety-mojo-senior-software-engineer",
+      "score": 58,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Senior Software Engineer II",
+      "company": "LVT (LiveView Technologies)",
+      "location": "American Fork, UT",
+      "url": "https://www.linkedin.com/jobs/view/senior-software-engineer-ii-at-lvt-liveview-technologies-4413267593",
+      "posted": "2026-06-23",
+      "salary": "n/a",
+      "id": "lvt-liveview-technologies-senior-software-engineer-ii",
+      "score": 58,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Senior Software Engineer",
+      "company": "Clad",
+      "location": "New York, NY",
+      "url": "https://www.linkedin.com/jobs/view/senior-software-engineer-at-clad-3892631863",
+      "posted": "2024-04-11",
+      "salary": "n/a",
+      "id": "clad-senior-software-engineer",
+      "score": 58,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Senior Software Engineer",
+      "company": "Zaymo",
+      "location": "Lehi, UT",
+      "url": "https://www.linkedin.com/jobs/view/senior-software-engineer-at-zaymo-4297352723",
+      "posted": "2025-09-09",
+      "salary": "n/a",
+      "id": "zaymo-senior-software-engineer",
+      "score": 58,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Staff Software Engineer",
+      "company": "Carta",
+      "location": "Seattle, WA",
+      "url": "https://www.linkedin.com/jobs/view/staff-software-engineer-at-carta-4380824477",
+      "posted": "2026-06-22",
+      "salary": "n/a",
+      "id": "carta-staff-software-engineer",
+      "score": 58,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Staff Software Engineer, Product",
+      "company": "Luminai",
+      "location": "San Mateo, CA",
+      "url": "https://www.linkedin.com/jobs/view/staff-software-engineer-product-at-luminai-4380164957",
+      "posted": "2026-03-03",
+      "salary": "n/a",
+      "id": "luminai-staff-software-engineer-product",
+      "score": 58,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Staff Software Engineer",
+      "company": "Standard Bots",
+      "location": "New York, NY",
+      "url": "https://www.linkedin.com/jobs/view/staff-software-engineer-at-standard-bots-4384534994",
+      "posted": "2026-03-12",
+      "salary": "n/a",
+      "id": "standard-bots-staff-software-engineer",
+      "score": 58,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Staff Software Engineer",
+      "company": "Amigo",
+      "location": "San Francisco, CA",
+      "url": "https://www.linkedin.com/jobs/view/staff-software-engineer-at-amigo-4436159333",
+      "posted": "2026-07-02",
+      "salary": "n/a",
+      "id": "amigo-staff-software-engineer",
+      "score": 58,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Staff Software Engineer, Backend",
+      "company": "Coco",
+      "location": "Los Angeles, CA",
+      "url": "https://www.linkedin.com/jobs/view/staff-software-engineer-backend-at-coco-4318510263",
+      "posted": "2025-10-22",
+      "salary": "n/a",
+      "id": "coco-staff-software-engineer-backend",
+      "score": 58,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Staff Software Engineer, Applications",
+      "company": "FloQast",
+      "location": "Los Angeles, CA",
+      "url": "https://www.linkedin.com/jobs/view/staff-software-engineer-applications-at-floqast-4413754443",
+      "posted": "2026-06-24",
+      "salary": "n/a",
+      "id": "floqast-staff-software-engineer-applications",
+      "score": 58,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Staff Software Engineer (Backend) - Everand Core",
+      "company": "Scribd, Inc.",
+      "location": "San Diego, CA",
+      "url": "https://www.linkedin.com/jobs/view/staff-software-engineer-backend-everand-core-at-scribd-inc-4438941581",
+      "posted": "2026-07-11",
+      "salary": "n/a",
+      "id": "scribd-inc-staff-software-engineer-backend-everand-core",
+      "score": 58,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Staff Software Engineer",
+      "company": "Nectar Social",
+      "location": "Palo Alto, CA",
+      "url": "https://www.linkedin.com/jobs/view/staff-software-engineer-at-nectar-social-4428404197",
+      "posted": "2026-06-16",
+      "salary": "n/a",
+      "id": "nectar-social-staff-software-engineer",
+      "score": 58,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Staff Software Engineer, Product",
+      "company": "Arena",
+      "location": "San Francisco Bay Area",
+      "url": "https://www.linkedin.com/jobs/view/staff-software-engineer-product-at-arena-4344679082",
+      "posted": "2025-12-18",
+      "salary": "n/a",
+      "id": "arena-staff-software-engineer-product",
+      "score": 58,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Staff Software Engineer",
+      "company": "Truewind",
+      "location": "San Francisco, CA",
+      "url": "https://www.linkedin.com/jobs/view/staff-software-engineer-at-truewind-4422060950",
+      "posted": "2026-05-30",
+      "salary": "n/a",
+      "id": "truewind-staff-software-engineer",
+      "score": 58,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Staff Software Engineer",
+      "company": "Art of Problem Solving",
+      "location": "San Diego, CA",
+      "url": "https://www.linkedin.com/jobs/view/staff-software-engineer-at-art-of-problem-solving-4416992182",
+      "posted": "2026-06-22",
+      "salary": "n/a",
+      "id": "art-of-problem-solving-staff-software-engineer",
+      "score": 58,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Staff Software Engineer",
+      "company": "Laurel",
+      "location": "Los Angeles, CA",
+      "url": "https://www.linkedin.com/jobs/view/staff-software-engineer-at-laurel-4405869191",
+      "posted": "2026-04-23",
+      "salary": "n/a",
+      "id": "laurel-staff-software-engineer",
+      "score": 58,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Senior Software Engineer",
+      "company": "Achievement Awards Group",
+      "location": "Westlake, OH",
+      "url": "https://www.linkedin.com/jobs/view/senior-software-engineer-at-achievement-awards-group-4438563118",
+      "posted": "2026-07-08",
+      "salary": "n/a",
+      "id": "achievement-awards-group-senior-software-engineer",
+      "score": 58,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Senior Software Engineer",
+      "company": "Clayton",
+      "location": "Maryville, TN",
+      "url": "https://www.linkedin.com/jobs/view/senior-software-engineer-at-clayton-4422470329",
+      "posted": "2026-06-02",
+      "salary": "n/a",
+      "id": "clayton-senior-software-engineer",
+      "score": 58,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Senior Software Engineer",
+      "company": "OCLC",
+      "location": "Dublin, OH",
+      "url": "https://www.linkedin.com/jobs/view/senior-software-engineer-at-oclc-4437897441",
+      "posted": "2026-07-07",
+      "salary": "n/a",
+      "id": "oclc-senior-software-engineer",
+      "score": 58,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "(USA) Senior, Software Engineer",
+      "company": "Walmart",
+      "location": "Bentonville, AR",
+      "url": "https://www.linkedin.com/jobs/view/usa-senior-software-engineer-at-walmart-4436500574",
+      "posted": "2026-07-07",
+      "salary": "n/a",
+      "id": "walmart-usa-senior-software-engineer",
+      "score": 58,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Senior Software Engineer",
+      "company": "Acima",
+      "location": "Draper, UT",
+      "url": "https://www.linkedin.com/jobs/view/senior-software-engineer-at-acima-4436865064",
+      "posted": "2026-07-07",
+      "salary": "n/a",
+      "id": "acima-senior-software-engineer",
+      "score": 58,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Senior Software Engineer",
+      "company": "YouVersion",
+      "location": "Edmond, OK",
+      "url": "https://www.linkedin.com/jobs/view/senior-software-engineer-at-youversion-4395461174",
+      "posted": "2026-07-03",
+      "salary": "n/a",
+      "id": "youversion-senior-software-engineer",
+      "score": 58,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Senior Software Engineer (Builders Welcome)",
+      "company": "pmtbox",
+      "location": "Orem, UT",
+      "url": "https://www.linkedin.com/jobs/view/senior-software-engineer-builders-welcome-at-pmtbox-4386945841",
+      "posted": "2026-03-17",
+      "salary": "n/a",
+      "id": "pmtbox-senior-software-engineer-builders-welcome",
+      "score": 58,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Senior Software Engineer",
+      "company": "Neighbor",
+      "location": "Lehi, UT",
+      "url": "https://www.linkedin.com/jobs/view/senior-software-engineer-at-neighbor-4410773447",
+      "posted": "2026-05-05",
+      "salary": "n/a",
+      "id": "neighbor-senior-software-engineer",
+      "score": 58,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Senior Software Engineer",
+      "company": "Perk",
+      "location": "Greater Boston",
+      "url": "https://www.linkedin.com/jobs/view/senior-software-engineer-at-perk-4430632291",
+      "posted": "2026-06-26",
+      "salary": "n/a",
+      "id": "perk-senior-software-engineer",
+      "score": 58,
+      "score_breakdown": {
+        "title_seniority_match": 25,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "senior/staff IC title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "source": "linkedin",
+      "title": "Full-stack Engineer",
+      "company": "Hercules",
+      "location": "San Francisco, CA",
+      "url": "https://www.linkedin.com/jobs/view/full-stack-engineer-at-hercules-4402924645",
+      "posted": "2026-04-16",
+      "salary": "n/a",
+      "id": "hercules-full-stack-engineer",
+      "score": 52,
+      "score_breakdown": {
+        "title_seniority_match": 15,
+        "stack_overlap": 16,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 9
+      },
+      "verdict": "skip",
+      "reasons": [
+        "1 stack term(s) in title"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "company": "OpenAI",
+      "ats": "ashby",
+      "title": "Technical Deployment Lead, Forward Deployed Engineering (FDE) - SF",
+      "location": "San Francisco",
+      "url": "https://jobs.ashbyhq.com/openai/c5a99c73-c4c4-4321-a519-e0104dc54747",
+      "remote_flag": true,
+      "posted": "2026-02-26T21:10:46.893+00:00",
+      "loc_note": "US remote",
+      "pre_score": 4,
+      "id": "openai-technical-deployment-lead-forward-deployed-engineerin",
+      "score": 46,
+      "score_breakdown": {
+        "title_seniority_match": 8,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "skip",
+      "reasons": [
+        "strong-brand company"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
+    },
+    {
+      "company": "OpenAI",
+      "ats": "ashby",
+      "title": "Technical Deployment Lead, Forward Deployed Engineering (FDE) - NYC",
+      "location": "New York City",
+      "url": "https://jobs.ashbyhq.com/openai/9f2e4897-be7d-40a1-804d-37e6608f506b",
+      "remote_flag": true,
+      "posted": "2026-03-12T16:50:24.228+00:00",
+      "loc_note": "US remote",
+      "pre_score": 4,
+      "id": "openai-technical-deployment-lead-forward-deployed-engineerin",
+      "score": 46,
+      "score_breakdown": {
+        "title_seniority_match": 8,
+        "stack_overlap": 12,
+        "remote_comp_fit": 4,
+        "domain_relevance": 8,
+        "company_quality": 14
+      },
+      "verdict": "skip",
+      "reasons": [
+        "strong-brand company"
+      ],
+      "flags": [
+        "location not clearly remote - verify"
+      ]
     }
   ]
 }

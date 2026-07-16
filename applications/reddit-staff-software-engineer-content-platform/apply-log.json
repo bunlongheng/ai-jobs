@@ -1,0 +1,100 @@
+{
+  "id": "reddit-staff-software-engineer-content-platform",
+  "url": "https://job-boards.greenhouse.io/reddit/jobs/8004045",
+  "stamp": "2026-07-14T18:37:28.453Z",
+  "outcome": "rejected_by_site",
+  "ready": true,
+  "resume_uploaded": true,
+  "required_total": 30,
+  "required_missing": [],
+  "fields": [
+    {
+      "label": "First Name*",
+      "value": "Bunlong"
+    },
+    {
+      "label": "Last Name*",
+      "value": "Heng"
+    },
+    {
+      "label": "Preferred First Name",
+      "value": "Bunlong"
+    },
+    {
+      "label": "Email*",
+      "value": "bheng.code@gmail.com"
+    },
+    {
+      "label": "Country*",
+      "value": "+1"
+    },
+    {
+      "label": "Search",
+      "value": ""
+    },
+    {
+      "label": "Phone*",
+      "value": "978-677-0861"
+    },
+    {
+      "label": "Location (City)*",
+      "value": "Town of Pelham, New Hampshire, United States"
+    },
+    {
+      "label": "LinkedIn Profile*",
+      "value": "https://www.linkedin.com/in/bunlongheng/"
+    },
+    {
+      "label": "How did you hear about this job?*",
+      "value": "Yes"
+    },
+    {
+      "label": "Please provide the name of your current (or most recent) company*",
+      "value": "Thryv"
+    },
+    {
+      "label": "Are you currently authorized to work in the U.S.?*",
+      "value": "Yes"
+    },
+    {
+      "label": "Do you now, or will you in the future, require immigration sponsorship to work a",
+      "value": "No"
+    },
+    {
+      "label": "By selecting \"I agree,\" I understand that the information I have provided as par",
+      "value": "I agree"
+    },
+    {
+      "label": "What gender identity do you most closely identify with? *",
+      "value": "Male"
+    },
+    {
+      "label": "Are you a person of transgender experience? *",
+      "value": "No"
+    },
+    {
+      "label": "What sexual orientation do you most closely identify with? *",
+      "value": "Heterosexual"
+    },
+    {
+      "label": "Do you live with a disability (as outlined by the ADA)?*",
+      "value": "I don't wish to answer"
+    },
+    {
+      "label": "Are you a veteran/have you served in the military? *",
+      "value": "No military service"
+    },
+    {
+      "label": "Please select up to 2 ethnicities that you most closely identify with.*",
+      "value": "I don't wish to answer"
+    },
+    {
+      "label": "By checking this box, I consent to Reddit collecting, storing, and processing my",
+      "value": "checked"
+    },
+    {
+      "label": "g-recaptcha-response",
+      "value": "+1"
+    }
+  ]
+}
