@@ -7,7 +7,7 @@ Paste these into the ATS custom-question fields.
 | Full name | Bunlong Heng |
 | Email | bheng.code@gmail.com |
 | Phone | 978-677-0861 |
-| Location | Dallas, TX (open to relocating / commuting to Andover, MA - home region: Lowell/Billerica) |
+| Location | Pelham, NH (local to Andover, MA - Greater Boston / Lowell region) |
 | Work authorization | US citizen |
 | Sponsorship needed | No, not now or in the future |
 | Willing to relocate | Yes - open to Andover, MA / Greater Boston (hybrid OK for this role) |

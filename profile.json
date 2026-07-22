@@ -9,7 +9,7 @@
     "github": "bunlongheng",
     "linkedin": "https://www.linkedin.com/in/bunlongheng/",
     "location": "Pelham, NH",
-    "resume_pdf": "/Users/bheng/Sites/bheng/public/docs/Bunlong Heng's Resume - FullStack.pdf"
+    "resume_pdf": "/Users/bheng/Sites/job/resume-bunlong.pdf"
   },
   "targets": {
     "titles": [
@@ -132,7 +132,7 @@
     "github": "https://github.com/bunlongheng",
     "portfolio": "https://www.bunlongheng.com",
     "linkedin": "https://www.linkedin.com/in/bunlongheng/",
-    "resume_pdf": "/Users/bheng/Sites/bheng/public/docs/Bunlong Heng's Resume - FullStack.pdf",
+    "resume_pdf": "/Users/bheng/Sites/job/resume-bunlong.pdf",
     "references": "Available upon request",
     "cover_letter_default": "always",
     "eeo": {
@@ -150,7 +150,7 @@
     "work_arrangement": "Remote only",
     "security_clearance": "None",
     "current_company": "Thryv",
-    "current_title": "Technical Engineering Manager"
+    "current_title": "Senior Full Stack Web Developer & Architect"
   },
   "sources": {
     "indeed": {

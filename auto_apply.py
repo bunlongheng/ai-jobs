@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""auto_apply.py - run the headless auto-apply bot for ONE job, then log it.
+"""DEPRECATED (2026-07-21): superseded by jobfill/ (server + Chrome extension).
+Use the JobFill flow instead - this headless path hit captcha walls and produced
+junk submissions. Kept for reference only.
+
+auto_apply.py - run the headless auto-apply bot for ONE job, then log it.
 
 For each job it:
   1. runs apply_bot.mjs <id> [--url URL] --auto  (headless fill + gated submit)
@@ -54,7 +58,10 @@ try:
     hit = next((a for a in lst if a.get("id") == jid), None)
     if hit is None:
         hit = {"id": jid, "title": jid, "company": "", "score": None}
-        (apps if isinstance(apps, list) else []).append(hit) if isinstance(apps, list) else apps.update({jid: hit})
+        if isinstance(apps, list):
+            apps.append(hit)
+        else:
+            apps[jid] = hit
     if submitted:
         hit["status"] = "applied"; hit["applied_at"] = now
     else:

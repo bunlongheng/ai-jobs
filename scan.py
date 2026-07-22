@@ -9,13 +9,14 @@ Level 0 before the WebSearch fallback.
 Usage: python3 scan.py [path/to/portals.json]
 """
 import json
+import os
 import sys
 import urllib.request
 import urllib.error
 from concurrent.futures import ThreadPoolExecutor
 
-HERE = "/Users/bheng/Sites/job"
-CFG = sys.argv[1] if len(sys.argv) > 1 else HERE + "/portals.json"
+HERE = os.path.dirname(os.path.abspath(__file__))
+CFG = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "portals.json")
 UA = {"User-Agent": "Mozilla/5.0 (jobhunt-scan)"}
 TIMEOUT = 15
 
@@ -113,14 +114,12 @@ def loc_ok(job, lf):
     blocked = any(b in blob for b in lf["blocked_terms"])
     if blocked and not us:
         return False, "non-US location"
-    if not blob.strip():
-        return True, "location unstated - verify US"
     if not us and not remote:
         return False, "location unclear"
     return True, ("US remote" if us else "generic remote - verify US")
 
 
-def pre_score(job, tf):
+def pre_score(job):
     t = job["title"].lower()
     s = 0
     if "staff" in t or "principal" in t:
@@ -155,7 +154,7 @@ def main():
                 if not ok:
                     continue
                 j["loc_note"] = why
-                j["pre_score"] = pre_score(j, tf)
+                j["pre_score"] = pre_score(j)
                 matched.append(j)
 
     # dedupe by url, rank by pre_score desc then company, cap per company

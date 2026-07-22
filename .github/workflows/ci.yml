@@ -1,0 +1,22 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Guardrail tests (jobfill rules + server)
+        run: python3 tests/test_jobfill.py
+      - name: Guardrail tests (scan filters + exclusions)
+        run: python3 tests/test_scan.py
+      - name: Guardrail tests (preflight gate)
+        run: python3 tests/test_preflight.py
+      - name: Lint
+        run: pipx run ruff check .

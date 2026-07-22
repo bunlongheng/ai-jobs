@@ -11,7 +11,7 @@ Usage:
   python3 jobsdb.py apply <id|dedupe>   # mark applied (status='applied', applied_at=now())
   python3 jobsdb.py top [N]             # top N by score not yet applied
 """
-import json, os, re, subprocess, sys
+import json, subprocess, sys
 
 ENV = "/Users/bheng/Sites/bheng/.env.local"
 
@@ -37,8 +37,12 @@ def q(s):
     return s.replace("'", "''") if s else ""
 
 
-def dq(obj):  # dollar-quoted jsonb literal
-    return "$j$" + json.dumps(obj or None) + "$j$"
+def dq(obj):  # dollar-quoted jsonb literal; grow the tag until it cannot collide
+    s = json.dumps(obj or None)
+    tag = "j"
+    while f"${tag}$" in s:
+        tag += "j"
+    return f"${tag}$" + s + f"${tag}$"
 
 
 def ingest(path):

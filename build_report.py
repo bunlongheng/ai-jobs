@@ -1,8 +1,8 @@
 import json, os, re, hashlib, base64, urllib.request
+from collections import Counter
 
 d = json.load(open(os.path.expanduser("~/Sites/job/jobs/latest.json")))
 jobs = d["jobs"]; ts = d["run"]
-from collections import Counter
 cnt = Counter(j["verdict"] for j in jobs)
 src = Counter(j.get("source", "ats") for j in jobs)
 

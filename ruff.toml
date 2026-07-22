@@ -1,0 +1,12 @@
+# Lint the engine scripts. The house style here is compact single-purpose
+# scripts - allow the deliberate compactness, catch everything else.
+line-length = 200
+
+[lint]
+per-file-ignores = { "tests/*" = ["E402"] }  # sys.path bootstrap must precede imports
+ignore = [
+    "E401",  # multiple imports on one line (house style in these scripts)
+    "E701",  # colon one-liners (if x: return y)
+    "E702",  # semicolon-joined statements
+    "E731",  # lambda assignment (esc = lambda ...)
+]

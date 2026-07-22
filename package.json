@@ -1,0 +1,11 @@
+{
+  "name": "job",
+  "private": true,
+  "description": "DIY job-hunt engine (see README.md). Playwright is the only node dep - used by scrape_indeed.mjs.",
+  "scripts": {
+    "test": "python3 tests/test_jobfill.py && python3 tests/test_scan.py"
+  },
+  "dependencies": {
+    "playwright": "^1.59.1"
+  }
+}

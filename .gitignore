@@ -18,3 +18,12 @@ node_modules/
 
 # per-run job snapshots keep only the latest
 jobs/2*.json
+
+# application PII artifacts - EEO answers, phone, address (never commit)
+applications/**/ext-events.jsonl
+applications/**/submitted-answers.json
+applications/**/apply-log.json
+applications/**/headful-run.log
+
+# local secrets (Stickies key)
+.claude/settings.local.json

@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "JobFill",
+  "version": "0.27.0",
+  "description": "Fill the open job application page from the local job-hunt kit (localhost:7777). You review and click Submit.",
+  "icons": {
+    "16": "icon16.png",
+    "32": "icon32.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "webNavigation",
+    "alarms"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1:7777/*",
+    "http://localhost:7777/*",
+    "https://*/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "JobFill",
+    "default_icon": {
+      "16": "icon16.png",
+      "32": "icon32.png",
+      "48": "icon48.png"
+    }
+  }
+}

@@ -1,0 +1,108 @@
+{
+ "date": "2026-07-21",
+ "ats": "greenhouse",
+ "status": "ready",
+ "covered": 16,
+ "total": 19,
+ "manual": [
+  "Do you have at least 12 years of full time relevant working experience?"
+ ],
+ "direct_url": "https://jobs.dropbox.com/listing/7421149?gh_jid=7421149",
+ "questions": [
+  [
+   "First Name",
+   "builtin/profile",
+   true
+  ],
+  [
+   "Last Name",
+   "builtin/profile",
+   true
+  ],
+  [
+   "Email",
+   "builtin/profile",
+   true
+  ],
+  [
+   "Phone",
+   "builtin/profile",
+   true
+  ],
+  [
+   "Resume/CV",
+   "kit upload",
+   true
+  ],
+  [
+   "Cover Letter",
+   "kit upload",
+   false
+  ],
+  [
+   "LinkedIn Profile",
+   "builtin/profile",
+   false
+  ],
+  [
+   "Website",
+   "builtin/profile",
+   false
+  ],
+  [
+   "What is your legal first name?",
+   "builtin/profile",
+   true
+  ],
+  [
+   "What are your personal pronouns?",
+   "rule: He / Him / His",
+   false
+  ],
+  [
+   "Current Location",
+   "rule: US - New Hampshire",
+   true
+  ],
+  [
+   "Please provide the zip code of your primary residence.",
+   "rule: 03076",
+   true
+  ],
+  [
+   "Are you currently authorized to work for any employer in the country outlined for this role?",
+   "builtin/profile",
+   true
+  ],
+  [
+   "How did you hear about this role? (Please select all that apply)",
+   "rule: LinkedIn",
+   true
+  ],
+  [
+   "Have you previously worked for Dropbox?",
+   "rule: No, I have not previously worked",
+   true
+  ],
+  [
+   "Do you have at least 12 years of full time relevant working experience?",
+   "HUMAN (deliberate)",
+   true
+  ],
+  [
+   "Please email me about future job openings",
+   "rule: Yes",
+   true
+  ],
+  [
+   "Location Cost Tier",
+   "NO RULE",
+   false
+  ],
+  [
+   "Fingerprint",
+   "NO RULE",
+   false
+  ]
+ ]
+}

@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 /**
+ * DEPRECATED (2026-07-21): superseded by jobfill/ (server + Chrome extension).
+ * This engine produced unreliable unattended submissions (captcha walls, junk field
+ * values). Use the JobFill extension + jobfill/server.py instead. Kept for reference.
+ *
  * apply_bot.mjs - ASSISTED job-application filler (Playwright, headful).
  *
  * Fills an application form from your kit + profile, uploads your resume PDF,

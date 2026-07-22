@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-15",
+  "updated": "2026-07-22",
   "statuses": [
     "planned",
     "kit_ready",
@@ -25,16 +25,18 @@
     },
     {
       "id": "factored-senior-full-stack-python-react",
-      "title": "Senior Full-Stack Engineer (Python & React)",
+      "title": "Senior Software Engineer (GenAI/ML)",
       "company": "Factored",
       "score": 82,
       "verdict": "apply",
-      "status": "planned",
+      "status": "rejected",
       "source_run": "2026-07-02-0741",
-      "url": "https://dynamitejobs.com/company/factored/remote-job/senior-full-stack-engineer-python-react",
-      "applied_at": null,
+      "url": "https://job-boards.greenhouse.io/factored/jobs/4514946008",
+      "applied_at": "2026-07-21",
       "kit_path": null,
-      "notes": "Verify salary clears $160k floor."
+      "notes": "Verify salary clears $160k floor. | direct ATS url found 2026-07-21 [rejected 2026-07-22: hiring focused on South America candidates]",
+      "liveness_checked": "2026-07-22",
+      "rejected_at": "2026-07-22"
     },
     {
       "id": "veeva-senior-frontend-fullstack",
@@ -105,54 +107,65 @@
       "id": "weather-company-lead-swe-met-tech",
       "company": "The Weather Company",
       "title": "Lead Software Engineer, Meteorological Technologies",
-      "status": "kit_ready",
+      "status": "applied",
       "score": 71,
       "location": "Andover, MA (Hybrid)",
-      "url": "https://www.indeed.com/viewjob?jk=f5a124e93d02a9b7",
+      "url": "https://job-boards.greenhouse.io/theweathercompany/jobs/5171779007",
       "kit_path": "applications/weather-company-lead-swe-met-tech",
       "flags": [
         "hybrid vs remote-only default (user approved)",
         "base floor under min"
-      ]
+      ],
+      "notes": " | direct ATS url found 2026-07-21",
+      "applied_at": "2026-07-21"
     },
     {
       "id": "reddit-staff-software-engineer-content-platform",
-      "title": "reddit-staff-software-engineer-content-platform",
-      "company": "",
-      "score": null,
-      "status": "kit_ready",
+      "title": "Staff Software Engineer, Content Platform",
+      "company": "Reddit",
+      "score": 86,
+      "status": "applied",
       "auto_outcome": "rejected_by_site",
-      "apply_log": "applications/reddit-staff-software-engineer-content-platform/apply-log.json"
+      "apply_log": "applications/reddit-staff-software-engineer-content-platform/apply-log.json",
+      "applied_at": "2026-07-21",
+      "url": "https://job-boards.greenhouse.io/reddit/jobs/8004045",
+      "liveness_checked": "2026-07-22"
     },
     {
       "id": "vanta-senior-fullstack-software-engineer-grc",
-      "title": "vanta-senior-fullstack-software-engineer-grc",
-      "company": "",
-      "score": null,
-      "status": "kit_ready",
+      "title": "Senior Fullstack Software Engineer, GRC",
+      "company": "Vanta",
+      "score": 79,
+      "status": "applied",
       "auto_outcome": "not_confirmed",
-      "apply_log": "applications/vanta-senior-fullstack-software-engineer-grc/apply-log.json"
+      "apply_log": "applications/vanta-senior-fullstack-software-engineer-grc/apply-log.json",
+      "url": "https://jobs.ashbyhq.com/vanta/1513e1ac-5dca-4acb-a99d-8b5461115651",
+      "applied_at": "2026-07-21"
     },
     {
       "id": "twilio-staff-software-engineer-l4-data-platform",
-      "title": "twilio-staff-software-engineer-l4-data-platform",
-      "company": "",
-      "score": null,
+      "title": "Staff Software Engineer (L4), Data Platform",
+      "company": "Twilio",
+      "score": 86,
       "status": "applied",
       "auto_outcome": "submitted",
       "apply_log": "applications/twilio-staff-software-engineer-l4-data-platform/apply-log.json",
       "applied_at": "2026-07-15",
-      "notes": "Bot filled 37/37 headless, user ticked hear-about + clicked Submit. Confirmed \"Thanks for applying\"."
+      "notes": "Bot filled 37/37 headless, user ticked hear-about + clicked Submit. Confirmed \"Thanks for applying\". [posting CLOSED as of 2026-07-22 - greenhouse 404, no longer accepting] [posting CLOSED 2026-07-22 - greenhouse 404]",
+      "url": "https://job-boards.greenhouse.io/twilio/jobs/7952515",
+      "liveness_checked": "2026-07-22"
     },
     {
       "id": "discord-staff-software-engineer-platform-security",
       "title": "Staff Software Engineer, Platform Security",
       "company": "Discord",
       "score": 86,
-      "status": "applied",
+      "status": "rejected",
       "applied_at": "2026-07-15",
       "auto_outcome": "submitted",
-      "notes": "Bot filled 22/22 headless incl 2 tailored essays, user submitted + entered Greenhouse security code xHpyeC7R. Confirmed received."
+      "notes": "Bot filled 22/22 headless incl 2 tailored essays, user submitted + entered Greenhouse security code xHpyeC7R. Confirmed received. | Rejection email 2026-07-20 (gmail-sync)",
+      "rejected_at": "2026-07-20",
+      "url": "https://job-boards.greenhouse.io/discord/jobs/8177912002"
     },
     {
       "id": "webflow-staff-software-engineer-developer-productivity",
@@ -161,7 +174,460 @@
       "score": 77,
       "status": "applied",
       "applied_at": "2026-07-15",
-      "auto_outcome": "submitted"
+      "auto_outcome": "submitted",
+      "url": "https://job-boards.greenhouse.io/webflow/jobs/7832069"
+    },
+    {
+      "id": "optum-full-stack-senior-software-developer",
+      "company": "Optum",
+      "title": "Full Stack Senior Software Developer",
+      "score": 88,
+      "url": "https://careers.unitedhealthgroup.com/job/eden-prairie/full-stack-senior-software-developer/34088/94256382272",
+      "status": "rejected",
+      "notes": " Indeed posting expired 2026-07-21; live on UHG careers (URL updated). [posting expired/removed 2026-07-21 - UHG 404]",
+      "preflight": {
+        "date": "2026-07-21",
+        "status": "account_wall",
+        "ats": "browser",
+        "covered": 0,
+        "total": 0,
+        "manual": [],
+        "direct_url": "https://careers.unitedhealthgroup.com/job/eden-prairie/full-stack-senior-software-developer/34088/94256382272"
+      }
+    },
+    {
+      "id": "dropbox-staff-fullstack-software-engineer-core-performance",
+      "company": "Dropbox",
+      "title": "Staff Fullstack Software Engineer, Core Performance",
+      "score": 79,
+      "url": "https://jobs.dropbox.com/listing/7421149?gh_jid=7421149",
+      "status": "kit_ready",
+      "preflight": {
+        "date": "2026-07-22",
+        "status": "ready",
+        "ats": "greenhouse",
+        "covered": 19,
+        "total": 19,
+        "manual": []
+      },
+      "notes": " [parked 2026-07-21: multi-step wizard + ZIP splash, too slow to auto-drive]",
+      "ai_able": true,
+      "liveness_checked": "2026-07-22"
+    },
+    {
+      "id": "stripe-staff-full-stack-engineer-identity",
+      "company": "Stripe",
+      "title": "Staff Full Stack Engineer, Identity",
+      "score": 79,
+      "url": "https://stripe.com/jobs/search?gh_jid=7895467",
+      "status": "applied",
+      "applied_at": "2026-07-21",
+      "liveness_checked": "2026-07-22"
+    },
+    {
+      "id": "owner-com-staff-software-engineer-full-stack-launch",
+      "company": "Owner.com",
+      "title": "Staff Software Engineer, Full-Stack",
+      "score": 78,
+      "url": "https://jobs.ashbyhq.com/owner/bae9c3e1-7f5f-4ea1-8ee3-0856a73165d3",
+      "status": "applied",
+      "notes": " | direct ATS url found 2026-07-21",
+      "applied_at": "2026-07-21"
+    },
+    {
+      "id": "coinbase-senior-staff-software-engineer-blockchain-platform",
+      "company": "Coinbase",
+      "title": "Senior Staff Software Engineer - Blockchain Platform",
+      "score": 90,
+      "url": "https://www.coinbase.com/careers/positions/7366208?gh_jid=7366208",
+      "status": "applied",
+      "applied_at": "2026-07-21",
+      "liveness_checked": "2026-07-22"
+    },
+    {
+      "id": "home-depot-thd-staff-software-engineer-enterprise-data-wareh",
+      "company": "Home Depot / THD",
+      "title": "Staff Software Engineer - Enterprise Data Warehouse",
+      "score": 84,
+      "url": "https://www.indeed.com/viewjob?jk=290b9aca77616d74",
+      "status": "manual_only",
+      "preflight": {
+        "date": "2026-07-21",
+        "status": "blocked",
+        "ats": "browser",
+        "covered": 0,
+        "total": 0,
+        "manual": [],
+        "direct_url": "https://www.indeed.com/applystart?jk=290b9aca77616d74&from=vj&pos=bottom&mvj=0&spon=0&asub=mob&astse=25bb651049ba2ed4&assa=7425"
+      }
+    },
+    {
+      "id": "epam-systems-inc-senior-full-stack-engineer-react-native-typ",
+      "company": "EPAM Systems, Inc.",
+      "title": "Senior Full Stack Engineer (React Native, TypeScript, Node.js)",
+      "score": 83,
+      "url": "https://www.indeed.com/viewjob?jk=595da27da8d66bd7",
+      "status": "manual_only",
+      "preflight": {
+        "date": "2026-07-21",
+        "status": "blocked",
+        "ats": "browser",
+        "covered": 0,
+        "total": 0,
+        "manual": [],
+        "direct_url": "https://www.indeed.com/applystart?jk=595da27da8d66bd7&from=vj&pos=bottom&mvj=0&spon=0&asub=mob&astse=927e2500ef274f89&assa=8122"
+      }
+    },
+    {
+      "id": "imgix-senior-full-stack-software-engineer",
+      "company": "Imgix",
+      "title": "Senior Full Stack Software Engineer",
+      "score": 78,
+      "url": "https://www.indeed.com/viewjob?jk=47a1f424451beb52",
+      "status": "manual_only",
+      "preflight": {
+        "date": "2026-07-21",
+        "status": "account_wall",
+        "ats": "browser",
+        "covered": 0,
+        "total": 0,
+        "manual": [],
+        "direct_url": "https://www.indeed.com/viewjob?jk=47a1f424451beb52"
+      }
+    },
+    {
+      "id": "twilio-staff-software-engineer-l4-email",
+      "company": "Twilio",
+      "title": "Staff Software Engineer (L4) - Email",
+      "score": 79,
+      "url": "https://job-boards.greenhouse.io/twilio/jobs/7967685",
+      "status": "rejected",
+      "applied_at": "2026-07-21",
+      "liveness_checked": "2026-07-22",
+      "rejected_at": "2026-07-22",
+      "notes": " [rejected 2026-07-22: hiring team decided not to move forward]"
+    },
+    {
+      "id": "abbott-laboratories-senior-full-stack-engineer",
+      "company": "Abbott Laboratories",
+      "title": "Senior Full Stack Engineer",
+      "score": 81,
+      "url": "https://www.indeed.com/viewjob?jk=6e85ee4c9b9accfe",
+      "status": "manual_only",
+      "preflight": {
+        "date": "2026-07-21",
+        "status": "blocked",
+        "ats": "browser",
+        "covered": 0,
+        "total": 0,
+        "manual": [],
+        "direct_url": "https://www.indeed.com/applystart?jk=6e85ee4c9b9accfe&from=vj&pos=bottom&mvj=0&spon=0&asub=mob&astse=a940be03640b07e5&assa=7517"
+      }
+    },
+    {
+      "id": "reddit-staff-software-engineer-devplatform",
+      "company": "Reddit",
+      "title": "Staff Software Engineer, DevPlatform",
+      "score": 79,
+      "status": "applied",
+      "url": "https://job-boards.greenhouse.io/reddit/jobs/8049901",
+      "applied_at": "2026-07-21"
+    },
+    {
+      "id": "coinbase-senior-fullstack-advisor-agentic-trading",
+      "company": "Coinbase",
+      "title": "Senior Software Engineer, Full Stack (Advisor - Agentic Trading)",
+      "score": 88,
+      "status": "kit_ready",
+      "url": "https://www.coinbase.com/careers/positions/8070574?gh_jid=8070574",
+      "kit_path": "applications/coinbase-senior-fullstack-advisor-agentic-trading",
+      "preflight": {
+        "date": "2026-07-22",
+        "status": "ready",
+        "ats": "greenhouse",
+        "covered": 19,
+        "total": 19,
+        "manual": []
+      },
+      "ai_able": true,
+      "liveness_checked": "2026-07-22"
+    },
+    {
+      "id": "linear-senior--staff-fullstack-engineer",
+      "company": "Linear",
+      "title": "Senior / Staff Fullstack Engineer",
+      "score": 76,
+      "status": "kit_ready",
+      "url": "https://jobs.ashbyhq.com/linear/d3bc1ced-3ce4-4086-a050-555055dbb1ff",
+      "ats": "ashby",
+      "ai_able": true,
+      "preflight": {
+        "date": "2026-07-22",
+        "status": "ready",
+        "ats": "ashby",
+        "covered": 0,
+        "total": 0,
+        "manual": [],
+        "note": "single-page - verified at fill"
+      },
+      "notes": "auto-added by ai_refresh (live + AI-able)"
+    },
+    {
+      "id": "linear-senior--staff-fullstack-engineer",
+      "company": "Linear",
+      "title": "Senior / Staff Fullstack Engineer",
+      "score": 76,
+      "status": "kit_ready",
+      "url": "https://jobs.ashbyhq.com/linear/cd5ae036-0223-427a-b038-ba16ef9dcb32",
+      "ats": "ashby",
+      "ai_able": true,
+      "preflight": {
+        "date": "2026-07-22",
+        "status": "ready",
+        "ats": "ashby",
+        "covered": 0,
+        "total": 0,
+        "manual": [],
+        "note": "single-page - verified at fill"
+      },
+      "notes": "auto-added by ai_refresh (live + AI-able)"
+    },
+    {
+      "id": "vanta-senior-fullstack-engineer-emerging-products",
+      "company": "Vanta",
+      "title": "Senior Fullstack Engineer, Emerging Products",
+      "score": 75,
+      "status": "kit_ready",
+      "url": "https://jobs.ashbyhq.com/vanta/e54ab450-192f-40f3-8029-37a44f2c09b1",
+      "ats": "ashby",
+      "ai_able": true,
+      "preflight": {
+        "date": "2026-07-22",
+        "status": "ready",
+        "ats": "ashby",
+        "covered": 0,
+        "total": 0,
+        "manual": [],
+        "note": "single-page - verified at fill"
+      },
+      "notes": "auto-added by ai_refresh (live + AI-able)"
+    },
+    {
+      "id": "coinbase-senior-staff-software-engineer-core-automation",
+      "company": "Coinbase",
+      "title": "Senior Staff Software Engineer, Core Automation",
+      "score": 74,
+      "status": "kit_ready",
+      "url": "https://www.coinbase.com/careers/positions/7580292?gh_jid=7580292",
+      "ats": "greenhouse",
+      "ai_able": true,
+      "preflight": {
+        "date": "2026-07-22",
+        "status": "ready",
+        "ats": "greenhouse",
+        "covered": 19,
+        "total": 19,
+        "manual": []
+      },
+      "notes": "auto-added by ai_refresh (live + AI-able)"
+    },
+    {
+      "id": "dropbox-principal-software-engineer-core-sharing--collaboration",
+      "company": "Dropbox",
+      "title": "Principal Software Engineer, Core Sharing & Collaboration",
+      "score": 74,
+      "status": "kit_ready",
+      "url": "https://jobs.dropbox.com/listing/8006972?gh_jid=8006972",
+      "ats": "greenhouse",
+      "ai_able": true,
+      "preflight": {
+        "date": "2026-07-22",
+        "status": "ready",
+        "ats": "greenhouse",
+        "covered": 18,
+        "total": 18,
+        "manual": []
+      },
+      "notes": "auto-added by ai_refresh (live + AI-able)"
+    },
+    {
+      "id": "linear-senior--staff-product-engineer",
+      "company": "Linear",
+      "title": "Senior / Staff Product Engineer",
+      "score": 74,
+      "status": "kit_ready",
+      "url": "https://jobs.ashbyhq.com/linear/069c4628-88d7-4e4d-b393-c996fc7f3076",
+      "ats": "ashby",
+      "ai_able": true,
+      "preflight": {
+        "date": "2026-07-22",
+        "status": "ready",
+        "ats": "ashby",
+        "covered": 0,
+        "total": 0,
+        "manual": [],
+        "note": "single-page - verified at fill"
+      },
+      "notes": "auto-added by ai_refresh (live + AI-able)"
+    },
+    {
+      "id": "openai-senior-staff-software-engineer-gov",
+      "company": "OpenAI",
+      "title": "Senior Staff Software Engineer, Gov",
+      "score": 74,
+      "status": "kit_ready",
+      "url": "https://jobs.ashbyhq.com/openai/a90cdb7c-1c33-4fca-9a96-26c236006f14",
+      "ats": "ashby",
+      "ai_able": true,
+      "preflight": {
+        "date": "2026-07-22",
+        "status": "ready",
+        "ats": "ashby",
+        "covered": 0,
+        "total": 0,
+        "manual": [],
+        "note": "single-page - verified at fill"
+      },
+      "notes": "auto-added by ai_refresh (live + AI-able)"
+    },
+    {
+      "id": "openai-technical-deployment-lead-forward-deployed-engineering-fde---sf",
+      "company": "OpenAI",
+      "title": "Technical Deployment Lead, Forward Deployed Engineering (FDE) - SF",
+      "score": 74,
+      "status": "kit_ready",
+      "url": "https://jobs.ashbyhq.com/openai/c5a99c73-c4c4-4321-a519-e0104dc54747",
+      "ats": "ashby",
+      "ai_able": true,
+      "preflight": {
+        "date": "2026-07-22",
+        "status": "ready",
+        "ats": "ashby",
+        "covered": 0,
+        "total": 0,
+        "manual": [],
+        "note": "single-page - verified at fill"
+      },
+      "notes": "auto-added by ai_refresh (live + AI-able)"
+    },
+    {
+      "id": "openai-technical-deployment-lead-forward-deployed-engineering-fde---ny",
+      "company": "OpenAI",
+      "title": "Technical Deployment Lead, Forward Deployed Engineering (FDE) - NYC",
+      "score": 74,
+      "status": "kit_ready",
+      "url": "https://jobs.ashbyhq.com/openai/9f2e4897-be7d-40a1-804d-37e6608f506b",
+      "ats": "ashby",
+      "ai_able": true,
+      "preflight": {
+        "date": "2026-07-22",
+        "status": "ready",
+        "ats": "ashby",
+        "covered": 0,
+        "total": 0,
+        "manual": [],
+        "note": "single-page - verified at fill"
+      },
+      "notes": "auto-added by ai_refresh (live + AI-able)"
+    },
+    {
+      "id": "replit-staff-software-engineer-product",
+      "company": "Replit",
+      "title": "Staff Software Engineer, Product",
+      "score": 74,
+      "status": "kit_ready",
+      "url": "https://jobs.ashbyhq.com/replit/47235851-fadd-4bd7-9cc6-61f545059ac1",
+      "ats": "ashby",
+      "ai_able": true,
+      "preflight": {
+        "date": "2026-07-22",
+        "status": "ready",
+        "ats": "ashby",
+        "covered": 0,
+        "total": 0,
+        "manual": [],
+        "note": "single-page - verified at fill"
+      },
+      "notes": "auto-added by ai_refresh (live + AI-able)"
+    },
+    {
+      "id": "replit-staff-software-engineer-money",
+      "company": "Replit",
+      "title": "Staff Software Engineer, Money",
+      "score": 74,
+      "status": "kit_ready",
+      "url": "https://jobs.ashbyhq.com/replit/14b3aef3-f926-4db9-8c31-af8ba848fbd8",
+      "ats": "ashby",
+      "ai_able": true,
+      "preflight": {
+        "date": "2026-07-22",
+        "status": "ready",
+        "ats": "ashby",
+        "covered": 0,
+        "total": 0,
+        "manual": [],
+        "note": "single-page - verified at fill"
+      },
+      "notes": "auto-added by ai_refresh (live + AI-able)"
+    },
+    {
+      "id": "replit-principal-software-engineer-money-infrastructure",
+      "company": "Replit",
+      "title": "Principal Software Engineer, Money Infrastructure",
+      "score": 74,
+      "status": "kit_ready",
+      "url": "https://jobs.ashbyhq.com/replit/bb52f792-58c2-41ab-954d-555c821fe3fe",
+      "ats": "ashby",
+      "ai_able": true,
+      "preflight": {
+        "date": "2026-07-22",
+        "status": "ready",
+        "ats": "ashby",
+        "covered": 0,
+        "total": 0,
+        "manual": [],
+        "note": "single-page - verified at fill"
+      },
+      "notes": "auto-added by ai_refresh (live + AI-able)"
+    },
+    {
+      "id": "vanta-principal-software-engineer-platform",
+      "company": "Vanta",
+      "title": "Principal Software Engineer, Platform",
+      "score": 74,
+      "status": "kit_ready",
+      "url": "https://jobs.ashbyhq.com/vanta/f1af3c57-be2d-4263-9579-0c04d29b1289",
+      "ats": "ashby",
+      "ai_able": true,
+      "preflight": {
+        "date": "2026-07-22",
+        "status": "ready",
+        "ats": "ashby",
+        "covered": 0,
+        "total": 0,
+        "manual": [],
+        "note": "single-page - verified at fill"
+      },
+      "notes": "auto-added by ai_refresh (live + AI-able)"
+    },
+    {
+      "id": "dropbox-senior-infrastructure-software-engineer-storage-core",
+      "company": "Dropbox",
+      "title": "Senior Infrastructure Software Engineer, Storage Core",
+      "score": 73,
+      "status": "kit_ready",
+      "url": "https://jobs.dropbox.com/listing/8008890?gh_jid=8008890",
+      "ats": "greenhouse",
+      "ai_able": true,
+      "preflight": {
+        "date": "2026-07-22",
+        "status": "ready",
+        "ats": "greenhouse",
+        "covered": 19,
+        "total": 19,
+        "manual": []
+      },
+      "notes": "auto-added by ai_refresh (live + AI-able)"
     }
   ]
 }
