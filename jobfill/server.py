@@ -414,10 +414,16 @@ class H(BaseHTTPRequestHandler):
                         for c in kept:
                             f.write(json.dumps(c) + "\n")
                 return self._send(200, pending)
-            if len(parts) == 2 and parts[0] == "job":
-                # drill-down detail page for one application
-                html, code = render_job_detail(parts[1])
-                return self._send(code, html.encode(), "text/html; charset=utf-8")
+            if parts == ["board"] or (len(parts) == 2 and parts[0] == "job"):
+                # RETIRED viewing routes - the board + drill-down now live in the
+                # Jobs app (Next.js). Redirect to the canonical /jobs so nothing 404s.
+                dest = "http://localhost:3017/jobs"
+                if len(parts) == 2 and parts[0] == "job":
+                    dest += "/" + parts[1]
+                self.send_response(302)
+                self.send_header("Location", dest)
+                self.end_headers()
+                return
             if len(parts) == 4 and parts[0] == "job" and parts[2] == "file":
                 # serve a kit file (resume.pdf, cover-letter.pdf) for the detail page
                 fp = os.path.join(APPS, os.path.basename(parts[1]), os.path.basename(parts[3]))
@@ -425,25 +431,6 @@ class H(BaseHTTPRequestHandler):
                     ctype = "application/pdf" if fp.endswith(".pdf") else "text/plain; charset=utf-8"
                     return self._send(200, open(fp, "rb").read(), ctype)
                 return self._send(404, {"error": "file not found"})
-            if parts == ["board"]:
-                # ALWAYS-UP local pipeline page: renders the /job report HTML straight
-                # from tracker.json (zero tokens, no skill run). Regenerates on each
-                # load so it is always live; 3s cache absorbs refresh spam.
-                import time
-                cache = getattr(self.server, "_board_cache", None)
-                now = time.time()
-                if cache and now - cache[0] < 3:
-                    return self._send(200, cache[1], "text/html; charset=utf-8")
-                report = os.path.expanduser("~/.claude/skills/job/report.py")
-                out_html = f"/tmp/job-pipeline-{date.today().isoformat()}.html"
-                try:
-                    subprocess.run(["python3", report, "--no-open", "--no-stickies"],
-                                   capture_output=True, timeout=30)
-                    html_bytes = open(out_html, "rb").read()
-                except Exception as e:
-                    html_bytes = (f"<h1>board error</h1><pre>{html_mod.escape(str(e))}</pre>").encode()
-                self.server._board_cache = (now, html_bytes)
-                return self._send(200, html_bytes, "text/html; charset=utf-8")
             if parts == ["kits"]:
                 t = load(TRACKER)
                 out = [{k: a.get(k) for k in ("id", "company", "title", "url", "status", "score")}
