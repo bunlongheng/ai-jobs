@@ -18,10 +18,17 @@ for (const p of ['playwright', os.homedir() + '/Sites/bheng/node_modules/playwri
 if (!chromium) { console.error('playwright not found'); process.exit(1); }
 
 const HOME = os.homedir();
-const JOB = `${HOME}/Sites/job`;
+const JOB = `${HOME}/Sites/jobs`;
 const prof = JSON.parse(fs.readFileSync(`${JOB}/profile.json`)).apply_answers;
 const resume = `${JOB}/resume-bunlong.pdf`;
-const APPLY = 'https://www.dropbox.jobs/en/jobs/apply/?id=7421149';
+// Args: --id <ghId> --jid <tracker-id> [--headless]. Defaults keep original behavior.
+const argv = process.argv.slice(2);
+const argOf = (f, d) => { const i = argv.indexOf(f); return i >= 0 ? argv[i + 1] : d; };
+const DID = argOf('--id', '7421149');
+const JID = argOf('--jid', 'dropbox-staff-fullstack-software-engineer-core-performance');
+const HEADLESS = argv.includes('--headless');
+const SHOTDIR = `${JOB}/applications/${JID}`;
+const APPLY = `https://www.dropbox.jobs/en/jobs/apply/?id=${DID}`;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // label-substring -> value (lowercase match). Truthful, from profile.
@@ -124,8 +131,8 @@ async function fillEmployment(page) {
   }
 }
 
-const browser = await chromium.launch({ channel: 'chrome', headless: false, args: ['--start-maximized'] })
-  .catch(() => chromium.launch({ headless: false, args: ['--start-maximized'] }));
+const browser = await chromium.launch({ channel: 'chrome', headless: HEADLESS, args: ['--start-maximized'] })
+  .catch(() => chromium.launch({ headless: HEADLESS, args: ['--start-maximized'] }));
 const ctx = await browser.newContext({ viewport: null });
 const page = await ctx.newPage();
 const ZIP = '03076';
@@ -190,7 +197,7 @@ for (let step = 0; step < 14; step++) {
   const finalSubmit = await page.locator('button:has-text("Submit application"), button:has-text("Submit Application")').count().catch(() => 0);
   const hasExp = /at least 12 years|years of.*experience|desired.*salary|salary expectation/.test(bodyTxt);
   if (finalSubmit || hasExp) {
-    await page.screenshot({ path: `${JOB}/applications/dropbox-staff-fullstack-software-engineer-core-performance/apply-stopped.png`, fullPage: true }).catch(() => {});
+    await page.screenshot({ path: `${SHOTDIR}/apply-preview.png`, fullPage: true }).catch(() => {});
     console.log(`STOP: ${finalSubmit ? 'final Submit reached' : 'human-only question (experience/salary)'} - your turn`);
     break;
   }
@@ -205,6 +212,7 @@ for (let step = 0; step < 14; step++) {
   lastUrl = url;
 }
 
-await page.screenshot({ path: `${JOB}/applications/dropbox-staff-fullstack-software-engineer-core-performance/apply-progress.png`, fullPage: true }).catch(() => {});
-console.log('\nDONE driving. Browser left OPEN for your review + Submit. Screenshot saved.');
+await page.screenshot({ path: `${SHOTDIR}/apply-preview.png`, fullPage: true }).catch(() => {});
+console.log(`\nDONE driving ${JID}. Screenshot -> ${SHOTDIR}/apply-preview.png`);
+if (HEADLESS) { await ctx.close().catch(() => {}); await browser.close().catch(() => {}); }
 // leave the browser open so the user can review and submit

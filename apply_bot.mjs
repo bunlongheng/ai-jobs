@@ -12,7 +12,7 @@
  *
  * Usage:
  *   node apply_bot.mjs <job-id> [--url <applyUrl>]
- *   (reads ~/Sites/job/applications/<job-id>/ + profile.json apply_answers)
+ *   (reads ~/Sites/jobs/applications/<job-id>/ + profile.json apply_answers)
  */
 import { createRequire } from 'module';
 import fs from 'fs';
@@ -44,8 +44,8 @@ for (let i = 3; i < process.argv.length; i++) {
   else if (a === '--profile') PROFILE = true;      // use the persistent logged-in Greenhouse profile
 }
 
-const dir = `${HOME}/Sites/job/applications/${id}`;
-const prof = JSON.parse(fs.readFileSync(`${HOME}/Sites/job/profile.json`));
+const dir = `${HOME}/Sites/jobs/applications/${id}`;
+const prof = JSON.parse(fs.readFileSync(`${HOME}/Sites/jobs/profile.json`));
 const A = prof.apply_answers || {};
 const read = (f) => { try { return fs.readFileSync(`${dir}/${f}`, 'utf8'); } catch { return ''; } };
 const cover = read('cover-letter.md');
@@ -53,6 +53,9 @@ const cover = read('cover-letter.md');
 // lowercase substrings of the question, values are the answer to type/select.
 let CUSTOM = {};
 try { CUSTOM = JSON.parse(fs.readFileSync(`${dir}/answers.json`, 'utf8')); } catch (_) {}
+// per-job radio/toggle rules (same shape as YESNO) - e.g. years-of-experience buckets
+let YESNO_EXTRA = [];
+try { YESNO_EXTRA = JSON.parse(fs.readFileSync(`${dir}/yesno.json`, 'utf8')); } catch (_) {}
 // ALWAYS prefer Bunlong's master resume PDF (his stated preference - never a
 // generated/tailored substitute). Fall back to a kit resume.pdf only if missing.
 const master = (A.resume_pdf || '').replace(/^~/, os.homedir());
@@ -230,7 +233,7 @@ async function chooseOption(page, f, keywords, isCountry) {
 }
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-const HEADLESS = (AUTO || FILLONLY) ? true : !SHOW;   // AUTO/fill-only run headless in the background
+const HEADLESS = SHOW ? false : (AUTO || FILLONLY);   // AUTO/fill-only headless by default; --show forces a visible window (headful auto-submit)
 const MODE = FILLONLY ? 'FILL-ONLY' : (AUTO ? 'AUTO' : 'ASSISTED');
 console.log(`\napply-bot (${MODE}${HEADLESS ? ', headless' : ''}) :: ${id}\n  -> ${url}\n`);
 
@@ -240,7 +243,7 @@ const vp = HEADLESS ? { width: 1280, height: 1600 } : null;
 if (PROFILE) {
   // persistent, logged-in profile so Greenhouse (my.greenhouse.io) recognizes the
   // session -> applications track in MyGreenhouse and fields prefill.
-  const profDir = `${HOME}/Sites/job/chrome-profile`;
+  const profDir = `${HOME}/Sites/jobs/chrome-profile`;
   for (const opts of [{ channel: 'chrome', headless: HEADLESS, viewport: vp, args: baseArgs },
                       { headless: HEADLESS, viewport: vp, args: baseArgs }]) {
     try { ctx = await chromium.launchPersistentContext(profDir, opts); break; } catch (_) {}
@@ -387,8 +390,65 @@ try {
       for (let i = 0; i < 5 && c.parentElement; i++) { c = c.parentElement; if (clickIn(c, ans)) { out.push(`${tag}=${ans}`); break; } }
     }
     return out;
-  }, YESNO).catch(() => []);
+  }, YESNO.concat(YESNO_EXTRA)).catch(() => []);
   for (const a of answered) report.push([a.split('=')[0], `answered: ${a.split('=')[1]}`]);
+
+  // ---- Ashby toggle groups: label.ashby-application-form-question-title + Yes/No
+  // button pair. Needs REAL Playwright clicks (JS .click() doesn't register with
+  // their handlers); success is VERIFIED via the _active class - never assumed. ----
+  for (const r of YESNO.concat(YESNO_EXTRA)) {
+    try {
+      const rx = new RegExp(r.re, 'i');
+      for (const lab of await page.locator('label.ashby-application-form-question-title').all()) {
+        const qt = (await lab.innerText().catch(() => '')) || '';
+        if (!rx.test(qt)) continue;
+        const entry = lab.locator('xpath=..');
+        const ansRx = new RegExp(`^\\s*${String(r.ans).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`, 'i');
+        const btn = entry.locator('button').filter({ hasText: ansRx }).first();
+        if (!(await btn.count().catch(() => 0))) continue;
+        if (/_active/.test((await btn.getAttribute('class').catch(() => '')) || '')) continue;
+        await btn.scrollIntoViewIfNeeded().catch(() => {});
+        await btn.click({ timeout: 3000 }).catch(() => {});
+        await sleep(300);
+        const ok = /_active/.test((await btn.getAttribute('class').catch(() => '')) || '');
+        report.push([qt.slice(0, 42), ok ? `toggled: ${r.ans} (verified)` : `TOGGLE FAILED (${r.ans})`]);
+      }
+    } catch (_) {}
+  }
+  // required Location typeahead: type the city, pick the first suggestion
+  try {
+    const locInput = page.locator('input[placeholder*="Start typing"]').first();
+    if (await locInput.count().catch(() => 0) && !(await locInput.inputValue().catch(() => ''))) {
+      await locInput.scrollIntoViewIfNeeded().catch(() => {});
+      await locInput.click({ timeout: 3000 }).catch(() => {});
+      await locInput.pressSequentially('Pelham, New Hampshire', { delay: 70 }).catch(() => {});
+      await sleep(1600);
+      const opt = page.locator('[role="option"]').first();
+      if (await opt.count().catch(() => 0)) await opt.click().catch(() => {});
+      else { await page.keyboard.press('ArrowDown').catch(() => {}); await page.keyboard.press('Enter').catch(() => {}); }
+      await sleep(400);
+      report.push(['location (typeahead)', 'Pelham, New Hampshire']);
+    }
+  } catch (_) {}
+  // verify long CUSTOM fills actually stuck (site re-renders can wipe them) - retype for real if empty
+  for (const f of fields) {
+    const ck = Object.keys(CUSTOM).find(k => f.key.includes(k.toLowerCase()));
+    if (!ck || f.type === 'file') continue;
+    const cv = String(CUSTOM[ck]);
+    if (cv.length <= 24 || (f.tag !== 'textarea' && f.tag !== 'input')) continue;
+    try {
+      const loc = page.locator(f.sel).first();
+      const cur = await loc.inputValue().catch(() => '');
+      if (!cur.trim()) {
+        await loc.scrollIntoViewIfNeeded().catch(() => {});
+        await loc.click({ timeout: 3000 }).catch(() => {});
+        await loc.pressSequentially(cv, { delay: 4 }).catch(() => {});
+        await sleep(300);
+        const now = await loc.inputValue().catch(() => '');
+        report.push([f.label || ck, now.trim() ? 'refilled (typed, verified)' : 'REFILL FAILED']);
+      }
+    } catch (_) {}
+  }
 
   // ---- tick required consent / agreement checkboxes (applying implies consent) ----
   const consented = await page.evaluate(() => {
@@ -432,6 +492,18 @@ try {
     }
     return miss;
   }, reqFields.map(f => ({ sel: f.sel, label: f.label || f.key.slice(0, 30) }))).catch(() => reqFields.map(f => f.label));
+  // required Ashby toggle groups (hidden from the input-based gate) must have an active option
+  const toggleMiss = await page.evaluate(() => {
+    const miss = [];
+    document.querySelectorAll('.ashby-application-form-field-entry').forEach(e => {
+      const lab = e.querySelector('label.ashby-application-form-question-title');
+      if (!lab || !/_required_/.test(lab.className)) return;
+      const btns = [...e.querySelectorAll('button')].filter(b => /^(yes|no)$/i.test((b.textContent || '').trim()));
+      if (btns.length >= 2 && !btns.some(b => /_active/.test(b.className))) miss.push((lab.textContent || '').trim().slice(0, 60));
+    });
+    return miss;
+  }).catch(() => []);
+  missing.push(...toggleMiss);
   const ready = resumeUploaded && missing.length === 0;
 
   const shot = `${dir}/apply-preview.png`;
