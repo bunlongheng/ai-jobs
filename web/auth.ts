@@ -10,6 +10,7 @@
  */
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
+import { isLocal } from "@/lib/is-local";
 
 const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "bheng.code@gmail.com").trim().toLowerCase();
 
@@ -28,10 +29,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async signIn({ user }) {
       return !!user.email && user.email.toLowerCase() === ADMIN_EMAIL;
     },
-    // Used by middleware: dev/local is open (unchanged local workflow); prod requires
-    // a valid session (which only the admin email can obtain via signIn above).
-    authorized({ auth }) {
-      if (process.env.NODE_ENV !== "production") return true;
+    // Used by middleware. Bypass ONLY local/LAN dev requests (localhost/192.168/10.x) and
+    // ONLY when not in production - so an exposed dev server still gates remote hosts, and
+    // production always requires a valid session (obtainable only by the admin email above).
+    authorized({ auth, request }) {
+      if (process.env.NODE_ENV !== "production" && isLocal(request)) return true;
       return !!auth?.user;
     },
   },
