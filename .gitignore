@@ -27,3 +27,20 @@ applications/**/headful-run.log
 
 # local secrets (Stickies key)
 .claude/settings.local.json
+web/node_modules/
+web/.next/
+web/jobs.db*
+web/test-results/
+
+# ===== personal data - NEVER ship (open-source prep 2026-07-22) =====
+applications/
+/jobs/
+profile.json
+resume-*.pdf
+answer-bank.md
+web/jobs.db*
+jobfill/rules.json
+jobfill/commands.jsonl
+legacy-python/
+portals.json
+resume-master.md

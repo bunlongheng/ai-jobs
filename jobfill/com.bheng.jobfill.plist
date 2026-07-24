@@ -7,7 +7,7 @@
   <array>
     <string>/usr/bin/env</string>
     <string>python3</string>
-    <string>/Users/bheng/Sites/job/jobfill/server.py</string>
+    <string>/Users/bheng/Sites/jobs/jobfill/server.py</string>
   </array>
   <key>RunAtLoad</key><true/>
   <key>KeepAlive</key><true/>

@@ -2,7 +2,7 @@
 /**
  * login_greenhouse.mjs - open the bot's PERSISTENT Chrome profile to
  * my.greenhouse.io so Bunlong logs into MyGreenhouse ONCE. The session is saved
- * in ~/Sites/job/chrome-profile and reused by `apply_bot.mjs --profile`, so
+ * in ~/Sites/jobs/chrome-profile and reused by `apply_bot.mjs --profile`, so
  * every Greenhouse application then prefills + tracks in his account.
  *
  * Usage: node login_greenhouse.mjs   (log in, then close the window)
@@ -16,7 +16,7 @@ for (const p of ['playwright', os.homedir() + '/Sites/bheng/node_modules/playwri
 }
 if (!chromium) { console.error('playwright not found'); process.exit(1); }
 
-const profDir = `${os.homedir()}/Sites/job/chrome-profile`;
+const profDir = `${os.homedir()}/Sites/jobs/chrome-profile`;
 let ctx;
 for (const opts of [{ channel: 'chrome', headless: false, args: ['--start-maximized'], viewport: null },
                     { headless: false, args: ['--start-maximized'], viewport: null }]) {

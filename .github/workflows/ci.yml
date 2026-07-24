@@ -1,22 +1,25 @@
 name: ci
-
-on:
-  push:
-  pull_request:
-
+on: [push, pull_request]
+defaults:
+  run:
+    working-directory: web
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
+    env:
+      JOBS_SECRET: test
+      JOBS_PASSWORD: test
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-node@v4
         with:
-          python-version: "3.12"
-      - name: Guardrail tests (jobfill rules + server)
-        run: python3 tests/test_jobfill.py
-      - name: Guardrail tests (scan filters + exclusions)
-        run: python3 tests/test_scan.py
-      - name: Guardrail tests (preflight gate)
-        run: python3 tests/test_preflight.py
-      - name: Lint
-        run: pipx run ruff check .
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
