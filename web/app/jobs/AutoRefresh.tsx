@@ -2,13 +2,24 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-/** Re-pull the server component every few seconds so submits (JobFill events)
- *  appear on the board without a manual reload. Local SQLite read - negligible cost. */
+/** 5s auto-refresh + pull-down-to-refresh (works in Add-to-Home-Screen mode
+ *  where Safari's native pull is disabled). */
 export default function AutoRefresh({ ms = 5000 }: { ms?: number }) {
   const router = useRouter();
   useEffect(() => {
-    const t = setInterval(() => router.refresh(), ms);
-    return () => clearInterval(t);
+    const t = setInterval(() => { if (!document.hidden) router.refresh(); }, ms);
+    let startY = 0, pulling = false;
+    const down = (e: TouchEvent) => { if (window.scrollY === 0) { startY = e.touches[0].clientY; pulling = true; } };
+    const move = (e: TouchEvent) => {
+      if (!pulling) return;
+      const dy = e.touches[0].clientY - startY;
+      if (dy > 70) { pulling = false; document.body.style.opacity = "0.5"; window.location.reload(); }
+    };
+    const up = () => { pulling = false; };
+    window.addEventListener("touchstart", down, { passive: true });
+    window.addEventListener("touchmove", move, { passive: true });
+    window.addEventListener("touchend", up, { passive: true });
+    return () => { clearInterval(t); window.removeEventListener("touchstart", down); window.removeEventListener("touchmove", move); window.removeEventListener("touchend", up); };
   }, [router, ms]);
   return null;
 }

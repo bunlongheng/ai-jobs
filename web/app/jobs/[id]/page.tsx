@@ -1,25 +1,28 @@
 import { getApp, type Field } from "@/lib/queries";
 import { getKit } from "@/lib/kit";
 import { getLogo } from "@/lib/logos";
+import Reactions from "../Reactions";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-function Section({ title, sub, html }: { title: string; sub?: string; html: string }) {
+function Section({ title, sub, html, grad = "from-blue-500 to-blue-700" }: { title: string; sub?: string; html: string; grad?: string }) {
   if (!html) return null;
   return (
-    <div className="bg-white border border-gray-300 rounded-xl px-6 py-5 mb-3.5">
-      <h2 className="text-[15px] font-bold mb-2.5">{title}{sub ? <span className="text-xs text-gray-400 font-normal ml-2">{sub}</span> : null}</h2>
-      <div className="prose-kit text-[13px] leading-relaxed" dangerouslySetInnerHTML={{ __html: html }} />
+    <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden mb-3.5">
+      <div className={`bg-gradient-to-r ${grad} px-4 py-2.5`}>
+        <h2 className="text-sm text-white tracking-wide">{title}{sub ? <span className="text-xs text-white/80 ml-2">{sub}</span> : null}</h2>
+      </div>
+      <div className="prose-kit text-[13px] leading-relaxed px-6 py-5" dangerouslySetInnerHTML={{ __html: html }} />
     </div>
   );
 }
 
 const STBG: Record<string, string> = {
-  applied: "bg-green-50 text-green-700", kit_ready: "bg-blue-50 text-blue-700",
-  rejected: "bg-red-50 text-red-600", interviewing: "bg-purple-50 text-purple-700",
-  manual_only: "bg-amber-50 text-amber-700", planned: "bg-gray-50 text-gray-600",
+  applied: "from-blue-500 to-blue-700", kit_ready: "from-emerald-500 to-green-600",
+  rejected: "from-rose-500 to-red-600", interviewing: "from-purple-500 to-violet-600",
+  manual_only: "from-amber-400 to-orange-500", planned: "from-gray-400 to-gray-500",
 };
 
 export default async function JobDetail({ params }: { params: Promise<{ id: string }> }) {
@@ -64,15 +67,16 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
               </div>
             </div>
             <div className="text-right">
-              <span className={`font-bold text-xs px-3 py-1 rounded-lg uppercase ${STBG[app.status || "planned"] || "bg-gray-50 text-gray-600"}`}>{app.status}</span>
+              <span className={`text-xs px-3 py-1 rounded-lg uppercase text-white bg-gradient-to-r ${STBG[app.status || "planned"] || "from-gray-400 to-gray-500"}`}>{app.status}</span>
               <div className="text-[22px] font-extrabold text-blue-700 mt-1.5">{app.score ?? "-"}</div>
+              <div className="mt-2 flex justify-end items-center gap-1"><Reactions id={app.id} liked={app.liked} /></div>
             </div>
           </div>
           {app.url ? <div className="mt-3"><a href={app.url} target="_blank" rel="noopener noreferrer" className="inline-block bg-green-700 text-white font-bold text-[13px] px-4 py-2 rounded-lg no-underline">Open apply page</a></div> : null}
           {meta.length ? <div className="mt-3 text-xs text-gray-600 leading-relaxed">{meta.map((m, i) => <div key={i}>{m}</div>)}</div> : null}
         </div>
 
-        <Section title="Resume (this version)" html={kit.resumeHtml} />
+        <Section title="Resume (this version)" grad="from-blue-500 to-blue-700" html={kit.resumeHtml} />
         {!kit.resumeHtml && kit.hasResumePdf ? (
           <div className="bg-white border border-gray-300 rounded-xl px-6 py-5 mb-3.5">
             <h2 className="text-[15px] font-bold mb-2.5">Resume (this version)</h2>
@@ -85,8 +89,8 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
             <p className="text-[13px] text-gray-400">Used the master resume (resume-bunlong.pdf).</p>
           </div>
         ) : null}
-        <Section title="Cover letter" html={kit.coverHtml} />
-        <Section title="Screening answers" html={kit.screeningHtml} />
+        <Section title="Cover letter" grad="from-purple-500 to-violet-600" html={kit.coverHtml} />
+        <Section title="Screening answers" grad="from-amber-400 to-orange-500" html={kit.screeningHtml} />
 
         {(() => {
           const isRed = (f: Field) => String(f[1] ?? "").trim().toUpperCase().startsWith("MANUAL");
@@ -95,8 +99,8 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
           return (
             <>
               {reds.length ? (
-                <div className="bg-red-50 border-2 border-red-300 rounded-xl px-5 py-4 mb-3.5">
-                  <h2 className="text-[15px] font-bold mb-2.5 text-red-700">Red - needs a rule or you <span className="text-xs font-bold text-white bg-red-600 rounded-full px-2 py-0.5 ml-2">{reds.length}</span></h2>
+                <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden mb-3.5">
+                  <h2 className="bg-gradient-to-r from-rose-500 to-red-600 text-white text-sm tracking-wide px-4 py-2.5">Red - needs a rule or you <span className="text-xs font-bold text-white bg-red-600 rounded-full px-2 py-0.5 ml-2">{reds.length}</span></h2>
                   <table className="w-full border-collapse">
                     <tbody>
                       {reds.map((f: Field, i: number) => (

@@ -266,6 +266,7 @@ async function pollCommands() {
           ? await chrome.tabs.create({ url: u, active: true }).then((t) => { lastOpenedTabId = t.id; return { ok: true, tabId: t.id }; })
           : { ok: false, error: "bad url" };
       }
+      else if (c.action === "detect_easy_apply") result = await doDetectEasyApply(c.urls || []);
       else if (c.action === "read") result = await doRead();
       else if (c.action === "audit") result = await doAudit(c.kitId, c.tabId);
       else if (c.action === "click") result = await doClick(c.text, c.tabId);
@@ -285,6 +286,27 @@ async function pollCommands() {
     }
   } catch (e) { /* server down - quiet */ }
 }
+// Easy Apply detection: open each job in a BACKGROUND tab (no focus steal), let
+// the content.js beacon report easy_apply_detected, then auto-close. Gentle + capped
+// so LinkedIn/Indeed never see a burst (owner rule: no suspicious bot behavior).
+async function doDetectEasyApply(urls) {
+  const list = (urls || []).filter((u) => /^https?:\/\//.test(u)).slice(0, 25);
+  let checked = 0;
+  for (const u of list) {
+    try {
+      const t = await chrome.tabs.create({ url: u, active: false });
+      await new Promise((r) => setTimeout(r, 3500)); // let the page render
+      // content.js is injected on demand (no auto content_scripts) - inject so the beacon runs
+      await chrome.scripting.executeScript({ target: { tabId: t.id }, files: ["content.js"] }).catch(() => {});
+      await new Promise((r) => setTimeout(r, 4500)); // beacon reports ~3.5s after inject
+      await chrome.tabs.remove(t.id).catch(() => {});
+      checked++;
+      await new Promise((r) => setTimeout(r, 2500)); // spaced, human-paced
+    } catch (_) {}
+  }
+  return { ok: true, checked };
+}
+
 setInterval(pollCommands, 5000);
 chrome.alarms.create("jobfill-poll", { periodInMinutes: 0.5 }); // revives the sleeping worker
 chrome.alarms.onAlarm.addListener((a) => { if (a.name === "jobfill-poll") pollCommands(); });

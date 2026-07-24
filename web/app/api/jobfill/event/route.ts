@@ -18,6 +18,31 @@ export async function POST(req: Request) {
 
   const stamp = new Date().toISOString().slice(0, 10);
   const d = db();
+
+  // Logged-in Chrome sees Easy Apply buttons that guests cannot. Stamp both the
+  // result (easy_apply 1/0) and that we checked (easy_apply_checked=1), matched by URL.
+  if (ev.outcome === "easy_apply_detected" && typeof ev.url === "string") {
+    const clean = (ev.url as string).split("?")[0].replace(/\/$/, "");
+    const found = ev.found ? 1 : 0;
+    const row = d.prepare("SELECT id FROM applications WHERE url LIKE ? || '%' OR ? LIKE url || '%'").get(clean, clean) as { id: string } | undefined;
+    if (row) d.prepare("UPDATE applications SET easy_apply=?, easy_apply_checked=1, updated_at=datetime('now') WHERE id=?").run(found, row.id);
+    return NextResponse.json({ ok: true, flagged: row?.id ?? null, easy: found });
+  }
+
+  // Native LinkedIn/Indeed Easy Apply has no kit id - the content script reports the
+  // submit with id "_meta" + the job URL. Match the application by URL and flip
+  // ready -> applied, same as a tracked submit. (owner request 2026-07-23)
+  if (ev.outcome === "submitted" && (jid === "_meta" || jid === "") && typeof ev.url === "string") {
+    const clean = (ev.url as string).split("?")[0].replace(/\/$/, "");
+    const row = d.prepare("SELECT id FROM applications WHERE url LIKE ? || '%' OR ? LIKE url || '%'").get(clean, clean) as { id: string } | undefined;
+    let flipped = false;
+    if (row) {
+      const r = d.prepare("UPDATE applications SET status='applied', applied_at=?, updated_at=datetime('now') WHERE id=? AND status!='applied'").run(stamp, row.id);
+      flipped = r.changes > 0;
+      d.prepare("INSERT INTO events (app_id, outcome, url, stamp) VALUES (?, 'submitted', ?, ?)").run(row.id, ev.url as string, stamp);
+    }
+    return NextResponse.json({ ok: true, tracker_updated: flipped, matched: row?.id ?? null });
+  }
   d.prepare("INSERT INTO events (app_id, outcome, url, fields, stamp, debug) VALUES (?, ?, ?, ?, ?, ?)")
     .run(jid, String(ev.outcome || ""), (ev.url as string) ?? null,
          ev.fields ? JSON.stringify(ev.fields) : null, stamp,

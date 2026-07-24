@@ -5,21 +5,49 @@ export type Field = [label: string, value: string, type?: string, options?: stri
 export type EventRow = { id: number; app_id: string; outcome: string; url: string | null; fields: string | null; stamp: string | null };
 
 const LABEL: Record<string, string> = {
-  planned: "Planned", kit_ready: "Ready", applied: "Applied",
+  planned: "New matches", kit_ready: "Ready", applied: "Applied",
   interviewing: "Interviewing", offer: "Offer", rejected: "Rejected",
-  skipped: "Skipped", manual_only: "Manual",
+  skipped: "Skipped", manual_only: "Manual", archived: "Archived (disliked)",
 };
 
-export function getBoard(): { groups: BoardGroup[]; counts: Record<string, number> } {
-  const rows = db().prepare("SELECT * FROM applications").all() as AppRow[];
+// Score filter applies to every status panel - a job shows only if its score is within
+// the selected range. Archived (manual set-aside) always shows. (owner request 2026-07-24)
+export const SCORE_TIERS = [90, 80, 70, 60, 50];
+
+export function getBoard(minScore = 0): {
+  groups: BoardGroup[]; counts: Record<string, number>; buckets: Record<number, number>;
+} {
+  const all = db().prepare("SELECT * FROM applications").all() as AppRow[];
+  // disliked jobs (liked = -1) leave their status panel and drop to the Archived panel
+  // at the bottom - still clickable, just set aside. (owner request 2026-07-24)
+  const archived = all.filter((r) => r.liked === -1);
+  const rows = all.filter((r) => r.liked !== -1);
+
+  // per-tier counts across all active (non-archived) jobs, for the score menu
+  const buckets: Record<number, number> = {};
+  for (const t of SCORE_TIERS) buckets[t] = 0;
+  for (const r of rows) for (const t of SCORE_TIERS) if ((r.score ?? 0) >= t) buckets[t]++;
+
+  const keep = (r: AppRow) => (r.score ?? 0) >= minScore;
   const counts: Record<string, number> = {};
-  for (const r of rows) counts[r.status || "planned"] = (counts[r.status || "planned"] || 0) + 1;
+  for (const r of rows) { if (!keep(r)) continue; counts[r.status || "planned"] = (counts[r.status || "planned"] || 0) + 1; }
+  if (archived.length) counts.archived = archived.length;
   const groups: BoardGroup[] = [];
   for (const st of STAGES) {
-    const g = rows.filter((r) => (r.status || "planned") === st).sort((a, b) => (b.score || 0) - (a.score || 0));
+    // Applied list is ordered newest-applied first (recent on top, old at the bottom);
+    // every other stage stays ranked by score. (owner request 2026-07-24)
+    const sort = st === "applied"
+      ? (a: AppRow, b: AppRow) => String(b.applied_at || "").localeCompare(String(a.applied_at || ""))
+      : (a: AppRow, b: AppRow) => (b.score || 0) - (a.score || 0);
+    const g = rows.filter((r) => (r.status || "planned") === st && keep(r)).sort(sort);
     if (g.length) groups.push({ status: st, label: LABEL[st] || st, rows: g });
   }
-  return { groups, counts };
+  // Archived always renders last (below Rejected).
+  if (archived.length) {
+    archived.sort((a, b) => (b.score || 0) - (a.score || 0));
+    groups.push({ status: "archived", label: LABEL.archived, rows: archived });
+  }
+  return { groups, counts, buckets };
 }
 
 export function getApp(id: string): { app: AppRow | undefined; events: EventRow[] } {

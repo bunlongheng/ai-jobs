@@ -15,10 +15,22 @@ const DOMAIN: Record<string, string> = {
 
 const GENERIC_MD5 = "b8a0bf372c762e966cc99ede8682bc71"; // google s2 generic globe
 
-function domainFor(company: string): string | null {
+// Candidate domains for a company not in the DOMAIN map, so the board isn't full of
+// letter-avatars. Modern startups use .ai/.io/.co/.dev as often as .com, so try a few.
+// The generic-globe filter in fetchFaviconDataUri rejects a parked/empty guess, so a
+// miss just falls back to the avatar.
+function candidateDomains(company: string): string[] {
   const c = (company || "").toLowerCase();
-  for (const [k, v] of Object.entries(DOMAIN)) if (c.includes(k)) return v;
-  return null;
+  for (const [k, v] of Object.entries(DOMAIN)) if (c.includes(k)) return [v];
+  // company IS already a domain (e.g. "TherapyNotes.com", "Einstellen.io")
+  const asDomain = c.trim().match(/^([a-z0-9][a-z0-9-]*\.(com|io|ai|co|app|dev|so|tax|net|org))$/);
+  if (asDomain) return [asDomain[1]];
+  const core = c
+    .replace(/\([^)]*\)/g, " ")                                    // drop "(SSG)" etc.
+    .replace(/\b(inc|llc|ltd|corp|corporation|company|co|group|holdings?|holding|partners|technologies|technology|labs|the)\b/g, " ")
+    .replace(/[^a-z0-9]+/g, "");
+  if (core.length < 2) return [];
+  return [".com", ".ai", ".io", ".co", ".dev"].map((t) => core + t);
 }
 
 async function fetchFaviconDataUri(dom: string): Promise<string | null> {
@@ -51,8 +63,8 @@ export async function refreshLogos(): Promise<{ fetched: number; withLogo: numbe
   let fetched = 0, withLogo = 0;
   for (const co of companies) {
     if (have.has(co)) continue;
-    const dom = domainFor(co);
-    const uri = dom ? await fetchFaviconDataUri(dom) : null;
+    let uri: string | null = null;
+    for (const dom of candidateDomains(co)) { uri = await fetchFaviconDataUri(dom); if (uri) break; }
     upsert.run(co, uri);
     fetched++;
     if (uri) withLogo++;

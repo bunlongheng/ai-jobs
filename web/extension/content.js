@@ -9,6 +9,38 @@
   window.__jobfill_v22 = true;
 
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  // Easy Apply beacon: on LinkedIn/Indeed job pages (logged in), report whether the
+  // Easy/Quick Apply button exists - ALWAYS report (found true or false) so the scan
+  // can tell "checked, not easy" apart from "not yet checked".
+  if (/linkedin\.com\/jobs\/view|indeed\.com\/viewjob/.test(location.href)) {
+    setTimeout(() => {
+      try {
+        const txt = [...document.querySelectorAll("button, a")].map((b) => (b.textContent || "").trim().toLowerCase());
+        const found = txt.some((t) => t === "easy apply" || t.startsWith("easily apply"));
+        chrome.runtime.sendMessage({ type: "event", data: { id: "_meta", outcome: "easy_apply_detected", url: location.href, found } });
+      } catch (_) {}
+    }, 3500);
+
+    // Native Easy/Quick Apply skips JobFill's Fill step, so watchForSubmit() never
+    // arms and the board never flips. Poll for the platform's OWN post-submit
+    // confirmation and report it by URL - server matches the app + flips to applied,
+    // zero clicks (owner request 2026-07-23). The success text is absent on load,
+    // so this can only fire after a real submit.
+    let sent = false;
+    const applyWatch = setInterval(() => {
+      if (sent) return;
+      try {
+        const t = (document.body.innerText || "").toLowerCase();
+        if (/your application was sent to|application sent\b|your application has been submitted|application submitted/.test(t)) {
+          sent = true;
+          chrome.runtime.sendMessage({ type: "event", data: { id: "_meta", outcome: "submitted", url: location.href } });
+          clearInterval(applyWatch);
+        }
+      } catch (_) {}
+    }, 2000);
+    setTimeout(() => clearInterval(applyWatch), 30 * 60 * 1000); // give up after 30 min on the tab
+  }
   const norm = (s) => (s || "").replace(/\s+/g, " ").replace(/[*:]+$/, "").trim().toLowerCase();
   let seen = new WeakSet(); // reset per fill run so re-Fill retries unanswered fields
 
@@ -313,6 +345,14 @@
       mouse(opt);
       await sleep(250);
       if (displayedValue(el) || el.value) return { picked, options }; // verified
+    }
+    // portal-rendered lists we cannot see: accept the top suggestion via keyboard,
+    // but ONLY keep it if the committed value verifiably matches a wanted token.
+    if (!opt) {
+      key(el, "ArrowDown"); await sleep(250); key(el, "Enter"); await sleep(400);
+      const got = displayedValue(el) || el.value || "";
+      const okTok = wants.some((w) => got.toLowerCase().includes(String(w).toLowerCase().split(",")[0]));
+      if (got && okTok) return { picked: got, options };
     }
     setNative(el, "");
     el.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));

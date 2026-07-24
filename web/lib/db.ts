@@ -13,6 +13,7 @@ export function db(): Database.Database {
   _db.pragma("journal_mode = WAL");
   _db.exec(SCHEMA);
   try { _db.exec("ALTER TABLE events ADD COLUMN debug TEXT"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE applications ADD COLUMN liked INTEGER DEFAULT 0"); } catch { /* exists */ }
   return _db;
 }
 
@@ -47,6 +48,7 @@ CREATE TABLE IF NOT EXISTS applications (
   has_resume_pdf INTEGER DEFAULT 0,
   resume_pdf    BLOB,           -- the PDF bytes, so /api/kit serves from the DB
   raw           TEXT,           -- full original JSON entry, for anything not columnized
+  liked         INTEGER DEFAULT 0,  -- 0 neutral | 1 hearted | -1 disliked (hidden from board)
   updated_at    TEXT DEFAULT (datetime('now'))
 );
 
@@ -83,6 +85,7 @@ export type AppRow = {
   applied_at: string | null; rejected_at: string | null; liveness_checked: string | null;
   notes: string | null; pf_status: string | null; pf_ats: string | null;
   pf_covered: number | null; pf_total: number | null; pf_direct_url: string | null;
+  liked: number | null;
 };
 
 export const STAGES = ["planned", "kit_ready", "manual_only", "applied", "interviewing", "offer", "rejected", "skipped"] as const;

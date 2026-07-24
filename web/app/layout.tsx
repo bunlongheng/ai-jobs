@@ -15,6 +15,8 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Jobs",
   description: "Job-hunt pipeline - find, score, apply, track",
+  icons: { apple: "/icon.png" },
+  appleWebApp: { capable: true, title: "Jobs", statusBarStyle: "default" },
 };
 
 export default function RootLayout({
