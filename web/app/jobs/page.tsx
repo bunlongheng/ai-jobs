@@ -39,7 +39,7 @@ const HGRAD: Record<string, string> = {
   kit_ready: "from-emerald-500 to-green-600",
   applied: "from-blue-500 to-blue-700",
   manual_only: "from-amber-400 to-orange-500",
-  rejected: "from-rose-500 to-red-600",
+  rejected: "from-rose-300 to-rose-400",
   interviewing: "from-purple-500 to-violet-600",
   skipped: "from-gray-400 to-gray-500",
   archived: "from-gray-400 to-gray-500",
@@ -132,23 +132,17 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
           </div>
         </div>
 
-        <div className="flex gap-2 mb-2">
-          <div className="flex-1 min-w-0 rounded-[10px] px-2.5 py-2.5 sm:px-4 sm:py-3 text-white shadow-sm bg-gradient-to-r from-gray-700 to-gray-900">
+        <div className="flex flex-wrap gap-2 mb-2">
+          <div className="flex-1 min-w-[88px] rounded-[10px] px-2.5 py-2.5 sm:px-4 sm:py-3 text-white shadow-sm bg-gradient-to-r from-gray-700 to-gray-900">
             <div className="text-[20px] sm:text-[26px] font-bold leading-none">{total}</div>
             <div className="text-[10px] sm:text-xs text-white/85 mt-0.5 truncate">Total</div>
           </div>
           {tiles.map((s) => (
-            <div key={s} className={`flex-1 min-w-0 rounded-[10px] px-2.5 py-2.5 sm:px-4 sm:py-3 text-white shadow-sm bg-gradient-to-r ${HGRAD[s]}`}>
+            <div key={s} className={`flex-1 min-w-[88px] rounded-[10px] px-2.5 py-2.5 sm:px-4 sm:py-3 text-white shadow-sm bg-gradient-to-r ${HGRAD[s]}`}>
               <div className="text-[20px] sm:text-[26px] font-bold leading-none">{s === "applied" ? (counts.applied || 0) + (counts.rejected || 0) : counts[s]}</div>
               <div className="text-[10px] sm:text-xs text-white/85 mt-0.5 truncate">{s === "planned" ? "New" : s === "kit_ready" ? "Ready" : s === "manual_only" ? "Manual" : s[0].toUpperCase() + s.slice(1)}</div>
             </div>
           ))}
-          {counts.archived ? (
-            <div className="flex-1 min-w-0 rounded-[10px] px-2.5 py-2.5 sm:px-4 sm:py-3 text-white shadow-sm bg-gradient-to-r from-gray-400 to-gray-500 opacity-70">
-              <div className="text-[20px] sm:text-[26px] font-bold leading-none">{counts.archived}</div>
-              <div className="text-[10px] sm:text-xs text-white/85 mt-0.5 truncate">Archived</div>
-            </div>
-          ) : null}
         </div>
 
 
@@ -160,18 +154,29 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
           const bySource = g.rows.reduce((m, r) => { const s = jobSource(r.url); m[s] = (m[s] || 0) + 1; return m; }, {} as Record<string, number>);
           const breakdown = Object.entries(bySource).sort((a, b) => b[1] - a[1]);
           return (
-          <div key={g.status} className={`mt-6 rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden ${g.status === "archived" ? "opacity-60 grayscale" : ""}`}>
+          <div key={g.status} className={`mt-6 rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden ${g.status === "archived" ? "opacity-75 [&_img]:grayscale" : ""}`}>
             <div className={`bg-gradient-to-r ${HGRAD[g.status] || "from-gray-500 to-gray-600"} px-4 py-2.5 flex items-center justify-between gap-2`}>
-              <h3 className="text-sm font-bold text-white tracking-wide shrink-0">{g.label}</h3>
-              <div className="flex items-center gap-1.5 flex-wrap justify-end">
-                {breakdown.map(([src, n]) => (
-                  <span key={src} className="text-[10px] font-semibold text-white/90 bg-white/20 rounded-full px-2 py-0.5 whitespace-nowrap">{src} {n}</span>
-                ))}
+              <div className="flex items-center gap-2 shrink-0">
+                <h3 className="text-sm font-bold text-white tracking-wide">{g.label}</h3>
                 <span className="text-xs font-bold text-white bg-white/30 rounded-full px-2.5 py-0.5">{g.rows.length}</span>
+              </div>
+              <div className="flex items-center gap-1.5 flex-wrap justify-end">
+                {breakdown.map(([src, n]) => {
+                  const uri = getLogo(`src:${src}`);
+                  return (
+                    <span key={src} title={src} className="inline-flex items-center justify-center gap-1 min-w-[46px] text-[11px] font-bold text-white bg-white/20 rounded-full pl-1 pr-2 py-0.5 whitespace-nowrap">
+                      {uri
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        ? <img src={uri} alt={src} width={16} height={16} className="w-4 h-4 rounded-full bg-white object-cover shrink-0" />
+                        : <span className="text-[9px] uppercase">{src}</span>}
+                      {n}
+                    </span>
+                  );
+                })}
               </div>
             </div>
             <table className="w-full table-fixed border-collapse text-[11px] sm:text-[13px]">
-              <colgroup><col className="w-[30px] sm:w-[44px]" /><col className="w-[21%]" /><col className={g.status === "planned" ? "w-[69%]" : "w-[61%]"} />{g.status !== "planned" ? <col className="w-[8%]" /> : null}<col className="w-[10%]" /></colgroup>
+              <colgroup><col className="w-[30px] sm:w-[44px]" /><col className="w-[21%]" /><col className={g.status === "planned" ? "w-[69%]" : g.status === "archived" ? "w-[53%]" : "w-[61%]"} />{g.status !== "planned" ? <col className={g.status === "archived" ? "w-[16%]" : "w-[8%]"} /> : null}<col className="w-[10%]" /></colgroup>
               <thead><tr className="bg-[#f6f8fa] text-gray-400 text-[11px] text-left">
                 <th className="pl-3 pr-1 py-2 font-medium">Src</th>
                 <th className="px-1 py-2 font-medium">Company</th><th className="px-2.5 py-2 font-medium">Role</th>
@@ -207,7 +212,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
                       <Link href={`/jobs/${r.id}`} className="text-[#1f2328] no-underline hover:text-blue-700">{r.title}</Link>
                       {r.url ? <a href={r.url} target="_blank" rel="noopener noreferrer" title="Open posting" className="text-blue-700 no-underline ml-1.5 align-middle">&#8599;</a> : null}
                     </td>
-                    {g.status !== "planned" ? <td className="px-1.5 py-2 text-right"><Link href={`/jobs/${r.id}`} className="no-underline">{pfBadge(r)}</Link></td> : null}
+                    {g.status !== "planned" ? <td className="px-1.5 py-2 text-right"><Link href={`/jobs/${r.id}`} className="no-underline">{g.status === "archived" ? (r.status === "rejected" ? <span className="text-[9px] font-bold uppercase tracking-wide bg-rose-100 text-rose-500 rounded px-1.5 py-0.5 whitespace-nowrap">rejected</span> : <span className="text-[9px] font-bold uppercase tracking-wide bg-gray-200 text-gray-500 rounded px-1.5 py-0.5 whitespace-nowrap">disliked</span>) : pfBadge(r)}</Link></td> : null}
                     <td className="pl-1 pr-3 py-2 text-right" style={{ color: DOT[g.status] }}><Link href={`/jobs/${r.id}`} className="no-underline" style={{ color: "inherit" }}>{r.score ?? "-"}</Link></td>
                   </tr>
                 ))}

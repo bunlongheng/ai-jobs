@@ -7,7 +7,7 @@ export type EventRow = { id: number; app_id: string; outcome: string; url: strin
 const LABEL: Record<string, string> = {
   planned: "New matches", kit_ready: "Ready", applied: "Applied",
   interviewing: "Interviewing", offer: "Offer", rejected: "Rejected",
-  skipped: "Skipped", manual_only: "Manual", archived: "Archived (disliked)",
+  skipped: "Skipped", manual_only: "Manual", archived: "Archived",
 };
 
 // Score filter applies to every status panel - a job shows only if its score is within
@@ -18,10 +18,11 @@ export function getBoard(minScore = 0): {
   groups: BoardGroup[]; counts: Record<string, number>; buckets: Record<number, number>;
 } {
   const all = db().prepare("SELECT * FROM applications").all() as AppRow[];
-  // disliked jobs (liked = -1) leave their status panel and drop to the Archived panel
-  // at the bottom - still clickable, just set aside. (owner request 2026-07-24)
-  const archived = all.filter((r) => r.liked === -1);
-  const rows = all.filter((r) => r.liked !== -1);
+  // "Archived" bucket = disliked (liked = -1) OR rejected - one muted panel at the bottom,
+  // each row tagged rejected/disliked in the UI. Rejected gets NO separate red panel.
+  // (owner request 2026-07-24)
+  const archived = all.filter((r) => r.liked === -1 || r.status === "rejected");
+  const rows = all.filter((r) => r.liked !== -1 && r.status !== "rejected");
 
   // per-tier counts across all active (non-archived) jobs, for the score menu
   const buckets: Record<number, number> = {};
@@ -31,6 +32,8 @@ export function getBoard(minScore = 0): {
   const keep = (r: AppRow) => (r.score ?? 0) >= minScore;
   const counts: Record<string, number> = {};
   for (const r of rows) { if (!keep(r)) continue; counts[r.status || "planned"] = (counts[r.status || "planned"] || 0) + 1; }
+  // Applied tile counts jobs you applied to, including those later rejected.
+  counts.rejected = all.filter((r) => r.status === "rejected").length;
   if (archived.length) counts.archived = archived.length;
   const groups: BoardGroup[] = [];
   for (const st of STAGES) {

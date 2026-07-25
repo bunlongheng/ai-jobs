@@ -29,11 +29,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async signIn({ user }) {
       return !!user.email && user.email.toLowerCase() === ADMIN_EMAIL;
     },
-    // Used by middleware. Bypass ONLY local/LAN dev requests (localhost/192.168/10.x) and
-    // ONLY when not in production - so an exposed dev server still gates remote hosts, and
-    // production always requires a valid session (obtainable only by the admin email above).
+    // Used by middleware. Loopback (this Mac) bypasses for convenience; every remote host
+    // - Tailscale, LAN - requires a valid session (obtainable only by the admin email).
+    // Works whether the server runs in dev or production mode.
     authorized({ auth, request }) {
-      if (process.env.NODE_ENV !== "production" && isLocal(request)) return true;
+      if (isLocal(request)) return true;
       return !!auth?.user;
     },
   },

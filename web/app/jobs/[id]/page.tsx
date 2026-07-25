@@ -2,6 +2,7 @@ import { getApp, type Field } from "@/lib/queries";
 import { getKit } from "@/lib/kit";
 import { getLogo } from "@/lib/logos";
 import Reactions from "../Reactions";
+import ApplyToggle from "../ApplyToggle";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -44,35 +45,63 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
   if (app.pf_status) meta.push(`Preflight: ${app.pf_status}${app.pf_total ? ` ${app.pf_covered}/${app.pf_total}` : ""}`);
   if (app.notes) meta.push(app.notes);
 
+  // Source (LinkedIn / Indeed / Ashby ...) derived from the apply URL, for its icon.
+  const u = (app.url || "").toLowerCase();
+  const src = !u.startsWith("http") ? ""
+    : u.includes("ashbyhq") ? "Ashby"
+    : u.includes("greenhouse") ? "Greenhouse"
+    : u.includes("lever.co") ? "Lever"
+    : u.includes("indeed") ? "Indeed"
+    : u.includes("linkedin") ? "LinkedIn" : "";
+  const srcUri = src ? getLogo(`src:${src}`) : null;
+
   return (
     <main className="min-h-screen bg-[#f6f8fa] text-[#1f2328]" style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" }}>
       <div className="max-w-[900px] mx-auto px-5 py-6 pb-16">
         <Link href="/jobs" className="text-xs text-blue-700 no-underline">&larr; back to board</Link>
 
-        <div className="bg-white border border-gray-300 rounded-xl px-6 py-5 mt-3 mb-3.5">
-          <div className="flex items-center justify-between gap-3 flex-wrap">
-            <div className="flex items-center gap-3 min-w-0">
-              {(() => {
-                const uri = getLogo(app.company);
-                return uri ? (
+        <div className="bg-white border border-gray-200 rounded-2xl px-6 py-5 mt-3 mb-4 shadow-sm">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-3.5 min-w-0">
+              <span className="relative shrink-0" style={{ width: 48, height: 48 }}>
+                {(() => {
+                  const uri = getLogo(app.company);
+                  return uri ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={uri} alt="" width={48} height={48} className="rounded-[12px] bg-white border border-gray-200 object-contain w-12 h-12" />
+                  ) : (
+                    <span className="inline-flex items-center justify-center rounded-[12px] bg-blue-600 text-white text-lg font-bold w-12 h-12">{(app.company || "?").trim().slice(0, 1).toUpperCase()}</span>
+                  );
+                })()}
+                {srcUri ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={uri} alt="" width={44} height={44} className="rounded-[10px] bg-white border border-gray-200 object-contain shrink-0" />
-                ) : (
-                  <span className="inline-flex items-center justify-center rounded-[10px] bg-blue-600 text-white text-lg font-bold shrink-0" style={{ width: 44, height: 44 }}>{(app.company || "?").trim().slice(0, 1).toUpperCase()}</span>
-                );
-              })()}
+                  <img src={srcUri} alt={src} title={src} width={20} height={20} className="absolute -bottom-1.5 -right-1.5 w-5 h-5 rounded-full bg-white border border-gray-200 object-contain shadow-sm" />
+                ) : null}
+              </span>
               <div className="min-w-0">
-                <div className="text-[22px] font-extrabold truncate">{app.company || "?"}</div>
-                <div className="text-[15px] text-gray-500 mt-0.5">{app.title}</div>
+                <div className="text-[22px] font-extrabold truncate leading-tight">{app.company || "?"}</div>
+                <div className="text-[15px] text-gray-500 mt-0.5 leading-snug">{app.title}</div>
+                {src ? (
+                  <span className="inline-flex items-center gap-1.5 mt-2 text-[11px] font-semibold text-gray-500 bg-gray-100 rounded-full pl-1 pr-2.5 py-0.5">
+                    {srcUri
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      ? <img src={srcUri} alt={src} width={16} height={16} className="w-4 h-4 rounded-full object-contain" />
+                      : null}
+                    {src}
+                  </span>
+                ) : null}
               </div>
             </div>
-            <div className="text-right">
-              <span className={`text-xs px-3 py-1 rounded-lg uppercase text-white bg-gradient-to-r ${STBG[app.status || "planned"] || "from-gray-400 to-gray-500"}`}>{app.status}</span>
-              <div className="text-[22px] font-extrabold text-blue-700 mt-1.5">{app.score ?? "-"}</div>
-              <div className="mt-2 flex justify-end items-center gap-1"><Reactions id={app.id} liked={app.liked} /></div>
+            <div className="text-right shrink-0">
+              <span className={`inline-block text-xs px-3 py-1 rounded-lg uppercase font-bold tracking-wide text-white bg-gradient-to-r ${STBG[app.status || "planned"] || "from-gray-400 to-gray-500"}`}>{app.status}</span>
+              <div className="text-[26px] font-extrabold text-blue-700 mt-2 leading-none">{app.score ?? "-"}</div>
+              <div className="mt-2.5 flex justify-end items-center gap-1"><Reactions id={app.id} liked={app.liked} /></div>
             </div>
           </div>
-          {app.url ? <div className="mt-3"><a href={app.url} target="_blank" rel="noopener noreferrer" className="inline-block bg-green-700 text-white font-bold text-[13px] px-4 py-2 rounded-lg no-underline">Open apply page</a></div> : null}
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            {app.url ? <a href={app.url} target="_blank" rel="noopener noreferrer" className="inline-block bg-green-700 text-white font-bold text-[13px] px-4 py-2 rounded-lg no-underline">Open apply page</a> : null}
+            <ApplyToggle id={app.id} status={app.status} appliedAt={app.applied_at} />
+          </div>
           {meta.length ? <div className="mt-3 text-xs text-gray-600 leading-relaxed">{meta.map((m, i) => <div key={i}>{m}</div>)}</div> : null}
         </div>
 

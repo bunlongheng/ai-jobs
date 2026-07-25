@@ -6,8 +6,9 @@
  * SECURITY: x-forwarded-for is deliberately NOT consulted (attacker-controlled). This
  * must never be the sole gate in production - callers also require NODE_ENV !== production.
  */
-const LOCAL_HOST_RE =
-  /^(localhost|127\.0\.0\.1|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|.*\.localhost)(:\d+)?$/;
+// Loopback only (this Mac). LAN ranges are deliberately NOT bypassed - a PII app should
+// require login for any device that isn't this machine.
+const LOCAL_HOST_RE = /^(localhost|127\.0\.0\.1|.*\.localhost)(:\d+)?$/;
 
 export function isLocal(request: { headers: { get(name: string): string | null } }): boolean {
   const host = request.headers.get("host") || "";
