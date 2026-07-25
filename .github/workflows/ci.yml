@@ -6,9 +6,6 @@ defaults:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      JOBS_SECRET: test
-      JOBS_PASSWORD: test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

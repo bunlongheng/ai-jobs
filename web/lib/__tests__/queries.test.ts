@@ -36,10 +36,13 @@ describe("getBoard", () => {
     expect(ready?.rows.map((r) => r.company)).toEqual(["Coinbase", "Linear"]); // score desc
   });
 
-  it("orders stages canonically (planned/ready before applied)", () => {
+  it("orders stages canonically (ready before applied, archived last)", () => {
+    // Rejected + disliked now merge into the "archived" group at the bottom.
     const order = getBoard().groups.map((g) => g.status);
     expect(order.indexOf("kit_ready")).toBeLessThan(order.indexOf("applied"));
-    expect(order.indexOf("applied")).toBeLessThan(order.indexOf("rejected"));
+    expect(order.indexOf("applied")).toBeLessThan(order.indexOf("archived"));
+    const archived = getBoard().groups.find((g) => g.status === "archived");
+    expect(archived?.rows.map((r) => r.company)).toContain("Old Co"); // the rejected row lives here now
   });
 });
 
