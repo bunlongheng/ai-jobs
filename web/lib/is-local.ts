@@ -11,6 +11,10 @@
 const LOCAL_HOST_RE = /^(localhost|127\.0\.0\.1|.*\.localhost)(:\d+)?$/;
 
 export function isLocal(request: { headers: { get(name: string): string | null } }): boolean {
+  // A proxied request (Tailscale serve, Caddy) always carries a forwarding header; a
+  // genuinely-local request straight to 127.0.0.1 does not. Reject proxied ones so a
+  // spoofed "Host: localhost" arriving through the tunnel cannot satisfy the bypass.
+  if (request.headers.get("x-forwarded-for") || request.headers.get("x-forwarded-host")) return false;
   const host = request.headers.get("host") || "";
   return LOCAL_HOST_RE.test(host);
 }
