@@ -11,10 +11,10 @@
 const LOCAL_HOST_RE = /^(localhost|127\.0\.0\.1|.*\.localhost)(:\d+)?$/;
 
 export function isLocal(request: { headers: { get(name: string): string | null } }): boolean {
-  // A proxied request (Tailscale serve, Caddy) always carries a forwarding header; a
-  // genuinely-local request straight to 127.0.0.1 does not. Reject proxied ones so a
-  // spoofed "Host: localhost" arriving through the tunnel cannot satisfy the bypass.
-  if (request.headers.get("x-forwarded-for") || request.headers.get("x-forwarded-host")) return false;
+  // Host-based bypass. NOTE (2026-07-25): a forwarded-header check was tried to close the
+  // Host-spoof edge but Next sets x-forwarded-* on every request (incl. direct localhost),
+  // so it over-gated. Accepted for the single-user tailnet: the only party who could spoof
+  // Host: localhost over the tunnel is the owner (sole tailnet member). Revisit if shared.
   const host = request.headers.get("host") || "";
   return LOCAL_HOST_RE.test(host);
 }
