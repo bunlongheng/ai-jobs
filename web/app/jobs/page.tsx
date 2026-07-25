@@ -13,7 +13,7 @@ function Logo({ company }: { company: string | null }) {
   const uri = getLogo(company);
   if (uri) {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={uri} alt="" width={20} height={20} className="inline-block rounded-[5px] align-middle bg-white border border-gray-200 object-contain shrink-0" />;
+    return <img src={uri} alt={`${company ?? ""} logo`} width={20} height={20} className="inline-block rounded-[5px] align-middle bg-white border border-gray-200 object-contain shrink-0" />;
   }
   const name = (company || "?").trim();
   const init = name.slice(0, 1).toUpperCase();
@@ -94,9 +94,8 @@ function pfBadge(r: AppRow) {
   }
   if (["wall","blocked","account_wall"].includes(st || "")) {
     // Wall jobs (LinkedIn/Indeed): tell the owner HOW hard the apply is.
-    const rr = r as AppRow & { easy_apply?: number; easy_apply_checked?: number };
-    if (rr.easy_apply) return <span className="text-blue-600 font-semibold whitespace-nowrap" title="Easy / Quick Apply">easy</span>;
-    if (rr.easy_apply_checked) return <span className="text-amber-600 whitespace-nowrap" title="Full external application">apply</span>;
+    if (r.easy_apply) return <span className="text-blue-600 font-semibold whitespace-nowrap" title="Easy / Quick Apply">easy</span>;
+    if (r.easy_apply_checked) return <span className="text-amber-600 whitespace-nowrap" title="Full external application">apply</span>;
     return <span className="text-gray-400 whitespace-nowrap" title="Easy Apply not checked yet">wall</span>;
   }
   return <span className="text-gray-400 whitespace-nowrap">pre-run needed</span>;
@@ -194,7 +193,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
                           <span className="relative inline-block align-middle shrink-0" style={{ width: 20, height: 20 }}>
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src={uri} alt={src} title={src} width={20} height={20} className="block rounded-[5px] bg-white border border-gray-200 object-contain" />
-                            {(r as any).easy_apply ? <span className="absolute -bottom-1 -right-1 leading-none pointer-events-none font-bold text-blue-600 bg-white rounded px-0.5" style={{ fontSize: 7 }} title="Easy/Quick Apply">easy</span> : null}
+                            {r.easy_apply ? <span className="absolute -bottom-1 -right-1 leading-none pointer-events-none font-bold text-blue-600 bg-white rounded px-0.5" style={{ fontSize: 7 }} title="Easy/Quick Apply">easy</span> : null}
                           </span>
                         ) : (
                           <span className="text-[10px] text-gray-400" title={src}>{src}</span>

@@ -68,7 +68,7 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
                   const uri = getLogo(app.company);
                   return uri ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={uri} alt="" width={48} height={48} className="rounded-[12px] bg-white border border-gray-200 object-contain w-12 h-12" />
+                    <img src={uri} alt={`${app.company ?? ""} logo`} width={48} height={48} className="rounded-[12px] bg-white border border-gray-200 object-contain w-12 h-12" />
                   ) : (
                     <span className="inline-flex items-center justify-center rounded-[12px] bg-blue-600 text-white text-lg font-bold w-12 h-12">{(app.company || "?").trim().slice(0, 1).toUpperCase()}</span>
                   );
