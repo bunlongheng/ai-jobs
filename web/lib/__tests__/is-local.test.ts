@@ -18,10 +18,11 @@ describe("isLocal", () => {
     expect(isLocal(req({ host: "evil.example.com" }))).toBe(false);
   });
 
-  it("never bypasses a PROXIED request even if Host is spoofed to localhost", () => {
-    // Tailscale serve / Caddy always add a forwarding header - a real loopback hit never does.
-    expect(isLocal(req({ host: "localhost", "x-forwarded-for": "100.99.41.27" }))).toBe(false);
-    expect(isLocal(req({ host: "localhost:3017", "x-forwarded-host": "m4.tailc55bed.ts.net" }))).toBe(false);
+  it("decides purely on Host (single-user tailnet trust boundary)", () => {
+    // A forwarded-header check was tried but Next sets x-forwarded-* on every request, so
+    // the decision is Host-only. A localhost Host bypasses regardless of forwarding.
+    expect(isLocal(req({ host: "localhost", "x-forwarded-for": "127.0.0.1" }))).toBe(true);
+    expect(isLocal(req({ host: "m4.tailc55bed.ts.net", "x-forwarded-for": "100.99.41.27" }))).toBe(false);
   });
 
   it("handles a missing Host header", () => {
