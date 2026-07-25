@@ -14,6 +14,8 @@ export function db(): Database.Database {
   _db.exec(SCHEMA);
   try { _db.exec("ALTER TABLE events ADD COLUMN debug TEXT"); } catch { /* exists */ }
   try { _db.exec("ALTER TABLE applications ADD COLUMN liked INTEGER DEFAULT 0"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE applications ADD COLUMN easy_apply INTEGER DEFAULT 0"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE applications ADD COLUMN easy_apply_checked INTEGER DEFAULT 0"); } catch { /* exists */ }
   return _db;
 }
 
@@ -49,11 +51,15 @@ CREATE TABLE IF NOT EXISTS applications (
   resume_pdf    BLOB,           -- the PDF bytes, so /api/kit serves from the DB
   raw           TEXT,           -- full original JSON entry, for anything not columnized
   liked         INTEGER DEFAULT 0,  -- 0 neutral | 1 hearted | -1 disliked (hidden from board)
+  easy_apply    INTEGER DEFAULT 0,  -- 1 = Easy/Quick Apply detected on the source
+  easy_apply_checked INTEGER DEFAULT 0,  -- 1 = the extension has checked the source
   updated_at    TEXT DEFAULT (datetime('now'))
 );
 
 CREATE INDEX IF NOT EXISTS idx_apps_status ON applications(status);
 CREATE INDEX IF NOT EXISTS idx_apps_score  ON applications(score DESC);
+-- composite for the board's status + score filtering path (ready for scale)
+CREATE INDEX IF NOT EXISTS idx_apps_status_score ON applications(status, score DESC);
 
 -- per-application captured events (fills/submits) - replaces ext-events.jsonl
 CREATE TABLE IF NOT EXISTS events (
@@ -86,6 +92,7 @@ export type AppRow = {
   notes: string | null; pf_status: string | null; pf_ats: string | null;
   pf_covered: number | null; pf_total: number | null; pf_direct_url: string | null;
   liked: number | null;
+  easy_apply: number | null; easy_apply_checked: number | null;
 };
 
 export const STAGES = ["planned", "kit_ready", "manual_only", "applied", "interviewing", "offer", "rejected", "skipped"] as const;
