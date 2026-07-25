@@ -39,14 +39,22 @@
   "overrides": {
     "sharp": ">=0.34.6",
     "postcss": ">=8.5.10",
+    "brace-expansion": "1.1.12",
     "@eslint/config-array": {
-      "brace-expansion": "2.0.2"
+      "brace-expansion": "2.0.2",
+      "minimatch": "^9.0.5"
     },
     "@eslint/eslintrc": {
-      "brace-expansion": "2.0.2"
+      "brace-expansion": "2.0.2",
+      "minimatch": "^9.0.5"
     },
-    "eslint-plugin-import": {
-      "brace-expansion": "1.1.12"
+    "@typescript-eslint/typescript-estree": {
+      "brace-expansion": "2.0.2",
+      "minimatch": "^9.0.5"
+    },
+    "eslint": {
+      "brace-expansion": "2.0.2",
+      "minimatch": "^9.0.5"
     }
   }
 }
