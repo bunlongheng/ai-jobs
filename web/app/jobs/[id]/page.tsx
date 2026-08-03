@@ -45,6 +45,17 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
   if (app.pf_status) meta.push(`Preflight: ${app.pf_status}${app.pf_total ? ` ${app.pf_covered}/${app.pf_total}` : ""}`);
   if (app.notes) meta.push(app.notes);
 
+  // Posting age from the scan date (source_run = "linkedin-YYYY-MM-DD"). LinkedIn/Indeed
+  // publish no hard "apply by" deadline, so we surface how long it has sat instead - the
+  // older a listing, the likelier it has closed. Age flag only; never auto-archives. (2026-08-02)
+  const seenIso = (app.source_run || "").match(/(\d{4}-\d{2}-\d{2})/)?.[1] || (app.updated_at || "").slice(0, 10) || "";
+  const ageDays = seenIso ? Math.max(0, Math.floor((Date.now() - new Date(`${seenIso}T00:00:00`).getTime()) / 86400000)) : null;
+  const showAge = ageDays !== null && ["planned", "kit_ready", "manual_only"].includes(app.status || "");
+  const stale = ageDays !== null && ageDays >= 28;
+  const aging = ageDays !== null && ageDays >= 15 && ageDays < 28;
+  const ageCls = stale ? "text-rose-700 bg-rose-100" : aging ? "text-amber-700 bg-amber-100" : "text-gray-500 bg-gray-100";
+  const ageLabel = ageDays === null ? "" : `Seen ${ageDays}d ago${stale ? " · likely expired" : aging ? " · apply soon" : ""}`;
+
   // Source (LinkedIn / Indeed / Ashby ...) derived from the apply URL, for its icon.
   const u = (app.url || "").toLowerCase();
   const src = !u.startsWith("http") ? ""
@@ -52,7 +63,8 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
     : u.includes("greenhouse") ? "Greenhouse"
     : u.includes("lever.co") ? "Lever"
     : u.includes("indeed") ? "Indeed"
-    : u.includes("linkedin") ? "LinkedIn" : "";
+    : u.includes("linkedin") ? "LinkedIn"
+    : u.includes("news.ycombinator.com") ? "HackerNews" : "";
   const srcUri = src ? getLogo(`src:${src}`) : null;
 
   return (
@@ -101,6 +113,7 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
           <div className="mt-3 flex flex-wrap items-center gap-2">
             {app.url ? <a href={app.url} target="_blank" rel="noopener noreferrer" className="inline-block bg-green-700 text-white font-bold text-[13px] px-4 py-2 rounded-lg no-underline">Open apply page</a> : null}
             <ApplyToggle id={app.id} status={app.status} appliedAt={app.applied_at} />
+            {showAge ? <span className={`inline-flex items-center text-[12px] font-semibold px-3 py-2 rounded-lg ${ageCls}`} title={`First scanned ${seenIso}. LinkedIn/Indeed publish no hard deadline; this is how long it has been on the board.`}>{ageLabel}</span> : null}
           </div>
           {meta.length ? <div className="mt-3 text-xs text-gray-600 leading-relaxed">{meta.map((m, i) => <div key={i}>{m}</div>)}</div> : null}
         </div>

@@ -53,6 +53,9 @@ export function normUrl(u) {
   if (!u) return "";
   const jk = u.match(/[?&]jk=([0-9a-f]+)/i);
   if (/indeed\.com/i.test(u) && jk) return `https://www.indeed.com/viewjob?jk=${jk[1].toLowerCase()}`;
+  // HN "Who is hiring" comment identity lives in ?id= (like Indeed's ?jk=) - keep it.
+  const hn = u.match(/[?&]id=(\d+)/);
+  if (/news\.ycombinator\.com/i.test(u) && hn) return `https://news.ycombinator.com/item?id=${hn[1]}`;
   return cleanUrl(u);
 }
 

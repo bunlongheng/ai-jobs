@@ -4,5 +4,9 @@
 export { auth as middleware } from "@/auth";
 
 export const config = {
-  matcher: ["/((?!api/auth|login|_next/static|_next/image|favicon.ico|icon.png).*)"],
+  // Public assets (icons, manifest, OG image) must bypass auth so home-screen install
+  // and link-share previews resolve even over the auth-gated Tailscale URL.
+  matcher: [
+    "/((?!api/auth|login|_next/static|_next/image|favicon.ico|icon.png|apple-icon.png|icon-192.png|icon-512.png|manifest.webmanifest|opengraph-image|twitter-image).*)",
+  ],
 };

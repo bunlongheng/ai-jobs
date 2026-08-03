@@ -8,4 +8,6 @@ NODE=/Users/bheng/.nvm/versions/node/v22.23.1/bin/node
 cd /Users/bheng/Sites/jobs || exit 1
 echo "==================== linkedin search $(date '+%Y-%m-%d %H:%M:%S') ===================="
 "$NODE" scrape_linkedin.mjs
+echo "-------------------- hacker news 'who is hiring' --------------------"
+"$NODE" hn_search.mjs   # source #3: public HN Algolia API, no scraping; monthly thread, dedupes on re-run
 echo "==================== done $(date '+%Y-%m-%d %H:%M:%S') ===================="

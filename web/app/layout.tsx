@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -12,11 +12,36 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const APP_URL = process.env.APP_URL || "https://m4.tailc55bed.ts.net";
+const DESC = "Job-hunt pipeline - find, score, tailor, apply, track";
+
 export const metadata: Metadata = {
-  title: "Jobs",
-  description: "Job-hunt pipeline - find, score, apply, track",
-  icons: { apple: "/icon.png" },
-  appleWebApp: { capable: true, title: "Jobs", statusBarStyle: "default" },
+  metadataBase: new URL(APP_URL),
+  title: { default: "Jobs", template: "%s · Jobs" },
+  description: DESC,
+  applicationName: "Jobs",
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: [{ url: "/icon.png", type: "image/png" }],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180" }],
+    shortcut: ["/icon.png"],
+  },
+  appleWebApp: { capable: true, title: "Jobs", statusBarStyle: "black-translucent" },
+  openGraph: {
+    type: "website",
+    siteName: "Jobs",
+    title: "Jobs",
+    description: DESC,
+    url: "/jobs",
+  },
+  twitter: { card: "summary_large_image", title: "Jobs", description: DESC },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#16a34a",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

@@ -65,6 +65,7 @@ function jobSource(url: string | null): string {
   if (u.includes("lever.co")) return "Lever";
   if (u.includes("indeed")) return "Indeed";
   if (u.includes("linkedin")) return "LinkedIn";
+  if (u.includes("news.ycombinator.com")) return "HackerNews";
   try {
     return new URL(url).hostname.replace(/^www\.|^careers\.|^jobs\./, "").split(".")[0].replace(/^\w/, (c) => c.toUpperCase());
   } catch {
@@ -73,7 +74,6 @@ function jobSource(url: string | null): string {
 }
 
 function pfBadge(r: AppRow) {
-  const st = r.pf_status;
   if (r.status !== "kit_ready" && r.status !== "manual_only") {
     if (r.status === "applied" && r.applied_at) return <span className="text-gray-400 whitespace-nowrap">{r.applied_at.slice(5).replace("-", "/").replace(/^0/, "")}</span>;
     return null;
@@ -92,13 +92,18 @@ function pfBadge(r: AppRow) {
       </span>
     );
   }
-  if (["wall","blocked","account_wall"].includes(st || "")) {
-    // Wall jobs (LinkedIn/Indeed): tell the owner HOW hard the apply is.
+  // Listing sources have no external form to pre-run - show the apply path by source
+  // instead of a misleading "pre-run needed". (2026-08-02)
+  const u = (r.url || "").toLowerCase();
+  if (u.includes("news.ycombinator.com"))
+    return <span className="text-orange-600 font-semibold whitespace-nowrap" title="Apply via the Hacker News post">HN</span>;
+  if (u.includes("linkedin.com") || u.includes("indeed.com")) {
     if (r.easy_apply) return <span className="text-blue-600 font-semibold whitespace-nowrap" title="Easy / Quick Apply">easy</span>;
     if (r.easy_apply_checked) return <span className="text-amber-600 whitespace-nowrap" title="Full external application">apply</span>;
-    return <span className="text-gray-400 whitespace-nowrap" title="Easy Apply not checked yet">wall</span>;
+    return <span className="text-gray-400 whitespace-nowrap" title="Apply on the source site">on-site</span>;
   }
-  return <span className="text-gray-400 whitespace-nowrap">pre-run needed</span>;
+  // A real ATS form that has not been pre-tested yet (none currently - all 11 are green).
+  return <span className="text-gray-400 whitespace-nowrap" title="ATS form not yet pre-tested">pre-run needed</span>;
 }
 
 export default async function Board({ searchParams }: { searchParams: Promise<{ min?: string }> }) {

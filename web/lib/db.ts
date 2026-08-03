@@ -93,6 +93,7 @@ export type AppRow = {
   pf_covered: number | null; pf_total: number | null; pf_direct_url: string | null;
   liked: number | null;
   easy_apply: number | null; easy_apply_checked: number | null;
+  source_run: string | null; updated_at: string | null;
 };
 
 export const STAGES = ["planned", "kit_ready", "manual_only", "applied", "interviewing", "offer", "rejected", "skipped"] as const;
