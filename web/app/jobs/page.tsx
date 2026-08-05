@@ -250,7 +250,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
                         {r.url ? <a data-external href={r.url} target="_blank" rel="noopener noreferrer" title="Open posting" className="shrink-0 text-blue-700 no-underline align-middle">&#8599;</a> : null}
                       </div>
                     </td>
-                    <td className="px-1.5 py-2 text-left">{g.status === "archived" ? (r.status === "rejected" ? statusPill("rejected", "bg-rose-100 text-rose-500", agoLabel(r.rejected_at)) : r.status === "expired" ? statusPill("expired", "bg-amber-100 text-amber-700", agoLabel(r.updated_at)) : statusPill("disliked", "bg-gray-200 text-gray-500")) : pfBadge(r)}</td>
+                    <td className="px-1.5 py-2 text-left">{g.status === "archived" ? (r.status === "rejected" ? statusPill("rejected", "bg-gray-100 text-gray-500", agoLabel(r.rejected_at)) : r.status === "expired" ? statusPill("expired", "bg-amber-100 text-amber-700", agoLabel(r.updated_at)) : statusPill("disliked", "bg-rose-100 text-rose-600")) : pfBadge(r)}</td>
                     <td className="pl-1 pr-3 py-2 text-right" style={{ color: DOT[g.status] }}>{r.score ?? "-"}</td>
                   </RowLink>
                 ))}
