@@ -394,6 +394,11 @@
     // Phone country code -> +1 US - United States
     if (has("+1 us") || (low.some((o) => /^\+\d/.test(o)) && has("united states")))
       return pick((o) => o.includes("+1") && o.includes("united states")) || pick((o) => o.startsWith("+1 us"));
+    // US state / province of residence (unmistakable state option set) -> New Hampshire.
+    // Robust to react-select label mangling where the "which state do you reside" label
+    // is lost. (owner NH resident, 2026-08-05)
+    if (has("alabama") && has("alaska") && (has("wyoming") || has("new hampshire")))
+      return pick((o) => o.toLowerCase() === "new hampshire") || pick((o) => /new hampshire/.test(o));
     // Gender -> Male
     if (has("male") && has("female"))
       return pick((o) => o === "male");
