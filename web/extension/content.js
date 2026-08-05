@@ -635,6 +635,26 @@
       if (!done) { flash(btns[0], false); report.push([short, "MANUAL - pick one", "button", opts]); debug.push({ label: short, options: opts, html: container.outerHTML.slice(0, 400) }); }
     }
 
+    // ---- required-completeness sweep (2026-08-04): flag any REQUIRED field still
+    // empty so JobFill catches it NOW, before the ATS submit-time "needs corrections"
+    // (submit-error should be the last resort, not the first detector). Conservative:
+    // only concrete input/textarea/select fields, deduped against what we reported.
+    const reportedLabels = new Set(report.map((x) => norm(x[0])));
+    const REQ_SEL = "input[required],textarea[required],select[required]," +
+      "input[aria-required='true'],textarea[aria-required='true'],select[aria-required='true']";
+    for (const el of deepQuery(REQ_SEL)) {
+      if (!visible(el) || el.disabled || el.type === "hidden" || el.type === "file") continue;
+      if (el.type === "radio" || el.type === "checkbox") continue; // radio/button group loops handle these
+      const tag = (el.tagName || "").toLowerCase();
+      const empty = tag === "select" ? !el.value : !String(el.value || "").trim();
+      if (!empty) continue;
+      const lab = norm(questionLabel(el) || labelFor(el));
+      if (!lab || reportedLabels.has(lab)) continue;
+      reportedLabels.add(lab);
+      flash(el, false);
+      report.push([lab.slice(0, 60), "MANUAL - required, still empty", tag === "select" ? "dropdown" : "text"]);
+    }
+
     if (report.length) {
       const reds = report.filter((x) => String(x[1]).startsWith("MANUAL")).length;
       // fill run over: lift the spotlight so the green/red borders are reviewable

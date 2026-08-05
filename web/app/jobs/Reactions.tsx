@@ -39,8 +39,8 @@ export default function Reactions({ id, liked }: { id: string; liked: number | n
         aria-label="Dislike"
         className={`transition-colors ${val === -1 ? "text-gray-600" : "text-gray-300 hover:text-gray-600"}`}
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M17 2h2a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-2m-3-11H8.5a3 3 0 0 0-3 2.4l-1.3 6A3 3 0 0 0 7.2 15H10v4a2 2 0 0 0 2 2l3-8V2z" transform="rotate(180 12 12)" />
+        <svg width="16" height="16" viewBox="0 0 24 24" fill={val === -1 ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17" />
         </svg>
       </button>
     </span>

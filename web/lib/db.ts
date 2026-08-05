@@ -16,6 +16,7 @@ export function db(): Database.Database {
   try { _db.exec("ALTER TABLE applications ADD COLUMN liked INTEGER DEFAULT 0"); } catch { /* exists */ }
   try { _db.exec("ALTER TABLE applications ADD COLUMN easy_apply INTEGER DEFAULT 0"); } catch { /* exists */ }
   try { _db.exec("ALTER TABLE applications ADD COLUMN easy_apply_checked INTEGER DEFAULT 0"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE applications ADD COLUMN jd TEXT"); } catch { /* exists */ }
   return _db;
 }
 
@@ -50,6 +51,7 @@ CREATE TABLE IF NOT EXISTS applications (
   has_resume_pdf INTEGER DEFAULT 0,
   resume_pdf    BLOB,           -- the PDF bytes, so /api/kit serves from the DB
   raw           TEXT,           -- full original JSON entry, for anything not columnized
+  jd            TEXT,           -- full job description (plain text), shown on the detail page
   liked         INTEGER DEFAULT 0,  -- 0 neutral | 1 hearted | -1 disliked (hidden from board)
   easy_apply    INTEGER DEFAULT 0,  -- 1 = Easy/Quick Apply detected on the source
   easy_apply_checked INTEGER DEFAULT 0,  -- 1 = the extension has checked the source
@@ -93,6 +95,7 @@ export type AppRow = {
   pf_covered: number | null; pf_total: number | null; pf_direct_url: string | null;
   liked: number | null;
   easy_apply: number | null; easy_apply_checked: number | null;
+  jd: string | null;
   source_run: string | null; updated_at: string | null;
 };
 

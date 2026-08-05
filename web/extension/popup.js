@@ -22,14 +22,36 @@ async function init() {
   KITS = r.data;
   const tab = await activeTab();
   const tabHost = hostOf(tab?.url || ""), tabUrl = (tab?.url || "").toLowerCase();
-  const sel = $("kit");
-  sel.innerHTML = KITS.map((k) =>
-    `<option value="${k.id}">${k.score ?? "-"} | ${k.company || "?"} - ${(k.title || k.id).slice(0, 40)}</option>`).join("");
-  // preselect: URL host match, else company-name token in the tab URL
-  const hit = KITS.find((k) => k.url && tabHost && hostOf(k.url) === tabHost) ||
-              KITS.find((k) => coToken(k.company) && tabUrl.includes(coToken(k.company)));
-  if (hit) sel.value = hit.id;
-  st.textContent = `${KITS.length} kits loaded${hit ? " - matched: " + (hit.company || hit.id) : " - SELECT KIT MANUALLY"}`;
+  // Preselect the kit. IMPORTANT: shared ATS hosts (jobs.ashbyhq.com, boards.greenhouse.io,
+  // jobs.lever.co) serve MANY companies under /<company>/, so a bare host match picks the
+  // WRONG company's kit (whichever is first in the list). Match most-specific first:
+  //   1. exact/prefix apply-URL match  2. company slug present in the tab URL path
+  //   3. bare host, ONLY for company-owned career hosts (not a shared ATS).
+  const SHARED_ATS = ["ashbyhq.com", "greenhouse.io", "lever.co", "myworkdayjobs.com", "icims.com", "workable.com", "smartrecruiters.com"];
+  const norm = (u) => (u || "").toLowerCase().split("?")[0].replace(/\/application\/?$/, "").replace(/\/$/, "");
+  const isShared = (h) => SHARED_ATS.some((d) => h.endsWith(d));
+  const hit =
+    KITS.find((k) => k.url && norm(k.url) && (norm(tabUrl) === norm(k.url) || norm(tabUrl).startsWith(norm(k.url) + "/"))) ||
+    KITS.find((k) => coToken(k.company) && tabUrl.includes(coToken(k.company))) ||
+    KITS.find((k) => k.url && tabHost && hostOf(k.url) === tabHost && !isShared(tabHost));
+  const via = hit
+    ? (norm(tabUrl) === norm(hit.url) || norm(tabUrl).startsWith(norm(hit.url) + "/") ? "url"
+       : coToken(hit.company) && tabUrl.includes(coToken(hit.company)) ? "company" : "host")
+    : null;
+  // Auto-detected -> lock it in (read-only chip, no dropdown to fiddle with, just Fill).
+  // No confident match -> fall back to a picker so you are never stuck.
+  const box = $("kitbox");
+  if (hit) {
+    box.innerHTML =
+      `<input type="hidden" id="kit" value="${hit.id}">` +
+      `<div style="padding:6px 9px;border:1px solid #16a34a;background:#f0fdf4;border-radius:6px;font-weight:400;color:#166534;font-size:9px;">${hit.company || "?"} - ${hit.title || hit.id}</div>`;
+    st.textContent = "";
+  } else {
+    box.innerHTML =
+      `<select id="kit">${KITS.map((k) => `<option value="${k.id}">${k.score ?? "-"} | ${k.company || "?"} - ${(k.title || k.id).slice(0, 40)}</option>`).join("")}</select>` +
+      `<div style="color:#b91c1c;font-size:11px;margin-top:2px;">No auto-match - pick the right kit.</div>`;
+    st.textContent = "";
+  }
 }
 
 let lastRun = null;
@@ -91,14 +113,24 @@ $("fill").onclick = async () => {
   // summary: counts by field type
   const byType = {};
   merged.forEach((r) => { const t = r[2] || "?"; byType[t] = (byType[t] || 0) + 1; });
-  const typeLine = Object.entries(byType).map(([t, n]) => `${n} ${t}`).join(", ");
-  st.innerHTML = `<b>${merged.length} fields</b> (${typeLine})<br>` +
-    `<span style="color:#059669">${merged.length - manual.length} filled</span> / ` +
-    `<span style="color:#dc2626">${manual.length} need you</span>. Review, captcha, Submit.${warn}`;
+  const chip = (val, label, bg, fg) => `<span style="display:inline-block;margin:0 4px 4px 0;padding:2px 8px;border-radius:6px;background:${bg};color:${fg};font-size:11px;font-weight:700;white-space:nowrap">${val} ${label}</span>`;
+  const typeChips = Object.entries(byType).map(([t, n]) =>
+    `<span style="display:inline-block;margin:0 4px 4px 0;padding:2px 7px;border-radius:6px;background:#f1f5f9;color:#475569;font-size:10px;font-weight:600;white-space:nowrap">${n} ${t}</span>`).join("");
+  st.innerHTML =
+    `<div>` +
+      chip(merged.length - manual.length, "filled", "#dcfce7", "#166534") +
+      chip(manual.length, "need you", manual.length ? "#fee2e2" : "#f1f5f9", manual.length ? "#b91c1c" : "#9ca3af") +
+      chip(merged.length, "fields", "#e0f2fe", "#075985") +
+    `</div>` +
+    `<div style="margin-top:1px">${typeChips}</div>` +
+    `<div style="color:#6b7280;font-size:11px;margin-top:3px">Review, captcha, Submit.${warn}</div>`;
+  $("copy").style.display = "block"; // report button only appears after a fill run
   $("report").innerHTML = merged.map((row) => {
     const [k, v, t, opts] = row;
     const bad = String(v).startsWith("MANUAL");
-    const optLine = opts?.length
+    // Only show the other options for RED fields (helps you pick). On a field that
+    // filled fine it is just noise, so hide it. (owner request 2026-08-04)
+    const optLine = bad && opts?.length
       ? `<div style="color:#9ca3af;font-size:11px;padding-left:44px">${opts.join(" | ").slice(0, 120)}</div>` : "";
     return `<div class="row"><span class="badge">${t || "?"}</span>` +
       `<span class="${bad ? "manual" : "ok"}">${v}</span> - ${k}${optLine}</div>`;
@@ -125,13 +157,6 @@ $("copy").onclick = async () => {
   }
   await navigator.clipboard.writeText(JSON.stringify(payload, null, 1));
   $("status").textContent = "Typed errors-only report copied - paste it to Claude.";
-};
-
-$("submitted").onclick = async () => {
-  const kitId = $("kit").value;
-  const tab = await activeTab();
-  const r = await send({ type: "event", data: { id: kitId, outcome: "submitted", url: tab?.url || "", manual: true } });
-  $("status").textContent = r?.ok ? "Tracker updated: applied" : "Failed: " + r?.error;
 };
 
 init();

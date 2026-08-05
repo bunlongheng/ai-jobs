@@ -45,6 +45,9 @@ const QUERIES = override ? [{ q: override, l: 'Remote' }] : [
   { q: 'senior software engineer typescript react', l: 'Remote' },
   { q: 'software engineer remote 140000', l: 'United States' },
   { q: 'senior full stack engineer hybrid', l: 'United States' },
+  // AI-assisted / build-with-AI product roles (owner target 2026-08-03, e.g. Origami "AI Product Engineer")
+  { q: 'AI product engineer', l: 'Remote' },
+  { q: 'forward deployed engineer', l: 'Remote' },
 ];
 
 const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';

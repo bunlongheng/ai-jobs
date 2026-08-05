@@ -10,4 +10,8 @@ echo "==================== linkedin search $(date '+%Y-%m-%d %H:%M:%S') ========
 "$NODE" scrape_linkedin.mjs
 echo "-------------------- hacker news 'who is hiring' --------------------"
 "$NODE" hn_search.mjs   # source #3: public HN Algolia API, no scraping; monthly thread, dedupes on re-run
+echo "-------------------- greenhouse ATS boards --------------------"
+"$NODE" greenhouse_search.mjs   # source #4: 31 public Greenhouse boards, zero auth; direct-ATS apply URLs, remote senior/staff only, 60+ bar
+echo "-------------------- gmail rejection sweep --------------------"
+"$NODE" rejection_sweep.mjs   # auto-flip applied -> rejected from Gmail rejection emails (needs GMAIL_REFRESH_TOKEN via gmail_auth.mjs)
 echo "==================== done $(date '+%Y-%m-%d %H:%M:%S') ===================="

@@ -5,7 +5,7 @@
 //   title_seniority_match 25 | stack_overlap 25 | remote_comp_fit 20
 //   domain_relevance 15 | company_quality 15
 // Owner rules: insert threshold 50; salary floor 140k (no penalty 140-160k);
-// hybrid up to 2 days/week OK - scored slightly below remote, never disqualified;
+// remote + hybrid OK (hybrid scored slightly below remote, never disqualified);
 // any tech_exclude / employment_exclude word-boundary hit disqualifies to 0.
 
 import { readFileSync } from "node:fs";
@@ -140,7 +140,7 @@ export async function fetchLogo(company) {
 // ---------- dedupe + insert pipeline ----------
 // jobs: [{ title, company, location, url, salary?, remoteHint? }]
 // Returns { results, deduped, inserted } where results carry {score, insertedThis}.
-export async function scoreDedupeInsert(db, jobs, profile, sourceRun, sourceNote) {
+export async function scoreDedupeInsert(db, jobs, profile, sourceRun, sourceNote, minScore = INSERT_THRESHOLD) {
   const existing = db.prepare("SELECT id, url, company, title FROM applications").all();
   const existingUrls = new Set(
     existing.map((r) => normUrl((r.url || "").toLowerCase())).filter((u) => u && u !== "n/a")
@@ -175,7 +175,7 @@ export async function scoreDedupeInsert(db, jobs, profile, sourceRun, sourceNote
       continue;
     }
     let insertedThis = false;
-    if (score >= INSERT_THRESHOLD) {
+    if (score >= minScore) {
       let id = slug(`${job.company}-${job.title}`);
       let n = 2;
       while (existingIds.has(id)) id = slug(`${job.company}-${job.title}`) + `-${n++}`;

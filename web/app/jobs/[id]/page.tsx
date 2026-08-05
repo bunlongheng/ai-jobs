@@ -85,10 +85,6 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
                     <span className="inline-flex items-center justify-center rounded-[12px] bg-blue-600 text-white text-lg font-bold w-12 h-12">{(app.company || "?").trim().slice(0, 1).toUpperCase()}</span>
                   );
                 })()}
-                {srcUri ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={srcUri} alt={src} title={src} width={20} height={20} className="absolute -bottom-1.5 -right-1.5 w-5 h-5 rounded-full bg-white border border-gray-200 object-contain shadow-sm" />
-                ) : null}
               </span>
               <div className="min-w-0">
                 <div className="text-[22px] font-extrabold truncate leading-tight">{app.company || "?"}</div>
@@ -118,6 +114,15 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
           {meta.length ? <div className="mt-3 text-xs text-gray-600 leading-relaxed">{meta.map((m, i) => <div key={i}>{m}</div>)}</div> : null}
         </div>
 
+        {app.jd ? (
+          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden mb-3.5">
+            <div className="bg-gradient-to-r from-slate-600 to-slate-800 px-4 py-2.5">
+              <h2 className="text-sm text-white tracking-wide">Job description</h2>
+            </div>
+            <div className="text-[13px] leading-relaxed px-6 py-5 whitespace-pre-wrap text-[#1f2328]">{app.jd}</div>
+          </div>
+        ) : null}
+
         <Section title="Resume (this version)" grad="from-blue-500 to-blue-700" html={kit.resumeHtml} />
         {!kit.resumeHtml && kit.hasResumePdf ? (
           <div className="bg-white border border-gray-300 rounded-xl px-6 py-5 mb-3.5">
@@ -129,6 +134,15 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
           <div className="bg-white border border-gray-300 rounded-xl px-6 py-5 mb-3.5">
             <h2 className="text-[15px] font-bold mb-1">Resume (this version)</h2>
             <p className="text-[13px] text-gray-400">Used the master resume (resume-bunlong.pdf).</p>
+          </div>
+        ) : null}
+        {kit.hasResumePdf ? (
+          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden mb-3.5">
+            <div className="bg-gradient-to-r from-blue-500 to-blue-700 px-4 py-2.5 flex items-center justify-between gap-2">
+              <h2 className="text-sm text-white tracking-wide">Resume PDF (as submitted)</h2>
+              <a href={`/api/kit/${app.id}/file/resume.pdf`} target="_blank" rel="noopener noreferrer" className="text-xs text-white/90 no-underline shrink-0">Open in new tab &rarr;</a>
+            </div>
+            <iframe src={`/api/kit/${app.id}/file/resume.pdf`} title="Resume PDF" className="w-full bg-gray-100" style={{ height: "80vh", border: 0 }} />
           </div>
         ) : null}
         <Section title="Cover letter" grad="from-purple-500 to-violet-600" html={kit.coverHtml} />

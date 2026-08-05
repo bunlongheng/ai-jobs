@@ -28,6 +28,10 @@ const QUERIES = [
   "staff frontend engineer react",
   "principal software engineer node",
   "senior software engineer react node",
+  // AI-assisted / build-with-AI product roles (owner target 2026-08-03, e.g. Origami "AI Product Engineer")
+  "AI product engineer",
+  "AI engineer full stack",
+  "forward deployed engineer",
 ];
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));

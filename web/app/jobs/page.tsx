@@ -100,7 +100,7 @@ function pfBadge(r: AppRow) {
   if (u.includes("linkedin.com") || u.includes("indeed.com")) {
     if (r.easy_apply) return <span className="text-blue-600 font-semibold whitespace-nowrap" title="Easy / Quick Apply">easy</span>;
     if (r.easy_apply_checked) return <span className="text-amber-600 whitespace-nowrap" title="Full external application">apply</span>;
-    return <span className="text-gray-400 whitespace-nowrap" title="Apply on the source site">on-site</span>;
+    return <span className="text-gray-400 whitespace-nowrap" title="Apply on the source site (LinkedIn/Indeed), not Easy Apply">source</span>;
   }
   // A real ATS form that has not been pre-tested yet (none currently - all 11 are green).
   return <span className="text-gray-400 whitespace-nowrap" title="ATS form not yet pre-tested">pre-run needed</span>;
@@ -189,8 +189,8 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
               <tbody>
                 {g.rows.map((r) => (
                   <tr key={r.id} className={`border-t border-gray-100 cursor-pointer ${HOVER[g.status] || "hover:bg-gray-50"}`}>
-                    <td className="pl-3 pr-1 py-2">
-                      <Link href={`/jobs/${r.id}`} className="block no-underline">
+                    <td className="p-0">
+                      <Link href={`/jobs/${r.id}`} className="block no-underline pl-3 pr-1 py-2">
                       {(() => {
                         const src = jobSource(r.url);
                         const uri = getLogo(`src:${src}`);
@@ -206,18 +206,18 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
                       })()}
                       </Link>
                     </td>
-                    <td className="px-1 py-2 truncate">
-                      <Link href={`/jobs/${r.id}`} className="flex items-center gap-1.5 text-[#1f2328] no-underline hover:text-blue-700">
+                    <td className="p-0 truncate">
+                      <Link href={`/jobs/${r.id}`} className="flex items-center gap-1.5 text-[#1f2328] no-underline hover:text-blue-700 px-1 py-2">
                         <Logo company={r.company} />
                         <span className="truncate">{r.company || "?"}</span>
                       </Link>
                     </td>
                     <td className="px-2.5 py-2 truncate">
-                      <Link href={`/jobs/${r.id}`} className="text-[#1f2328] no-underline hover:text-blue-700">{r.title}</Link>
-                      {r.url ? <a href={r.url} target="_blank" rel="noopener noreferrer" title="Open posting" className="text-blue-700 no-underline ml-1.5 align-middle">&#8599;</a> : null}
+                      <Link href={`/jobs/${r.id}`} className="inline-block py-2 text-[#1f2328] no-underline hover:text-blue-700 align-middle">{r.title}</Link>
+                      {r.url ? <a href={r.url} target="_blank" rel="noopener noreferrer" title="Open posting" className="text-blue-700 no-underline ml-1.5 py-2 align-middle">&#8599;</a> : null}
                     </td>
                     {g.status !== "planned" ? <td className="px-1.5 py-2 text-right"><Link href={`/jobs/${r.id}`} className="no-underline">{g.status === "archived" ? (r.status === "rejected" ? <span className="text-[9px] font-bold uppercase tracking-wide bg-rose-100 text-rose-500 rounded px-1.5 py-0.5 whitespace-nowrap">rejected</span> : <span className="text-[9px] font-bold uppercase tracking-wide bg-gray-200 text-gray-500 rounded px-1.5 py-0.5 whitespace-nowrap">disliked</span>) : pfBadge(r)}</Link></td> : null}
-                    <td className="pl-1 pr-3 py-2 text-right" style={{ color: DOT[g.status] }}><Link href={`/jobs/${r.id}`} className="no-underline" style={{ color: "inherit" }}>{r.score ?? "-"}</Link></td>
+                    <td className="p-0 text-right" style={{ color: DOT[g.status] }}><Link href={`/jobs/${r.id}`} className="block no-underline pl-1 pr-3 py-2" style={{ color: "inherit" }}>{r.score ?? "-"}</Link></td>
                   </tr>
                 ))}
               </tbody>
