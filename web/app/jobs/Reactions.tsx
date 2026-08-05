@@ -2,6 +2,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "./Toast";
+import { confirmDialog } from "./ConfirmModal";
 
 // Heart to keep, thumbs-down to hide, clock to mark EXPIRED. liked: 1 hearted, -1
 // disliked (row vanishes), 0 neutral. Expire sets status='expired' -> Archived list.
@@ -38,10 +39,15 @@ export default function Reactions({ id, liked, status }: { id: string; liked: nu
     }).then(() => start(() => router.refresh()));
   }
 
-  function deleteJob(e: React.MouseEvent) {
+  async function deleteJob(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-    if (!window.confirm("Delete this job completely? It will be removed from every panel, including Archived.")) return;
+    const ok = await confirmDialog({
+      title: "Delete this job?",
+      body: "It will be removed from every panel, including Archived.",
+      confirmLabel: "Delete",
+    });
+    if (!ok) return;
     toast("Deleted", "#ef4444");
     fetch("/api/jobs/like", {
       method: "POST",

@@ -6,7 +6,7 @@ import AutoRefresh from "./AutoRefresh";
 import JobsMenu from "./JobsMenu";
 import ScoreMenu from "./ScoreMenu";
 import CommandK from "./CommandK";
-import Toast from "./Toast";
+import CollapsiblePanel from "./CollapsiblePanel";
 
 export const dynamic = "force-dynamic"; // always read live SQLite
 
@@ -45,10 +45,6 @@ const TILE: Record<string, string> = {
   rejected: "bg-red-50 border-red-200 text-red-600",             // red = rejected
   skipped: "bg-gray-50 border-gray-200 text-gray-400",
   interviewing: "bg-purple-50 border-purple-200 text-purple-700",
-};
-const DOT: Record<string, string> = {
-  planned: "#0284c7", kit_ready: "#1d4ed8", kit_only: "#64748b", applied: "#16a34a", manual_only: "#9a6700",
-  rejected: "#cf222e", skipped: "#8a949e", interviewing: "#8250df",
 };
 // Color-coded gradient header per bucket (owner scheme 2026-08-05):
 // New = light/baby blue (just arrived) -> Ready = dark blue (real, pre-scanned) ->
@@ -92,31 +88,6 @@ function jobSource(url: string | null): string {
   } catch {
     return "Direct";
   }
-}
-
-// "Applied via" - the channel the application actually went out through. HN jobs the
-// engine auto-emailed show Gmail; ATS/board rows show that platform; everything else is
-// the company's own careers site. (owner request 2026-08-05)
-function applyVia(r: AppRow): string {
-  const notes = (r.notes || "").toLowerCase();
-  if (notes.includes("auto-emailed") || notes.includes("emailed")) return "Gmail";
-  const src = jobSource(r.url);
-  if (["Ashby", "Greenhouse", "Lever", "LinkedIn", "Indeed", "HackerNews"].includes(src)) return src;
-  return "Company";
-}
-// The Via cell only shows once a row has actually been applied to - blank on New/Ready.
-function ViaCell({ r }: { r: AppRow }) {
-  const applied = r.status === "applied" || r.status === "rejected" || r.status === "interviewing" || !!r.applied_at;
-  if (!applied) return null;
-  const via = applyVia(r);
-  const label = via === "Company" ? "Company site" : via === "HackerNews" ? "Hacker News" : via;
-  const uri = via === "Company" ? getLogo(r.company) : markUri(via, r.company);
-  return uri ? (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={uri} alt={label} title={`Applied via ${label}`} width={18} height={18} className="w-[18px] h-[18px] rounded-[5px] object-contain inline-block align-middle bg-white border border-gray-200" />
-  ) : (
-    <LetterTile name={r.company || label} size={18} />
-  );
 }
 
 // Relative "how long ago" from a YYYY-MM-DD date. "today" / "1d ago" / "12d ago".
@@ -164,6 +135,30 @@ function pfBadge(r: AppRow) {
   // SOURCE LOGO (not the word "source"/"apply"), plus a blue "easy" pill for LinkedIn
   // Easy Apply so those are easy to spot and bang out first. (owner request 2026-08-05)
   const u = (r.url || "").toLowerCase();
+  return sourceBadge(r, u);
+}
+
+// Ready-panel Status cell: a tiny per-row completion bar (covered / total fields from the
+// pre-scan) sitting in the status gap, so you see at a glance which pre-scanned forms are
+// fully done vs still short (e.g. 25/27). Green fill = covered, red tail = still open.
+// (owner request 2026-08-05)
+function readyProgress(r: AppRow) {
+  const total = r.pf_total ?? 0;
+  const covered = Math.min(r.pf_covered ?? 0, total);
+  if (!total) return pfBadge(r); // not pre-scanned - fall back to the source logo
+  const pct = Math.round((covered / total) * 100);
+  const done = covered >= total;
+  return (
+    <span className="inline-flex items-center gap-1.5 whitespace-nowrap" title={`${covered} of ${total} fields answered${done ? "" : ` - ${total - covered} still open`}`}>
+      <span className="relative inline-block h-1.5 w-14 rounded-full bg-gray-200 overflow-hidden shrink-0">
+        <span className="absolute inset-y-0 left-0 rounded-full bg-blue-600" style={{ width: `${pct}%` }} />
+      </span>
+      <span className={`text-[10px] tabular-nums ${done ? "text-blue-700 font-bold" : "text-gray-500"}`}>{covered}/{total}</span>
+    </span>
+  );
+}
+
+function sourceBadge(r: AppRow, u: string) {
   const src = jobSource(r.url);
   const uri = markUri(src, r.company);
   const logo = uri
@@ -177,8 +172,6 @@ function pfBadge(r: AppRow) {
       return <span className="inline-flex items-center justify-end gap-1 whitespace-nowrap" title="Easy / Quick Apply - bang these out first">{logo}<span className="text-[9px] font-bold uppercase tracking-wide rounded px-1 py-0.5 bg-blue-100 text-blue-700">easy</span></span>;
     return <span className="inline-flex items-center justify-end whitespace-nowrap" title="Apply on the source site">{logo}</span>;
   }
-  // A direct-ATS form not yet pre-run: show the source logo (like the listing rows),
-  // never the noisy "pre-run needed" text - the kit is still ready to apply. (owner 2026-08-05)
   return <span className="inline-flex items-center justify-start whitespace-nowrap" title="Apply on the source ATS">{logo}</span>;
 }
 
@@ -201,7 +194,6 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
     <main className="min-h-screen bg-[#f6f8fa] text-[#1f2328]" style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" }}>
       <div className="max-w-[900px] mx-auto px-5 py-7 pb-16">
         <AutoRefresh />
-        <Toast />
         <div className="mb-4 flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -239,28 +231,20 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
           // per-source breakdown for this group's header (LinkedIn 17, Indeed 13, ...)
           const bySource = g.rows.reduce((m, r) => { const s = jobSource(r.url); m[s] = (m[s] || 0) + 1; return m; }, {} as Record<string, number>);
           const breakdown = Object.entries(bySource).sort((a, b) => b[1] - a[1]);
+          const breakdownPills = breakdown.map(([src, n]) => {
+            const uri = markUri(src);
+            return (
+              <span key={src} title={src} className="inline-flex items-center justify-center gap-1 min-w-[46px] text-[11px] font-bold text-white bg-white/20 rounded-full pl-1 pr-2 py-0.5 whitespace-nowrap">
+                {uri
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  ? <img src={uri} alt={src} width={16} height={16} className="w-4 h-4 rounded-full bg-white object-contain shrink-0" />
+                  : <LetterTile name={src} size={16} round />}
+                {n}
+              </span>
+            );
+          });
           return (
-          <div key={g.status} className={`mt-6 rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden ${g.status === "archived" ? "opacity-75 [&_img]:grayscale" : ""}`}>
-            <div className={`bg-gradient-to-r ${HGRAD[g.status] || "from-gray-500 to-gray-600"} px-4 py-2.5 flex items-center justify-between gap-2`}>
-              <div className="flex items-center gap-2 shrink-0">
-                <h3 className="text-sm font-bold text-white tracking-wide">{g.label}</h3>
-                <span className="text-xs font-bold text-white bg-white/30 rounded-full px-2.5 py-0.5">{g.rows.length}</span>
-              </div>
-              <div className="flex items-center gap-1.5 flex-wrap justify-end">
-                {breakdown.map(([src, n]) => {
-                  const uri = markUri(src);
-                  return (
-                    <span key={src} title={src} className="inline-flex items-center justify-center gap-1 min-w-[46px] text-[11px] font-bold text-white bg-white/20 rounded-full pl-1 pr-2 py-0.5 whitespace-nowrap">
-                      {uri
-                        /* eslint-disable-next-line @next/next/no-img-element */
-                        ? <img src={uri} alt={src} width={16} height={16} className="w-4 h-4 rounded-full bg-white object-contain shrink-0" />
-                        : <LetterTile name={src} size={16} round />}
-                      {n}
-                    </span>
-                  );
-                })}
-              </div>
-            </div>
+          <CollapsiblePanel key={g.status} status={g.status} label={g.label} count={g.rows.length} gradient={HGRAD[g.status] || "from-gray-500 to-gray-600"} archived={g.status === "archived"} breakdown={breakdownPills}>
             <table className="w-full table-fixed border-collapse text-[11px] sm:text-[13px]">
               {/* ONE fixed colgroup on EVERY panel so all columns align top-down across
                   panels - Src, Company, Role (arrow pinned to its right edge), Status
@@ -301,13 +285,13 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
                         {r.url ? <a data-external href={r.url} target="_blank" rel="noopener noreferrer" title="Open posting" className="shrink-0 text-blue-700 no-underline align-middle">&#8599;</a> : null}
                       </div>
                     </td>
-                    <td className="px-1.5 py-2 text-left">{g.status === "archived" ? (r.status === "rejected" ? statusPill("rejected", "bg-gray-100 text-gray-500", agoLabel(r.rejected_at) || agoLabel(r.updated_at)) : r.status === "expired" ? statusPill("expired", "bg-amber-100 text-amber-700", agoLabel(r.updated_at)) : statusPill("disliked", "bg-rose-100 text-rose-600", agoLabel(r.updated_at))) : pfBadge(r)}</td>
-                    <td className="pl-1 pr-3 py-2 text-right" style={{ color: DOT[g.status] }}>{r.score ?? "-"}</td>
+                    <td className="px-1.5 py-2 text-left">{g.status === "archived" ? (r.status === "rejected" ? statusPill("rejected", "bg-gray-100 text-gray-500", agoLabel(r.rejected_at) || agoLabel(r.updated_at)) : r.status === "expired" ? statusPill("expired", "bg-amber-100 text-amber-700", agoLabel(r.updated_at)) : statusPill("disliked", "bg-rose-100 text-rose-600", agoLabel(r.updated_at))) : g.status === "kit_only" ? <span className="inline-block text-[9px] font-bold uppercase tracking-wide rounded px-1.5 py-0.5 bg-sky-50 text-sky-400 whitespace-nowrap">needs prescan</span> : g.status === "kit_ready" ? readyProgress(r) : pfBadge(r)}</td>
+                    <td className="pl-1 pr-3 py-2 text-right text-gray-400">{r.score ?? "-"}</td>
                   </RowLink>
                 ))}
               </tbody>
             </table>
-          </div>
+          </CollapsiblePanel>
           );
         })}
         <div className="mt-8 text-center text-xs text-gray-400">Jobs &middot; reads jobs.db &middot; localhost/jobs</div>
