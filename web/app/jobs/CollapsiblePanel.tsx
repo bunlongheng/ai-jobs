@@ -5,16 +5,18 @@ import { useEffect, useState } from "react";
 // on one panel at a time. Collapsed state is remembered per-panel in localStorage, so a
 // panel you close stays closed across refreshes. (owner request 2026-08-05)
 export default function CollapsiblePanel({
-  status, label, count, gradient, archived, breakdown, children,
+  status, label, count, gradient, archived, defaultCollapsed, breakdown, children,
 }: {
   status: string; label: string; count: number; gradient: string;
-  archived?: boolean; breakdown: React.ReactNode; children: React.ReactNode;
+  archived?: boolean; defaultCollapsed?: boolean; breakdown: React.ReactNode; children: React.ReactNode;
 }) {
   const key = `jobs-panel-collapsed:${status}`;
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(!defaultCollapsed);
   useEffect(() => {
-    try { setOpen(localStorage.getItem(key) !== "1"); } catch {}
-  }, [key]);
+    // Respect a saved choice; otherwise fall back to the panel's default (Not-ready starts
+    // collapsed so Ready is the focus). (owner request 2026-08-05)
+    try { const v = localStorage.getItem(key); setOpen(v === null ? !defaultCollapsed : v !== "1"); } catch {}
+  }, [key, defaultCollapsed]);
 
   function toggle() {
     setOpen((o) => {
@@ -25,7 +27,7 @@ export default function CollapsiblePanel({
   }
 
   return (
-    <div className={`mt-6 rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden ${archived ? "opacity-75 [&_img]:grayscale" : ""}`}>
+    <div id={`panel-${status}`} className={`mt-6 scroll-mt-4 rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden ${archived ? "opacity-75 [&_img]:grayscale" : ""}`}>
       <button
         onClick={toggle}
         aria-expanded={open}
@@ -33,11 +35,11 @@ export default function CollapsiblePanel({
         className={`w-full bg-gradient-to-r ${gradient} px-4 py-2.5 flex items-center justify-between gap-2 text-left`}
       >
         <div className="flex items-center gap-2 shrink-0">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-white/90 transition-transform duration-200" style={{ transform: open ? "rotate(90deg)" : "none" }}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-200 text-white/90" style={{ transform: open ? "rotate(90deg)" : "none" }}>
             <polyline points="9 18 15 12 9 6" />
           </svg>
-          <h3 className="text-sm font-bold text-white tracking-wide">{label}</h3>
-          <span className="text-xs font-bold text-white bg-white/30 rounded-full px-2.5 py-0.5">{count}</span>
+          <h3 className="text-sm font-bold tracking-wide text-white">{label}</h3>
+          <span className="text-xs font-bold rounded-full px-2.5 py-0.5 bg-white/30 text-white">{count}</span>
         </div>
         <div className="flex items-center gap-1.5 flex-wrap justify-end">{breakdown}</div>
       </button>

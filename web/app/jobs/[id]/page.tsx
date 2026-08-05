@@ -1,6 +1,7 @@
 import { getApp, type Field } from "@/lib/queries";
 import { getKit } from "@/lib/kit";
 import { getLogo } from "@/lib/logos";
+import { nearHome } from "@/lib/near-home";
 import Reactions from "../Reactions";
 import ApplyToggle from "../ApplyToggle";
 import CopyButton from "../CopyButton";
@@ -39,10 +40,9 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
   const kit = getKit(id);
 
   // Apply-by-email (Hacker News / direct recruiter outreach): the email IS the application.
-  // Compose ONE ready-to-send email = subject + cover body + links + walk-through invite.
-  // No name/contact sign-off in the body - the owner's Gmail signature ("Best regard,
-  // Bunlong Heng, email, phone, logo") auto-appends. Form-based ATS apps don't email, so
-  // this block only shows for HN. (owner 2026-08-05)
+  // Compose ONE ready-to-send email = subject + cover body + links + walk-through invite +
+  // sign-off + contact. Gmail's URL-compose does NOT auto-insert the account signature, so
+  // the sign-off block MUST live in the body. (owner 2026-08-05)
   const isEmailApply = (app.url || "").toLowerCase().includes("news.ycombinator.com");
   const emailSubject = `Application: ${app.title ?? ""} - Bunlong Heng`;
   const coverBody = (() => {
@@ -61,11 +61,23 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
     "LinkedIn - https://www.linkedin.com/in/bunlongheng",
     "",
     "Happy to walk through any of these projects if one catches your eye - just let me know and we can find a time.",
+    "",
+    "With great excitement,",
+    "Bunlong Heng",
+    "bheng.code@gmail.com",
+    "978-677-0861",
   ].join("\n");
-  // "Apply now" opens Gmail's web compose with subject + body (+ recruiter email if we can
-  // spot one in the posting text) pre-injected - one tap, no clipboard. (owner 2026-08-05)
-  const recruiterEmail = (`${app.jd || ""} ${app.notes || ""}`).match(/[\w.+-]+@[\w-]+\.[\w.-]{2,}/)?.[0] || "";
-  const gmailComposeUrl = `https://mail.google.com/mail/?view=cm&fs=1${recruiterEmail ? `&to=${encodeURIComponent(recruiterEmail)}` : ""}&su=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+  // Find the apply-to email in the posting. Handles plain addresses AND the HN-style
+  // obfuscation "name [at] company [dot] com" / "name (at) company dot com". (owner 2026-08-05)
+  const recruiterEmail = (() => {
+    const t = `${app.jd || ""} ${app.notes || ""}`;
+    const plain = t.match(/[\w.+-]+@[\w-]+\.[\w.-]{2,}/);
+    if (plain) return plain[0];
+    const obf = t.match(/([\w.+-]+)\s*[[(]?\s*at\s*[\])]?\s*([\w-]+)\s*[[(]?\s*(?:dot|\.)\s*[\])]?\s*([\w.]{2,})/i);
+    return obf ? `${obf[1]}@${obf[2]}.${obf[3]}` : "";
+  })();
+  // "Apply now" opens Gmail web compose (primary account) with to/subject/body pre-injected.
+  const gmailComposeUrl = `https://mail.google.com/mail/u/0/?view=cm&fs=1&tf=1${recruiterEmail ? `&to=${encodeURIComponent(recruiterEmail)}` : ""}&su=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
 
   const fields: Field[] = (() => {
     for (const e of events) {
@@ -124,15 +136,27 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
               <div className="min-w-0">
                 <div className="text-[22px] font-extrabold truncate leading-tight">{app.company || "?"}</div>
                 <div className="text-[15px] text-gray-500 mt-0.5 leading-snug">{app.title}</div>
-                {src ? (
-                  <span className="inline-flex items-center gap-1.5 mt-2 text-[11px] font-semibold text-gray-500 bg-gray-100 rounded-full pl-1 pr-2.5 py-0.5">
-                    {srcUri
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      ? <img src={srcUri} alt={src} width={16} height={16} className="w-4 h-4 rounded-full object-contain" />
-                      : null}
-                    {src}
-                  </span>
-                ) : null}
+                <div className="flex flex-wrap items-center gap-2 mt-2">
+                  {src ? (
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-gray-500 bg-gray-100 rounded-full pl-1 pr-2.5 py-0.5">
+                      {srcUri
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        ? <img src={srcUri} alt={src} width={16} height={16} className="w-4 h-4 rounded-full object-contain" />
+                        : null}
+                      {src}
+                    </span>
+                  ) : null}
+                  {(() => {
+                    const nh = nearHome(app.location);
+                    if (!nh) return null;
+                    return (
+                      <span title={`${nh.town} - about ${nh.miles} miles from Pelham, NH`} className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-0.5">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z" /><circle cx="12" cy="10" r="2.5" /></svg>
+                        Near home {nh.miles === 0 ? "(Pelham)" : `~${nh.miles}mi`}
+                      </span>
+                    );
+                  })()}
+                </div>
               </div>
             </div>
             <div className="text-right shrink-0">
@@ -192,13 +216,19 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
               </span>
             </div>
             <div className="px-6 py-5">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wide shrink-0 w-12">To</span>
+                {recruiterEmail
+                  ? <><span className="flex-1 min-w-0 text-[14px] text-[#1f2328] truncate">{recruiterEmail}</span><CopyButton text={recruiterEmail} tone="onLight" /></>
+                  : <span className="flex-1 min-w-0 text-[13px] text-amber-600">No apply-email in the post - add it in Gmail (the posting uses a link or hid the address)</span>}
+              </div>
               <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-100">
                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wide shrink-0 w-12">Subject</span>
                 <span className="flex-1 min-w-0 text-[14px] text-[#1f2328]">{emailSubject}</span>
                 <CopyButton text={emailSubject} tone="onLight" />
               </div>
               <pre className="whitespace-pre-wrap text-[14px] leading-relaxed text-[#1f2328]" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>{emailBody}</pre>
-              <p className="text-[11px] text-gray-400 mt-4 pt-3 border-t border-gray-100">Your Gmail signature (Best regard, Bunlong Heng + contact) appends below this automatically.</p>
+              <p className="text-[11px] text-gray-400 mt-4 pt-3 border-t border-gray-100">Sign-off + contact are included in the body above (Gmail does not auto-add your signature to a pre-filled compose).</p>
             </div>
           </div>
         ) : (

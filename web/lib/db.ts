@@ -17,6 +17,7 @@ export function db(): Database.Database {
   try { _db.exec("ALTER TABLE applications ADD COLUMN easy_apply INTEGER DEFAULT 0"); } catch { /* exists */ }
   try { _db.exec("ALTER TABLE applications ADD COLUMN easy_apply_checked INTEGER DEFAULT 0"); } catch { /* exists */ }
   try { _db.exec("ALTER TABLE applications ADD COLUMN jd TEXT"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE applications ADD COLUMN tech TEXT"); } catch { /* exists */ }
   return _db;
 }
 
@@ -96,6 +97,7 @@ export type AppRow = {
   liked: number | null;
   easy_apply: number | null; easy_apply_checked: number | null;
   jd: string | null;
+  tech: string | null;
   source_run: string | null; updated_at: string | null;
 };
 

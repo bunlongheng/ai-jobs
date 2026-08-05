@@ -71,3 +71,21 @@ export async function refreshLogos(): Promise<{ fetched: number; withLogo: numbe
   }
   return { fetched, withLogo };
 }
+
+/** Warm the favicon cache for tech-stack icons, stored under "tech:<slug>" keys so the
+ *  board's Tech column can read them the same way it reads company logos. Downloads once. */
+export async function refreshTechIcons(entries: { slug: string; domain: string }[]): Promise<{ fetched: number; withLogo: number }> {
+  const d = db();
+  const have = new Set((d.prepare("SELECT company FROM logos WHERE company LIKE 'tech:%'").all() as { company: string }[]).map((r) => r.company));
+  const upsert = d.prepare("INSERT INTO logos (company, data_uri, updated_at) VALUES (?, ?, datetime('now')) ON CONFLICT(company) DO UPDATE SET data_uri=excluded.data_uri, updated_at=datetime('now')");
+  let fetched = 0, withLogo = 0;
+  for (const e of entries) {
+    const key = `tech:${e.slug}`;
+    if (have.has(key)) continue;
+    const uri = await fetchFaviconDataUri(e.domain);
+    upsert.run(key, uri);
+    fetched++;
+    if (uri) withLogo++;
+  }
+  return { fetched, withLogo };
+}

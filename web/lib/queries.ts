@@ -25,10 +25,11 @@ export function getBoard(minScore = 0): {
   const archived = all.filter((r) => r.liked === -1 || r.status === "rejected" || r.status === "expired");
   const rows = all.filter((r) => r.liked !== -1 && r.status !== "rejected" && r.status !== "expired");
 
-  // per-tier counts across all active (non-archived) jobs, for the score menu
+  // per-tier counts for the score menu - over EVERY job (incl. applied + archived +
+  // rejected), so the dropdown numbers match the true universe. (owner request 2026-08-05)
   const buckets: Record<number, number> = {};
   for (const t of SCORE_TIERS) buckets[t] = 0;
-  for (const r of rows) for (const t of SCORE_TIERS) if ((r.score ?? 0) >= t) buckets[t]++;
+  for (const r of all) for (const t of SCORE_TIERS) if ((r.score ?? 0) >= t) buckets[t]++;
 
   const keep = (r: AppRow) => (r.score ?? 0) >= minScore;
   const counts: Record<string, number> = {};
@@ -59,26 +60,45 @@ export function getBoard(minScore = 0): {
       const ready = g.filter(preScanned);
       const kitOnly = g.filter((r) => !preScanned(r));
       // Not-ready pile renders ABOVE Ready (owner request 2026-08-05).
-      if (kitOnly.length) groups.push({ status: "kit_only", label: "Not ready · needs pre-scan", rows: kitOnly });
+      if (kitOnly.length) groups.push({ status: "kit_only", label: "Not ready", rows: kitOnly });
       if (ready.length) groups.push({ status: "kit_ready", label: LABEL.kit_ready, rows: ready });
     } else {
       groups.push({ status: st, label: LABEL[st] || st, rows: g });
     }
   }
-  // Archived always renders last (below Rejected) - also score-scoped.
+  // Archived always renders last (below Rejected) - recency-first (latest activity on top,
+  // like the Applied list) so today's rejections/dislikes/expires surface at the top.
+  // (owner request 2026-08-05)
   if (archivedKept.length) {
-    archivedKept.sort((a, b) => (b.score || 0) - (a.score || 0));
+    const recency = (r: AppRow) => String(r.rejected_at || r.updated_at || "");
+    archivedKept.sort((a, b) => recency(b).localeCompare(recency(a)));
     groups.push({ status: "archived", label: LABEL.archived, rows: archivedKept });
   }
   return { groups, counts, buckets };
+}
+
+// Last-`days` daily activity for the hero-tile sparklines: how many jobs were detected
+// (source_run date), made ready (pf_date), and applied (applied_at) each day. Oldest ->
+// newest so the last point is today. (owner request 2026-08-05)
+export function getTrends(days = 7): { detected: number[]; ready: number[]; applied: number[] } {
+  const rows = db().prepare("SELECT source_run, pf_date, applied_at FROM applications WHERE status!='deleted'").all() as
+    { source_run: string | null; pf_date: string | null; applied_at: string | null }[];
+  const labels: string[] = [];
+  const now = new Date();
+  for (let i = days - 1; i >= 0; i--) { const d = new Date(now); d.setDate(d.getDate() - i); labels.push(d.toISOString().slice(0, 10)); }
+  const idx: Record<string, number> = {};
+  labels.forEach((l, i) => { idx[l] = i; });
+  const detected = Array(days).fill(0), ready = Array(days).fill(0), applied = Array(days).fill(0);
+  for (const r of rows) {
+    const det = String(r.source_run || "").slice(-10); if (det in idx) detected[idx[det]]++;
+    const rd = String(r.pf_date || "").slice(0, 10); if (rd in idx) ready[idx[rd]]++;
+    const ap = String(r.applied_at || "").slice(0, 10); if (ap in idx) applied[idx[ap]]++;
+  }
+  return { detected, ready, applied };
 }
 
 export function getApp(id: string): { app: AppRow | undefined; events: EventRow[] } {
   const app = db().prepare("SELECT * FROM applications WHERE id = ?").get(id) as AppRow | undefined;
   const events = db().prepare("SELECT * FROM events WHERE app_id = ? ORDER BY id DESC").all(id) as EventRow[];
   return { app, events };
-}
-
-export function aiAbleReady(): AppRow[] {
-  return db().prepare("SELECT * FROM applications WHERE status='kit_ready' AND ai_able=1 ORDER BY score DESC").all() as AppRow[];
 }

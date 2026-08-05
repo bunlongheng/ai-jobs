@@ -73,11 +73,16 @@ export async function POST(req: Request) {
   // Plugin pre-run verdict: any field the extension could not answer arrives as
   // "MANUAL ..." - that is a RED. Green (pf_status=ready) ONLY at zero red.
   if (Array.isArray(ev.fields) && ev.fields.length && ev.outcome !== "submitted") {
-    type F = [string, string, string?, string[]?] | { label?: string; value?: string };
-    const vals = (ev.fields as F[]).map((f) => String(Array.isArray(f) ? f[1] ?? "" : f.value ?? ""));
-    const labels = (ev.fields as F[]).map((f) => String(Array.isArray(f) ? f[0] ?? "" : f.label ?? ""));
-    const scored = vals.filter((_, i) => !/recaptcha/i.test(labels[i]));
-    const red = scored.filter((v) => v.trim().toUpperCase().startsWith("MANUAL")).length;
+    type F = [string, string, string?, string[]?] | { label?: string; value?: string; type?: string };
+    const fields = (ev.fields as F[]).map((f) => Array.isArray(f)
+      ? { label: String(f[0] ?? ""), value: String(f[1] ?? ""), type: String(f[2] ?? "") }
+      : { label: String(f.label ?? ""), value: String(f.value ?? ""), type: String(f.type ?? "") });
+    // Resume / cover-letter / attachment uploads count as COVERED: the docs are prepared
+    // and the JobFill extension attaches them at apply time, so they never block "ready".
+    // (owner request 2026-08-05) Only genuine unanswered questions count as red.
+    const isFile = (l: string, t: string) => /attach|resume|\bcv\b|cover letter|upload|portfolio/i.test(l) || t === "file";
+    const scored = fields.filter((f) => !/recaptcha/i.test(f.label));
+    const red = scored.filter((f) => f.value.trim().toUpperCase().startsWith("MANUAL") && !isFile(f.label, f.type)).length;
     const total = scored.length;
     d.prepare("UPDATE applications SET pf_status=?, pf_covered=?, pf_total=?, pf_date=?, pf_ats='plugin', updated_at=datetime('now') WHERE id=?")
       .run(red === 0 ? "ready" : "gaps", total - red, total, stamp, jid);

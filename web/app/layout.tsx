@@ -17,24 +17,24 @@ const DESC = "Job-hunt pipeline - find, score, tailor, apply, track";
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
-  title: { default: "Jobs", template: "%s · Jobs" },
+  title: { default: "AI-Jobs", template: "%s · AI-Jobs" },
   description: DESC,
-  applicationName: "Jobs",
+  applicationName: "AI-Jobs",
   manifest: "/manifest.webmanifest",
   icons: {
     icon: [{ url: "/icon.png", type: "image/png" }],
     apple: [{ url: "/apple-icon.png", sizes: "180x180" }],
     shortcut: ["/icon.png"],
   },
-  appleWebApp: { capable: true, title: "Jobs", statusBarStyle: "black-translucent" },
+  appleWebApp: { capable: true, title: "AI-Jobs", statusBarStyle: "black-translucent" },
   openGraph: {
     type: "website",
-    siteName: "Jobs",
-    title: "Jobs",
+    siteName: "AI-Jobs",
+    title: "AI-Jobs",
     description: DESC,
     url: "/jobs",
   },
-  twitter: { card: "summary_large_image", title: "Jobs", description: DESC },
+  twitter: { card: "summary_large_image", title: "AI-Jobs", description: DESC },
 };
 
 export const viewport: Viewport = {

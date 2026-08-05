@@ -3,8 +3,8 @@ import type { MetadataRoute } from "next";
 // PWA manifest -> proper "Add to Home Screen" (standalone app icon, splash, theme).
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Jobs",
-    short_name: "Jobs",
+    name: "AI-Jobs",
+    short_name: "AI-Jobs",
     description: "Job-hunt pipeline - find, score, tailor, apply, track",
     start_url: "/jobs",
     display: "standalone",

@@ -1,4 +1,4 @@
-import { getBoard, SCORE_TIERS } from "@/lib/queries";
+import { getBoard, getTrends, SCORE_TIERS } from "@/lib/queries";
 import type { AppRow } from "@/lib/db";
 import { getLogo } from "@/lib/logos";
 import RowLink from "./RowLink";
@@ -7,6 +7,8 @@ import JobsMenu from "./JobsMenu";
 import ScoreMenu from "./ScoreMenu";
 import CommandK from "./CommandK";
 import CollapsiblePanel from "./CollapsiblePanel";
+import PanelNav from "./PanelNav";
+import { techMeta } from "@/lib/tech";
 
 export const dynamic = "force-dynamic"; // always read live SQLite
 
@@ -49,16 +51,33 @@ const TILE: Record<string, string> = {
 // Color-coded gradient header per bucket (owner scheme 2026-08-05):
 // New = light/baby blue (just arrived) -> Ready = dark blue (real, pre-scanned) ->
 // Applied = green (done). Manual amber, Rejected/Archived rose/gray, Interviewing purple.
+// Modern blue ramp - New (lightest) -> Not-ready (mid, vivid pop) -> Ready (deepest).
+// White text on all for consistency. These feed BOTH the hero tiles and the panel headers.
 const HGRAD: Record<string, string> = {
-  planned: "from-sky-400 to-sky-500",
-  kit_ready: "from-blue-600 to-blue-800",
-  kit_only: "from-slate-400 to-slate-600",
-  applied: "from-green-600 to-emerald-700",
+  planned: "from-sky-400 to-cyan-400",
+  kit_ready: "from-blue-600 to-indigo-700",
+  kit_only: "from-sky-500 to-blue-500",
+  applied: "from-emerald-500 to-green-600",
   manual_only: "from-amber-400 to-orange-500",
-  rejected: "from-rose-300 to-rose-400",
-  interviewing: "from-purple-500 to-violet-600",
-  skipped: "from-gray-400 to-gray-500",
-  archived: "from-gray-400 to-gray-500",
+  rejected: "from-rose-400 to-pink-500",
+  interviewing: "from-violet-500 to-purple-600",
+  skipped: "from-slate-400 to-slate-500",
+  archived: "from-slate-400 to-slate-500",
+};
+// Per-panel chevron color so you can tell at a glance which panel you're scrolled into:
+// Not-ready = light blue, Ready = green, Archived = dark gray. Others stay white.
+// (owner request 2026-08-05)
+// Open-posting (external ↗) link color per panel, matched to that panel's gradient so you
+// can tell which panel a row belongs to at a glance. (owner request 2026-08-05)
+const LINKC: Record<string, string> = {
+  planned: "#0ea5e9",      // sky - New
+  kit_only: "#3b82f6",     // blue - Not ready
+  kit_ready: "#4f46e5",    // indigo - Ready
+  applied: "#10b981",      // emerald - Applied
+  manual_only: "#f59e0b",  // amber - Manual
+  rejected: "#f43f5e",     // rose
+  interviewing: "#8b5cf6", // violet
+  archived: "#64748b",     // slate
 };
 // Row hover tint matching each panel's color
 const HOVER: Record<string, string> = {
@@ -175,11 +194,85 @@ function sourceBadge(r: AppRow, u: string) {
   return <span className="inline-flex items-center justify-start whitespace-nowrap" title="Apply on the source ATS">{logo}</span>;
 }
 
+// Tech column: ONE icon - the single most telling stack for the job. React/Next/TS show
+// up on almost every full-stack role and carry no signal, so we surface the most
+// distinctive tech (Python, Go, Rust, Kafka, AWS...) when the job has one, and only fall
+// back to the ubiquitous trio when that's all there is. (owner request 2026-08-05)
+const UBIQUITOUS = new Set(["react", "nextjs", "typescript", "javascript", "node"]);
+function topTech(slugs: string[]): string | null {
+  if (!slugs.length) return null;
+  return slugs.find((s) => !UBIQUITOUS.has(s)) || (slugs.includes("typescript") ? "typescript" : slugs[0]);
+}
+function techCell(r: AppRow) {
+  let slugs: string[] = [];
+  try { slugs = JSON.parse(r.tech || "[]"); } catch { /* bad json */ }
+  const s = topTech(slugs);
+  if (!s) return <span className="text-gray-300">-</span>;
+  const label = techMeta(s)?.label || s;
+  const uri = getLogo(`tech:${s}`);
+  return uri
+    // eslint-disable-next-line @next/next/no-img-element
+    ? <img src={uri} alt={label} title={label} width={18} height={18} className="w-[18px] h-[18px] rounded-[4px] object-contain bg-white shrink-0 inline-block align-middle" />
+    : <span title={label} className="text-[9px] font-bold uppercase tracking-tight text-gray-500 bg-gray-100 rounded px-1 py-0.5 leading-none">{label.slice(0, 3)}</span>;
+}
+
+// Tiny 7-day area sparkline for the hero tiles - white on the gradient, last point (today)
+// dotted. Answers "am I slacking or sprinting" without a separate dashboard. (owner 2026-08-05)
+function Sparkline({ data, w = 62, h = 26 }: { data: number[]; w?: number; h?: number }) {
+  const n = data.length;
+  if (n < 2) return null;
+  const max = Math.max(1, ...data);
+  const pts = data.map((v, i) => [(i / (n - 1)) * w, h - 2 - (v / max) * (h - 5)] as const);
+  const line = pts.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`).join(" ");
+  const area = `M0 ${h} ${pts.map(([x, y]) => `L${x.toFixed(1)} ${y.toFixed(1)}`).join(" ")} L${w} ${h} Z`;
+  const [lx, ly] = pts[n - 1];
+  return (
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="shrink-0" aria-hidden>
+      <path d={area} fill="rgba(255,255,255,0.22)" />
+      <path d={line} fill="none" stroke="rgba(255,255,255,0.95)" strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round" />
+      <circle cx={lx} cy={ly} r="2.2" fill="#fff" />
+    </svg>
+  );
+}
+
+// A single compact status glyph for narrow (phone) screens - one icon per state instead
+// of the full desktop pill/bar/text. (owner request 2026-08-05)
+function glyphSvg(g: string) {
+  const p = { fill: "none", stroke: "#fff", strokeWidth: 3, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+  switch (g) {
+    case "check": return <svg width="11" height="11" viewBox="0 0 24 24" {...p}><polyline points="20 6 9 17 4 12" /></svg>;
+    case "clock": return <svg width="11" height="11" viewBox="0 0 24 24" {...p}><circle cx="12" cy="12" r="8" /><polyline points="12 8 12 12 15 14" /></svg>;
+    case "x": return <svg width="10" height="10" viewBox="0 0 24 24" {...p}><line x1="6" y1="6" x2="18" y2="18" /><line x1="18" y1="6" x2="6" y2="18" /></svg>;
+    case "down": return <svg width="10" height="10" viewBox="0 0 24 24" fill="#fff"><path d="M17 2H6.5a2 2 0 0 0-2 1.7l-1.4 8A2 2 0 0 0 5 14h5v4a3 3 0 0 0 3 3l4-9V2z" /></svg>;
+    case "half": return <svg width="11" height="11" viewBox="0 0 24 24" {...p}><line x1="6" y1="12" x2="18" y2="12" /></svg>;
+    default: return <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#fff", display: "block" }} />;
+  }
+}
+function statusIcon(gstatus: string, r: AppRow) {
+  let color = "#94a3b8", glyph = "dot", title = "New";
+  if (gstatus === "archived") {
+    if (r.status === "rejected") { color = "#9ca3af"; glyph = "x"; title = "Rejected"; }
+    else if (r.status === "expired") { color = "#d97706"; glyph = "clock"; title = "Expired"; }
+    else { color = "#f43f5e"; glyph = "down"; title = "Not interested"; }
+  } else if (gstatus === "kit_only") { color = "#38bdf8"; glyph = "clock"; title = "Needs pre-scan"; }
+  else if (gstatus === "kit_ready") {
+    const done = (r.pf_total ?? 0) > 0 && (r.pf_covered ?? 0) >= (r.pf_total ?? 0);
+    color = "#2563eb"; glyph = done ? "check" : "half"; title = done ? "Ready - all fields covered" : `Ready - ${r.pf_covered ?? 0}/${r.pf_total ?? 0} fields`;
+  } else if (gstatus === "applied") { color = "#16a34a"; glyph = "check"; title = "Applied"; }
+  else if (gstatus === "manual_only") { color = "#d97706"; glyph = "dot"; title = "Manual"; }
+  else if (gstatus === "planned") { color = "#0ea5e9"; glyph = "dot"; title = "New"; }
+  return (
+    <span title={title} className="inline-flex items-center justify-center rounded-full align-middle" style={{ width: 18, height: 18, background: color }}>
+      {glyphSvg(glyph)}
+    </span>
+  );
+}
+
 export default async function Board({ searchParams }: { searchParams: Promise<{ min?: string }> }) {
   const sp = await searchParams;
-  // Default to 80+ so the board opens on the highest-priority few with actual content
-  // (top score is ~88, so 90+ would be empty). (owner request 2026-07-24)
-  const min = sp.min !== undefined ? parseInt(sp.min) || 0 : 80;
+  // Default to 60+ - owner has already applied to everything 70+/80+/90+, so the live
+  // work sits at 60+. Opening there puts focus straight on the Ready panel. (owner 2026-08-05)
+  const min = sp.min !== undefined ? parseInt(sp.min) || 0 : 60;
   const { groups, counts, buckets } = getBoard(min);
   // Full job index for the Cmd+K search (ALL scores/statuses, independent of the min filter).
   const searchJobs = getBoard(0).groups.flatMap((g) => g.rows.map((r) => ({
@@ -189,6 +282,14 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
   // Applied folds in rejected (they were applied to), and there is no separate Rejected tile.
   const total = Object.entries(counts).reduce((a, [k, v]) => a + (k === "skipped" || k === "archived" ? 0 : v), 0);
   const tiles = ["planned", "kit_only", "kit_ready", "manual_only", "applied"].filter((s) => counts[s]);
+  // 7-day activity for the hero sparklines. Each tile shows the series most relevant to it:
+  // detection for New/Not-ready/Total, pre-scan for Ready, applications for Applied.
+  const trends = getTrends(7);
+  const TREND: Record<string, number[]> = {
+    total: trends.detected, planned: trends.detected, kit_only: trends.detected,
+    kit_ready: trends.ready, manual_only: trends.applied, applied: trends.applied,
+  };
+  const todayOf = (arr: number[]) => arr[arr.length - 1] || 0;
 
   return (
     <main className="min-h-screen bg-[#f6f8fa] text-[#1f2328]" style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" }}>
@@ -197,9 +298,9 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
         <div className="mb-4 flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/icon.png" alt="Jobs" width={52} height={52} className="hidden sm:block rounded-[12px] shadow-sm shrink-0" />
+            <img src="/icon.png" alt="AI-Jobs" width={52} height={52} className="hidden sm:block rounded-[12px] shadow-sm shrink-0" />
             <div>
-              <h1 className="text-3xl font-bold text-[#1f2328] mb-1">Jobs</h1>
+              <h1 className="text-3xl font-bold text-[#1f2328] mb-1">AI-Jobs</h1>
               <div className="text-[13px] text-gray-500">{total} tracked &middot; live from SQLite &middot; zero-token</div>
             </div>
           </div>
@@ -211,14 +312,26 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
         </div>
 
         <div className="flex flex-wrap gap-2 mb-2">
-          <div className="flex-1 min-w-[88px] rounded-[10px] px-2.5 py-2.5 sm:px-4 sm:py-3 text-white shadow-sm bg-gradient-to-r from-gray-700 to-gray-900">
-            <div className="text-[20px] sm:text-[26px] font-bold leading-none">{total}</div>
-            <div className="text-[10px] sm:text-xs text-white/85 mt-0.5 truncate">Total</div>
+          <div className="flex-1 min-w-[88px] rounded-[10px] px-2.5 py-2.5 sm:px-4 sm:py-3 text-white shadow-sm bg-gradient-to-r from-gray-700 to-gray-900 flex items-center justify-between gap-2">
+            <div className="min-w-0">
+              <div className="text-[20px] sm:text-[26px] font-bold leading-none">{total}</div>
+              <div className="text-[10px] sm:text-xs text-white/85 mt-0.5 truncate">Total</div>
+            </div>
+            <div className="hidden sm:flex flex-col items-end shrink-0">
+              <Sparkline data={TREND.total} />
+              <span className="text-[10px] text-white/70 mt-0.5">+{todayOf(TREND.total)} today</span>
+            </div>
           </div>
           {tiles.map((s) => (
-            <div key={s} className={`flex-1 min-w-[88px] rounded-[10px] px-2.5 py-2.5 sm:px-4 sm:py-3 text-white shadow-sm bg-gradient-to-r ${HGRAD[s]}`}>
-              <div className="text-[20px] sm:text-[26px] font-bold leading-none">{s === "applied" ? (counts.applied || 0) + (counts.rejected || 0) : counts[s]}</div>
-              <div className="text-[10px] sm:text-xs text-white/85 mt-0.5 truncate">{s === "planned" ? "New" : s === "kit_ready" ? "Ready" : s === "kit_only" ? "Not ready" : s === "manual_only" ? "Manual" : s[0].toUpperCase() + s.slice(1)}</div>
+            <div key={s} className={`flex-1 min-w-[88px] rounded-[10px] px-2.5 py-2.5 sm:px-4 sm:py-3 text-white shadow-sm bg-gradient-to-r ${HGRAD[s]} flex items-center justify-between gap-2`}>
+              <div className="min-w-0">
+                <div className="text-[20px] sm:text-[26px] font-bold leading-none">{s === "applied" ? (counts.applied || 0) + (counts.rejected || 0) : counts[s]}</div>
+                <div className="text-[10px] sm:text-xs text-white/85 mt-0.5 truncate">{s === "planned" ? "New" : s === "kit_ready" ? "Ready" : s === "kit_only" ? "Not ready" : s === "manual_only" ? "Manual" : s[0].toUpperCase() + s.slice(1)}</div>
+              </div>
+              <div className="hidden sm:flex flex-col items-end shrink-0">
+                <Sparkline data={TREND[s] || trends.detected} />
+                <span className="text-[10px] text-white/70 mt-0.5">+{todayOf(TREND[s] || trends.detected)} today</span>
+              </div>
             </div>
           ))}
         </div>
@@ -234,7 +347,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
           const breakdownPills = breakdown.map(([src, n]) => {
             const uri = markUri(src);
             return (
-              <span key={src} title={src} className="inline-flex items-center justify-center gap-1 min-w-[46px] text-[11px] font-bold text-white bg-white/20 rounded-full pl-1 pr-2 py-0.5 whitespace-nowrap">
+              <span key={src} title={src} className="inline-flex items-center justify-center gap-1 min-w-[46px] text-[11px] font-bold rounded-full pl-1 pr-2 py-0.5 whitespace-nowrap text-white bg-white/20">
                 {uri
                   /* eslint-disable-next-line @next/next/no-img-element */
                   ? <img src={uri} alt={src} width={16} height={16} className="w-4 h-4 rounded-full bg-white object-contain shrink-0" />
@@ -244,16 +357,18 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
             );
           });
           return (
-          <CollapsiblePanel key={g.status} status={g.status} label={g.label} count={g.rows.length} gradient={HGRAD[g.status] || "from-gray-500 to-gray-600"} archived={g.status === "archived"} breakdown={breakdownPills}>
+          <CollapsiblePanel key={g.status} status={g.status} label={g.label} count={g.rows.length} gradient={HGRAD[g.status] || "from-gray-500 to-gray-600"} archived={g.status === "archived"} defaultCollapsed={g.status === "kit_only"} breakdown={breakdownPills}>
             <table className="w-full table-fixed border-collapse text-[11px] sm:text-[13px]">
-              {/* ONE fixed colgroup on EVERY panel so all columns align top-down across
-                  panels - Src, Company, Role (arrow pinned to its right edge), Status
-                  (reserved even on New/planned), Score. (owner request 2026-08-05) */}
-              <colgroup><col className="w-[30px] sm:w-[44px]" /><col className="w-[20%]" /><col className="w-[48%]" /><col className="w-[16%]" /><col className="w-[10%]" /></colgroup>
+              {/* Identical column widths on EVERY panel (thead governs table-fixed) so
+                  columns align top-down across panels. Company + Score hide on phones;
+                  Role widens and Status collapses to one icon there. (owner request 2026-08-05) */}
               <thead><tr className="bg-[#f6f8fa] text-gray-400 text-[11px] text-left">
-                <th className="pl-3 pr-1 py-2 font-medium">Src</th>
-                <th className="px-1 py-2 font-medium">Company</th><th className="px-2.5 py-2 font-medium">Role</th>
-                <th className="px-1.5 py-2 font-medium text-left">Status</th><th className="pl-1 pr-3 py-2 font-medium text-right">Score</th>
+                <th className="pl-3 pr-1 py-2 font-medium w-[30px]">Src</th>
+                <th className="pl-1 pr-1 py-2 font-medium hidden sm:table-cell sm:w-[16%]">Company</th>
+                <th className="px-2.5 py-2 font-medium w-[56%] sm:w-[50%]">Role</th>
+                <th className="px-1 py-2 font-medium text-center w-[13%] sm:w-[8%]">Tech</th>
+                <th className="px-1.5 py-2 font-medium text-left w-[22%] sm:w-[14%]">Status</th>
+                <th className="pl-1 pr-3 py-2 font-medium text-right hidden sm:table-cell sm:w-[8%]">Score</th>
               </tr></thead>
               <tbody>
                 {g.rows.map((r) => (
@@ -273,8 +388,9 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
                         );
                       })()}
                     </td>
-                    <td className="px-1 py-2 truncate">
-                      <span className="flex items-center gap-1.5 text-[#1f2328]">
+                    <td className="pl-1 pr-1 py-2 truncate hidden sm:table-cell">
+                      <span className="flex items-center gap-2 text-[#1f2328]">
+                        <span className="text-gray-300 font-normal select-none leading-none">|</span>
                         <Logo company={r.company} />
                         <span className="truncate">{r.company || "?"}</span>
                       </span>
@@ -282,11 +398,15 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
                     <td className="px-2.5 py-2">
                       <div className="flex items-center gap-1.5 min-w-0">
                         <span className="flex-1 min-w-0 truncate text-[#1f2328]">{r.title}</span>
-                        {r.url ? <a data-external href={r.url} target="_blank" rel="noopener noreferrer" title="Open posting" className="shrink-0 text-blue-700 no-underline align-middle">&#8599;</a> : null}
+                        {r.url ? <a data-external href={r.url} target="_blank" rel="noopener noreferrer" title="Open posting" className="shrink-0 no-underline align-middle font-bold" style={{ color: LINKC[g.status] || "#2563eb" }}>&#8599;</a> : null}
                       </div>
                     </td>
-                    <td className="px-1.5 py-2 text-left">{g.status === "archived" ? (r.status === "rejected" ? statusPill("rejected", "bg-gray-100 text-gray-500", agoLabel(r.rejected_at) || agoLabel(r.updated_at)) : r.status === "expired" ? statusPill("expired", "bg-amber-100 text-amber-700", agoLabel(r.updated_at)) : statusPill("disliked", "bg-rose-100 text-rose-600", agoLabel(r.updated_at))) : g.status === "kit_only" ? <span className="inline-block text-[9px] font-bold uppercase tracking-wide rounded px-1.5 py-0.5 bg-sky-50 text-sky-400 whitespace-nowrap">needs prescan</span> : g.status === "kit_ready" ? readyProgress(r) : pfBadge(r)}</td>
-                    <td className="pl-1 pr-3 py-2 text-right text-gray-400">{r.score ?? "-"}</td>
+                    <td className="px-1 py-2 text-center">{techCell(r)}</td>
+                    <td className="px-1.5 py-2 text-left">
+                      <span className="sm:hidden">{statusIcon(g.status, r)}</span>
+                      <span className="hidden sm:inline">{g.status === "archived" ? (r.status === "rejected" ? statusPill("rejected", "bg-gray-100 text-gray-500", agoLabel(r.rejected_at) || agoLabel(r.updated_at)) : r.status === "expired" ? statusPill("expired", "bg-amber-100 text-amber-700", agoLabel(r.updated_at)) : statusPill("disliked", "bg-rose-100 text-rose-600", agoLabel(r.updated_at))) : g.status === "kit_only" ? <span className="inline-block text-[9px] font-bold uppercase tracking-wide rounded px-1.5 py-0.5 bg-sky-50 text-sky-400 whitespace-nowrap">needs prescan</span> : g.status === "kit_ready" ? readyProgress(r) : pfBadge(r)}</span>
+                    </td>
+                    <td className="pl-1 pr-3 py-2 text-right text-gray-400 hidden sm:table-cell">{r.score ?? "-"}</td>
                   </RowLink>
                 ))}
               </tbody>
@@ -296,6 +416,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
         })}
         <div className="mt-8 text-center text-xs text-gray-400">Jobs &middot; reads jobs.db &middot; localhost/jobs</div>
       </div>
+      <PanelNav />
     </main>
   );
 }
