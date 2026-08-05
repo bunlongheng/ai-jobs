@@ -137,6 +137,46 @@ $("fill").onclick = async () => {
   }).join("");
 };
 
+// Capture Q&A: harvest every question -> answer you filled on the page, copy it as clean
+// text (paste straight to Claude) AND persist to jobfill/captured-answers.jsonl so Claude
+// learns your answers for similar questions next time. (owner request 2026-08-05)
+$("capture").onclick = async () => {
+  const st = $("status");
+  const tab = await activeTab();
+  st.textContent = "Reading your answers...";
+  try {
+    await chrome.scripting.executeScript({ target: { tabId: tab.id, allFrames: true }, files: ["content.js"] });
+  } catch (e) {}
+  let frames = [{ frameId: 0 }];
+  try { frames = (await chrome.webNavigation.getAllFrames({ tabId: tab.id })) || frames; } catch (e) {}
+  const answers = [];
+  const seen = new Set();
+  for (const f of frames) {
+    try {
+      const r = await chrome.tabs.sendMessage(tab.id, { type: "jobfill:capture" }, { frameId: f.frameId });
+      for (const a of r?.answers || []) {
+        const k = a.label.toLowerCase();
+        if (seen.has(k)) continue;
+        seen.add(k);
+        answers.push(a);
+      }
+    } catch (e) {}
+  }
+  if (!answers.length) { st.textContent = "No filled answers found on this page."; return; }
+
+  const kitId = $("kit")?.value || "_capture";
+  const kit = KITS.find((k) => k.id === kitId);
+  const header = `# Captured Q&A${kit ? ` - ${kit.company || ""} ${kit.title || ""}`.trimEnd() : ""}\n${tab.url}\n`;
+  const text = header + "\n" + answers.map((a) => `Q: ${a.label}\nA: ${a.value}`).join("\n\n") + "\n";
+  await navigator.clipboard.writeText(text);
+
+  // persist for Claude to learn from (best-effort; clipboard copy already succeeded)
+  const saved = await send({ type: "event", data: { id: kitId, outcome: "captured_answers", url: tab.url, answers } });
+  st.textContent = `Captured ${answers.length} Q&A - copied for Claude${saved?.ok ? " + saved to learn file" : ""}. Paste it to Claude.`;
+  $("report").innerHTML = answers.map((a) =>
+    `<div class="row"><span class="badge">${a.type || "?"}</span><span class="ok">${(a.value || "").slice(0, 80)}</span> - ${a.label}</div>`).join("");
+};
+
 $("copy").onclick = async () => {
   const tab = await activeTab();
   const ver = chrome.runtime.getManifest().version;

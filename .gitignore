@@ -44,3 +44,6 @@ jobfill/commands.jsonl
 legacy-python/
 portals.json
 resume-master.md
+
+# captured application answers (PII - never commit)
+jobfill/captured-answers.jsonl

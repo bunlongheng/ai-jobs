@@ -38,6 +38,13 @@ export function getBoard(minScore = 0): {
   counts.rejected = all.filter((r) => r.status === "rejected" && keep(r)).length;
   const archivedKept = archived.filter(keep);
   if (archivedKept.length) counts.archived = archivedKept.length;
+  // Ready = only jobs whose form was actually PRE-SCANNED (plugin pre-run recorded).
+  // Everything else that's kit_ready (kit written but not pre-scanned, incl. listing
+  // jobs with no form) drops to a separate "Not ready · needs pre-scan" pile. (owner 2026-08-05)
+  const preScanned = (r: AppRow) => r.pf_ats === "plugin" && (r.pf_total ?? 0) > 0;
+  const krRows = rows.filter((r) => (r.status || "planned") === "kit_ready" && keep(r));
+  counts.kit_ready = krRows.filter(preScanned).length;
+  counts.kit_only = krRows.filter((r) => !preScanned(r)).length;
   const groups: BoardGroup[] = [];
   for (const st of STAGES) {
     // Applied list is ordered newest-applied first (recent on top, old at the bottom);
@@ -46,7 +53,15 @@ export function getBoard(minScore = 0): {
       ? (a: AppRow, b: AppRow) => String(b.applied_at || "").localeCompare(String(a.applied_at || ""))
       : (a: AppRow, b: AppRow) => (b.score || 0) - (a.score || 0);
     const g = rows.filter((r) => (r.status || "planned") === st && keep(r)).sort(sort);
-    if (g.length) groups.push({ status: st, label: LABEL[st] || st, rows: g });
+    if (!g.length) continue;
+    if (st === "kit_ready") {
+      const ready = g.filter(preScanned);
+      const kitOnly = g.filter((r) => !preScanned(r));
+      if (ready.length) groups.push({ status: "kit_ready", label: LABEL.kit_ready, rows: ready });
+      if (kitOnly.length) groups.push({ status: "kit_only", label: "Not ready · needs pre-scan", rows: kitOnly });
+    } else {
+      groups.push({ status: st, label: LABEL[st] || st, rows: g });
+    }
   }
   // Archived always renders last (below Rejected) - also score-scoped.
   if (archivedKept.length) {

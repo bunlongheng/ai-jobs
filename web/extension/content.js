@@ -420,24 +420,46 @@
     const fileInputs = deepQuery("input[type=file]");
     let resumeDone = false;
     for (const fi of fileInputs) {
-      const sec = fi.closest("div,section");
-      const ctx = norm(labelFor(fi) + " " + (sec?.textContent || "").slice(0, 200));
-      // Greenhouse persists uploads as a chip in the DOM, NOT in input.files -
-      // read the chip so existing attachments are inventoried (and mismatches caught)
+      const sec = fi.closest("div,section,fieldset");
+      // Classify by the NEAREST question label (questionLabel walks to the closest
+      // preceding text) - NOT the whole section blob, which on Ashby/Greenhouse holds
+      // BOTH "Resume/CV" and "Cover Letter" and cross-wires them. The resume must NEVER
+      // land in a cover slot. (owner bug 2026-08-05)
+      const near = norm(questionLabel(fi) + " " + (labelFor(fi) || ""));
+      const isCover = /cover|motivation|letter/.test(near);
+      const isResume = !isCover && /resume|cv\b|curriculum|\bcv$/.test(near);
+      // Greenhouse/Ashby persist uploads as a chip in the DOM, NOT in input.files -
+      // read the chip so existing attachments are inventoried (and mismatches caught).
       const chip = ((sec?.textContent || "").match(/([\w\-. ()&']{3,60}\.(pdf|docx?|txt|rtf))/i) || [])[1];
-      if (/cover/.test(ctx)) {
-        if (chip && /resume|cv\b/i.test(chip)) {
+
+      if (isCover) {
+        // A cover slot NEVER gets the resume. A chip here that isn't a cover file is the
+        // resume misfiled by hand or a prior bug - flag it (filename has no "resume"/"cv"
+        // token, so match on the ABSENCE of "cover" instead). (owner bug 2026-08-05)
+        if (chip && !/cover/i.test(chip))
           report.push(["cover letter", "MANUAL - WRONG FILE attached: " + chip.trim() + " (remove it, then Fill again)", "file"]);
-        } else if (chip) {
+        else if (chip)
           report.push(["cover letter", "already attached: " + chip.trim(), "file"]);
-        } else if (cover) {
+        else if (cover)
           attach(fi, new File([cover], pname + " - Cover Letter.txt", { type: "text/plain" }), "cover letter");
-        }
-      } else if (!resumeDone && (/resume|cv\b|curriculum/.test(ctx) || fileInputs.length === 1)) {
+        else
+          report.push(["cover letter", "MANUAL - attach a cover letter yourself (no cover doc in this kit)", "file"]);
+        continue;
+      }
+
+      // Resume slot: an explicit resume label, OR the page's SOLE file input that is not
+      // a cover slot. Never the old "one input in THIS frame" fallback - a cover-only
+      // frame has one input and must not receive the resume. (owner bug 2026-08-05)
+      if (!resumeDone && (isResume || (fileInputs.length === 1 && !isCover))) {
         if (chip) report.push(["resume", "already attached: " + chip.trim(), "file"]);
         else attach(fi, b64ToFile(resumeB64, pname + " - Senior Full-Stack Engineer.pdf"), "resume");
         resumeDone = true;
+        continue;
       }
+
+      // Unlabeled upload we can't confidently classify: do NOT guess - a wrong guess is
+      // exactly how the resume ended up in the cover slot. Leave it for the human.
+      report.push([norm(questionLabel(fi)).slice(0, 40) || "attachment", "MANUAL - unlabeled upload, attach by hand", "file"]);
     }
 
     for (const el of deepQuery("input[type=text],input[type=email],input[type=tel],input[type=url],input:not([type]),textarea")) {
@@ -738,6 +760,35 @@
         meta: { frame: location.href.slice(0, 100), inputs: deepQuery("input,textarea,select").length },
       })).catch((e) => sendResponse({ ok: false, error: String(e) }));
       return true;
+    }
+    if (msg.type === "jobfill:capture") {
+      // READ-ONLY: harvest the question -> answer pairs YOU actually filled, so Claude
+      // can learn them for similar questions next time. Only non-empty fields; checkbox
+      // groups fold into one label. Nothing is typed/clicked. (owner request 2026-08-05)
+      const byLabel = new Map();
+      for (const el of deepQuery("input,textarea,select")) {
+        if (!visible(el) || el.type === "hidden" || el.type === "password") continue;
+        const t = (el.type || el.tagName).toLowerCase();
+        let value = "";
+        if (t === "radio" || t === "checkbox") {
+          if (!el.checked) continue;
+          value = norm(labelFor(el)) || (el.value || "").trim();
+        } else if (el.tagName === "SELECT") {
+          value = (el.options[el.selectedIndex]?.text || "").trim();
+          if (/^\s*(select|choose|--|please)/i.test(value)) value = "";
+        } else {
+          value = (el.value || "").trim();
+        }
+        if (!value) continue;
+        const label = norm(questionLabel(el)).slice(0, 200);
+        if (!label) continue;
+        const prev = byLabel.get(label);
+        // checkbox groups: same question, multiple ticked -> join the picked options
+        if (prev && (t === "checkbox" || t === "radio")) prev.value += ", " + value;
+        else if (!prev) byLabel.set(label, { label, value: value.slice(0, 6000), type: t });
+      }
+      sendResponse({ ok: true, answers: [...byLabel.values()], url: location.href, title: document.title });
+      return;
     }
     if (msg.type === "jobfill:ping") sendResponse({ ok: true });
   });

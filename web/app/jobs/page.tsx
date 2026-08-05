@@ -5,6 +5,7 @@ import RowLink from "./RowLink";
 import AutoRefresh from "./AutoRefresh";
 import JobsMenu from "./JobsMenu";
 import ScoreMenu from "./ScoreMenu";
+import CommandK from "./CommandK";
 
 export const dynamic = "force-dynamic"; // always read live SQLite
 
@@ -21,6 +22,21 @@ function Logo({ company }: { company: string | null }) {
   return <span className="inline-flex items-center justify-center rounded-[5px] align-middle text-white text-[12px] font-bold" style={{ width: 20, height: 20, background: bg }}>{init}</span>;
 }
 
+// Resolve a source/company mark: prefer the ATS logo (src:Ashby...), then the company
+// logo cached under the bare name (direct sites like Coinbase live there), so a company
+// source never falls through to a globe. (owner rule 2026-08-05: always an icon, never
+// the raw name)
+function markUri(src: string, company?: string | null): string | null {
+  return getLogo(`src:${src}`) || getLogo(src) || (company ? getLogo(company) : null);
+}
+// Last-resort brand tile - a colored initial, NEVER a globe or raw name text.
+function LetterTile({ name, size = 20, round = false }: { name: string; size?: number; round?: boolean }) {
+  const n = (name || "?").trim();
+  const init = n.slice(0, 1).toUpperCase();
+  const bg = GRAD[[...n].reduce((a, c) => a + c.charCodeAt(0), 0) % GRAD.length];
+  return <span className={`inline-flex items-center justify-center align-middle text-white font-bold shrink-0 ${round ? "rounded-full" : "rounded-[5px]"}`} style={{ width: size, height: size, background: bg, fontSize: Math.round(size * 0.5) }}>{init}</span>;
+}
+
 const TILE: Record<string, string> = {
   kit_ready: "bg-green-50 border-green-200 text-green-700",     // green = ready to apply
   applied: "bg-blue-50 border-blue-200 text-blue-700",           // blue = applied
@@ -30,7 +46,7 @@ const TILE: Record<string, string> = {
   interviewing: "bg-purple-50 border-purple-200 text-purple-700",
 };
 const DOT: Record<string, string> = {
-  planned: "#0284c7", kit_ready: "#1d4ed8", applied: "#16a34a", manual_only: "#9a6700",
+  planned: "#0284c7", kit_ready: "#1d4ed8", kit_only: "#64748b", applied: "#16a34a", manual_only: "#9a6700",
   rejected: "#cf222e", skipped: "#8a949e", interviewing: "#8250df",
 };
 // Color-coded gradient header per bucket (owner scheme 2026-08-05):
@@ -39,6 +55,7 @@ const DOT: Record<string, string> = {
 const HGRAD: Record<string, string> = {
   planned: "from-sky-400 to-sky-500",
   kit_ready: "from-blue-600 to-blue-800",
+  kit_only: "from-slate-400 to-slate-600",
   applied: "from-green-600 to-emerald-700",
   manual_only: "from-amber-400 to-orange-500",
   rejected: "from-rose-300 to-rose-400",
@@ -50,6 +67,7 @@ const HGRAD: Record<string, string> = {
 const HOVER: Record<string, string> = {
   planned: "hover:bg-sky-50",
   kit_ready: "hover:bg-blue-50",
+  kit_only: "hover:bg-slate-50",
   applied: "hover:bg-green-50",
   manual_only: "hover:bg-amber-50",
   rejected: "hover:bg-red-50",
@@ -73,6 +91,31 @@ function jobSource(url: string | null): string {
   } catch {
     return "Direct";
   }
+}
+
+// "Applied via" - the channel the application actually went out through. HN jobs the
+// engine auto-emailed show Gmail; ATS/board rows show that platform; everything else is
+// the company's own careers site. (owner request 2026-08-05)
+function applyVia(r: AppRow): string {
+  const notes = (r.notes || "").toLowerCase();
+  if (notes.includes("auto-emailed") || notes.includes("emailed")) return "Gmail";
+  const src = jobSource(r.url);
+  if (["Ashby", "Greenhouse", "Lever", "LinkedIn", "Indeed", "HackerNews"].includes(src)) return src;
+  return "Company";
+}
+// The Via cell only shows once a row has actually been applied to - blank on New/Ready.
+function ViaCell({ r }: { r: AppRow }) {
+  const applied = r.status === "applied" || r.status === "rejected" || r.status === "interviewing" || !!r.applied_at;
+  if (!applied) return null;
+  const via = applyVia(r);
+  const label = via === "Company" ? "Company site" : via === "HackerNews" ? "Hacker News" : via;
+  const uri = via === "Company" ? getLogo(r.company) : markUri(via, r.company);
+  return uri ? (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={uri} alt={label} title={`Applied via ${label}`} width={18} height={18} className="w-[18px] h-[18px] rounded-[5px] object-contain inline-block align-middle bg-white border border-gray-200" />
+  ) : (
+    <LetterTile name={r.company || label} size={18} />
+  );
 }
 
 // Relative "how long ago" from a YYYY-MM-DD date. "today" / "1d ago" / "12d ago".
@@ -121,11 +164,11 @@ function pfBadge(r: AppRow) {
   // Easy Apply so those are easy to spot and bang out first. (owner request 2026-08-05)
   const u = (r.url || "").toLowerCase();
   const src = jobSource(r.url);
-  const uri = getLogo(`src:${src}`);
+  const uri = markUri(src, r.company);
   const logo = uri
     // eslint-disable-next-line @next/next/no-img-element
     ? <img src={uri} alt={src} title={src} width={18} height={18} className="w-[18px] h-[18px] rounded-full object-contain inline-block align-middle" />
-    : <span className="text-[10px] text-gray-400">{src}</span>;
+    : <LetterTile name={r.company || src} size={18} round />;
   if (u.includes("news.ycombinator.com"))
     return <span className="inline-flex items-center justify-end whitespace-nowrap" title="Apply via the Hacker News post">{logo}</span>;
   if (u.includes("linkedin.com") || u.includes("indeed.com")) {
@@ -133,8 +176,9 @@ function pfBadge(r: AppRow) {
       return <span className="inline-flex items-center justify-end gap-1 whitespace-nowrap" title="Easy / Quick Apply - bang these out first">{logo}<span className="text-[9px] font-bold uppercase tracking-wide rounded px-1 py-0.5 bg-blue-100 text-blue-700">easy</span></span>;
     return <span className="inline-flex items-center justify-end whitespace-nowrap" title="Apply on the source site">{logo}</span>;
   }
-  // A real ATS form that has not been pre-tested yet (none currently - all 11 are green).
-  return <span className="text-gray-400 whitespace-nowrap" title="ATS form not yet pre-tested">pre-run needed</span>;
+  // A direct-ATS form not yet pre-run: show the source logo (like the listing rows),
+  // never the noisy "pre-run needed" text - the kit is still ready to apply. (owner 2026-08-05)
+  return <span className="inline-flex items-center justify-start whitespace-nowrap" title="Apply on the source ATS">{logo}</span>;
 }
 
 export default async function Board({ searchParams }: { searchParams: Promise<{ min?: string }> }) {
@@ -143,10 +187,14 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
   // (top score is ~88, so 90+ would be empty). (owner request 2026-07-24)
   const min = sp.min !== undefined ? parseInt(sp.min) || 0 : 80;
   const { groups, counts, buckets } = getBoard(min);
+  // Full job index for the Cmd+K search (ALL scores/statuses, independent of the min filter).
+  const searchJobs = getBoard(0).groups.flatMap((g) => g.rows.map((r) => ({
+    id: r.id, title: r.title || "", company: r.company || "", score: r.score ?? 0, status: r.status || "",
+  })));
   // Total excludes skipped so the tiles reconcile: New + Ready + Manual + Applied = Total.
   // Applied folds in rejected (they were applied to), and there is no separate Rejected tile.
   const total = Object.entries(counts).reduce((a, [k, v]) => a + (k === "skipped" || k === "archived" ? 0 : v), 0);
-  const tiles = ["planned", "kit_ready", "manual_only", "applied"].filter((s) => counts[s]);
+  const tiles = ["planned", "kit_ready", "kit_only", "manual_only", "applied"].filter((s) => counts[s]);
 
   return (
     <main className="min-h-screen bg-[#f6f8fa] text-[#1f2328]" style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" }}>
@@ -162,6 +210,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            <CommandK jobs={searchJobs} />
             <ScoreMenu min={min} buckets={buckets} tiers={[...SCORE_TIERS]} />
             <JobsMenu />
           </div>
@@ -175,7 +224,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
           {tiles.map((s) => (
             <div key={s} className={`flex-1 min-w-[88px] rounded-[10px] px-2.5 py-2.5 sm:px-4 sm:py-3 text-white shadow-sm bg-gradient-to-r ${HGRAD[s]}`}>
               <div className="text-[20px] sm:text-[26px] font-bold leading-none">{s === "applied" ? (counts.applied || 0) + (counts.rejected || 0) : counts[s]}</div>
-              <div className="text-[10px] sm:text-xs text-white/85 mt-0.5 truncate">{s === "planned" ? "New" : s === "kit_ready" ? "Ready" : s === "manual_only" ? "Manual" : s[0].toUpperCase() + s.slice(1)}</div>
+              <div className="text-[10px] sm:text-xs text-white/85 mt-0.5 truncate">{s === "planned" ? "New" : s === "kit_ready" ? "Ready" : s === "kit_only" ? "Not ready" : s === "manual_only" ? "Manual" : s[0].toUpperCase() + s.slice(1)}</div>
             </div>
           ))}
         </div>
@@ -197,13 +246,13 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
               </div>
               <div className="flex items-center gap-1.5 flex-wrap justify-end">
                 {breakdown.map(([src, n]) => {
-                  const uri = getLogo(`src:${src}`);
+                  const uri = markUri(src);
                   return (
                     <span key={src} title={src} className="inline-flex items-center justify-center gap-1 min-w-[46px] text-[11px] font-bold text-white bg-white/20 rounded-full pl-1 pr-2 py-0.5 whitespace-nowrap">
                       {uri
                         /* eslint-disable-next-line @next/next/no-img-element */
-                        ? <img src={uri} alt={src} width={16} height={16} className="w-4 h-4 rounded-full bg-white object-cover shrink-0" />
-                        : <span className="text-[9px] uppercase">{src}</span>}
+                        ? <img src={uri} alt={src} width={16} height={16} className="w-4 h-4 rounded-full bg-white object-contain shrink-0" />
+                        : <LetterTile name={src} size={16} round />}
                       {n}
                     </span>
                   );
@@ -214,11 +263,11 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
               {/* ONE fixed colgroup on EVERY panel so all columns align top-down across
                   panels - Src, Company, Role (arrow pinned to its right edge), Status
                   (reserved even on New/planned), Score. (owner request 2026-08-05) */}
-              <colgroup><col className="w-[30px] sm:w-[44px]" /><col className="w-[21%]" /><col className="w-[46%]" /><col className="w-[17%]" /><col className="w-[10%]" /></colgroup>
+              <colgroup><col className="w-[30px] sm:w-[44px]" /><col className="w-[20%]" /><col className="w-[40%]" /><col className="w-[16%]" /><col className="w-[8%]" /><col className="w-[10%]" /></colgroup>
               <thead><tr className="bg-[#f6f8fa] text-gray-400 text-[11px] text-left">
                 <th className="pl-3 pr-1 py-2 font-medium">Src</th>
                 <th className="px-1 py-2 font-medium">Company</th><th className="px-2.5 py-2 font-medium">Role</th>
-                <th className="px-1.5 py-2 font-medium text-left">Status</th><th className="pl-1 pr-3 py-2 font-medium text-right">Score</th>
+                <th className="px-1.5 py-2 font-medium text-left">Status</th><th className="px-1 py-2 font-medium text-center">Via</th><th className="pl-1 pr-3 py-2 font-medium text-right">Score</th>
               </tr></thead>
               <tbody>
                 {g.rows.map((r) => (
@@ -226,15 +275,15 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
                     <td className="pl-3 pr-1 py-2">
                       {(() => {
                         const src = jobSource(r.url);
-                        const uri = getLogo(`src:${src}`);
-                        return uri ? (
+                        const uri = markUri(src, r.company);
+                        return (
                           <span className="relative inline-block align-middle shrink-0" style={{ width: 20, height: 20 }}>
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={uri} alt={src} title={src} width={20} height={20} className="block rounded-[5px] bg-white border border-gray-200 object-contain" />
+                            {uri
+                              /* eslint-disable-next-line @next/next/no-img-element */
+                              ? <img src={uri} alt={src} title={src} width={20} height={20} className="block rounded-[5px] bg-white border border-gray-200 object-contain" />
+                              : <LetterTile name={r.company || src} size={20} />}
                             {r.easy_apply ? <span className="absolute -bottom-1 -right-1 leading-none pointer-events-none font-bold text-blue-600 bg-white rounded px-0.5" style={{ fontSize: 7 }} title="Easy/Quick Apply">easy</span> : null}
                           </span>
-                        ) : (
-                          <span className="text-[10px] text-gray-400" title={src}>{src}</span>
                         );
                       })()}
                     </td>
@@ -250,7 +299,8 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
                         {r.url ? <a data-external href={r.url} target="_blank" rel="noopener noreferrer" title="Open posting" className="shrink-0 text-blue-700 no-underline align-middle">&#8599;</a> : null}
                       </div>
                     </td>
-                    <td className="px-1.5 py-2 text-left">{g.status === "archived" ? (r.status === "rejected" ? statusPill("rejected", "bg-gray-100 text-gray-500", agoLabel(r.rejected_at)) : r.status === "expired" ? statusPill("expired", "bg-amber-100 text-amber-700", agoLabel(r.updated_at)) : statusPill("disliked", "bg-rose-100 text-rose-600")) : pfBadge(r)}</td>
+                    <td className="px-1.5 py-2 text-left">{g.status === "archived" ? (r.status === "rejected" ? statusPill("rejected", "bg-gray-100 text-gray-500", agoLabel(r.rejected_at) || agoLabel(r.updated_at)) : r.status === "expired" ? statusPill("expired", "bg-amber-100 text-amber-700", agoLabel(r.updated_at)) : statusPill("disliked", "bg-rose-100 text-rose-600", agoLabel(r.updated_at))) : pfBadge(r)}</td>
+                    <td className="px-1 py-2 text-center"><ViaCell r={r} /></td>
                     <td className="pl-1 pr-3 py-2 text-right" style={{ color: DOT[g.status] }}>{r.score ?? "-"}</td>
                   </RowLink>
                 ))}

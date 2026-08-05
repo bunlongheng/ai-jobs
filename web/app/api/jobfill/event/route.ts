@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import path from "path";
+import { appendFileSync } from "fs";
 import { db } from "@/lib/db";
 import { originBlocked } from "@/lib/jobfill";
 
@@ -18,6 +19,27 @@ export async function POST(req: Request) {
 
   const stamp = new Date().toISOString().slice(0, 10);
   const d = db();
+
+  // "Capture Q&A" from the extension: the question -> answer pairs you actually typed,
+  // appended to jobfill/captured-answers.jsonl so Claude can learn them for similar
+  // questions next time. READ-ONLY on the DB (one event row for provenance). (2026-08-05)
+  if (ev.outcome === "captured_answers" && Array.isArray(ev.answers)) {
+    const kit = d.prepare("SELECT company, title FROM applications WHERE id=?").get(jid) as { company?: string; title?: string } | undefined;
+    const ts = new Date().toISOString();
+    const lines = (ev.answers as Array<{ label?: string; value?: string; type?: string }>)
+      .filter((a) => a && a.label && a.value)
+      .map((a) => JSON.stringify({
+        ts, kitId: jid, company: kit?.company ?? null, title: kit?.title ?? null,
+        url: (ev.url as string) ?? null, label: String(a.label).slice(0, 300),
+        value: String(a.value).slice(0, 6000), type: a.type ?? null,
+      }));
+    if (lines.length) {
+      try { appendFileSync(path.join(process.cwd(), "..", "jobfill", "captured-answers.jsonl"), lines.join("\n") + "\n"); } catch {}
+      d.prepare("INSERT INTO events (app_id, outcome, url, fields, stamp) VALUES (?, 'captured_answers', ?, ?, ?)")
+        .run(jid, (ev.url as string) ?? null, JSON.stringify(ev.answers), stamp);
+    }
+    return NextResponse.json({ ok: true, captured: lines.length, file: "jobfill/captured-answers.jsonl" });
+  }
 
   // Logged-in Chrome sees Easy Apply buttons that guests cannot. Stamp both the
   // result (easy_apply 1/0) and that we checked (easy_apply_checked=1), matched by URL.
