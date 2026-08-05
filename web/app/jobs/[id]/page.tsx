@@ -3,17 +3,19 @@ import { getKit } from "@/lib/kit";
 import { getLogo } from "@/lib/logos";
 import Reactions from "../Reactions";
 import ApplyToggle from "../ApplyToggle";
+import CopyButton from "../CopyButton";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-function Section({ title, sub, html, grad = "from-blue-500 to-blue-700" }: { title: string; sub?: string; html: string; grad?: string }) {
+function Section({ title, sub, html, grad = "from-blue-500 to-blue-700", copyText }: { title: string; sub?: string; html: string; grad?: string; copyText?: string }) {
   if (!html) return null;
   return (
     <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden mb-3.5">
-      <div className={`bg-gradient-to-r ${grad} px-4 py-2.5`}>
+      <div className={`bg-gradient-to-r ${grad} px-4 py-2.5 flex items-center justify-between gap-2`}>
         <h2 className="text-sm text-white tracking-wide">{title}{sub ? <span className="text-xs text-white/80 ml-2">{sub}</span> : null}</h2>
+        {copyText ? <CopyButton text={copyText} /> : null}
       </div>
       <div className="prose-kit text-[13px] leading-relaxed px-6 py-5" dangerouslySetInnerHTML={{ __html: html }} />
     </div>
@@ -27,11 +29,43 @@ const STBG: Record<string, string> = {
   expired: "from-amber-500 to-orange-600",
 };
 
-export default async function JobDetail({ params }: { params: Promise<{ id: string }> }) {
+export default async function JobDetail({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ min?: string }> }) {
   const { id } = await params;
+  const sp = await searchParams;
+  // Preserve the board's score filter so "back to board" returns to the same view. (2026-08-05)
+  const backHref = sp.min !== undefined ? `/jobs?min=${sp.min}` : "/jobs";
   const { app, events } = getApp(id);
   if (!app) notFound();
   const kit = getKit(id);
+
+  // Apply-by-email (Hacker News / direct recruiter outreach): the email IS the application.
+  // Compose ONE ready-to-send email = subject + cover body + links + walk-through invite.
+  // No name/contact sign-off in the body - the owner's Gmail signature ("Best regard,
+  // Bunlong Heng, email, phone, logo") auto-appends. Form-based ATS apps don't email, so
+  // this block only shows for HN. (owner 2026-08-05)
+  const isEmailApply = (app.url || "").toLowerCase().includes("news.ycombinator.com");
+  const emailSubject = `Application: ${app.title ?? ""} - Bunlong Heng`;
+  const coverBody = (() => {
+    let b = (kit.coverText || "").trim();
+    const i = b.search(/with great excitement|best regard|sincerely/i); // drop any existing sign-off
+    if (i >= 0) b = b.slice(0, i).trim();
+    return b;
+  })();
+  const emailBody = [
+    coverBody,
+    "",
+    "A few links if useful:",
+    "Portfolio - https://www.bunlongheng.com",
+    "Resume - https://www.bunlongheng.com/resume",
+    "GitHub - https://github.com/bunlongheng",
+    "LinkedIn - https://www.linkedin.com/in/bunlongheng",
+    "",
+    "Happy to walk through any of these projects if one catches your eye - just let me know and we can find a time.",
+  ].join("\n");
+  // "Apply now" opens Gmail's web compose with subject + body (+ recruiter email if we can
+  // spot one in the posting text) pre-injected - one tap, no clipboard. (owner 2026-08-05)
+  const recruiterEmail = (`${app.jd || ""} ${app.notes || ""}`).match(/[\w.+-]+@[\w-]+\.[\w.-]{2,}/)?.[0] || "";
+  const gmailComposeUrl = `https://mail.google.com/mail/?view=cm&fs=1${recruiterEmail ? `&to=${encodeURIComponent(recruiterEmail)}` : ""}&su=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
 
   const fields: Field[] = (() => {
     for (const e of events) {
@@ -69,9 +103,9 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
   const srcUri = src ? getLogo(`src:${src}`) : null;
 
   return (
-    <main className="min-h-screen bg-[#f6f8fa] text-[#1f2328]" style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" }}>
+    <main className="min-h-screen bg-[#f6f8fa] text-[#1f2328]" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
       <div className="max-w-[900px] mx-auto px-5 py-6 pb-16">
-        <Link href="/jobs" className="text-xs text-blue-700 no-underline">&larr; back to board</Link>
+        <Link href={backHref} className="text-xs text-blue-700 no-underline">&larr; back to board</Link>
 
         <div className="bg-white border border-gray-200 rounded-2xl px-6 py-5 mt-3 mb-4 shadow-sm">
           <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -124,7 +158,7 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
           </div>
         ) : null}
 
-        <Section title="Resume (this version)" grad="from-blue-500 to-blue-700" html={kit.resumeHtml} />
+        <Section title="Resume (this version)" grad="from-blue-500 to-blue-700" html={kit.resumeHtml} copyText={kit.resumeText} />
         {!kit.resumeHtml && kit.hasResumePdf ? (
           <div className="bg-white border border-gray-300 rounded-xl px-6 py-5 mb-3.5">
             <h2 className="text-[15px] font-bold mb-2.5">Resume (this version)</h2>
@@ -138,21 +172,39 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
           </div>
         ) : null}
         {kit.hasResumePdf ? (
-          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden mb-3.5">
-            <div className="bg-gradient-to-r from-blue-500 to-blue-700 px-4 py-2.5 flex items-center justify-between gap-2">
-              <h2 className="text-sm text-white tracking-wide">Resume PDF (as submitted)</h2>
-              <a href={`/api/kit/${app.id}/file/resume.pdf`} target="_blank" rel="noopener noreferrer" className="text-xs text-white/90 no-underline shrink-0">Open in new tab &rarr;</a>
-            </div>
-            <object data={`/api/kit/${app.id}/file/resume.pdf`} type="application/pdf" className="w-full bg-gray-100 block" style={{ height: "80vh" }}>
-              <div className="px-6 py-6 text-[13px] text-gray-600">
-                Inline preview is not supported on this device.{" "}
-                <a href={`/api/kit/${app.id}/file/resume.pdf`} target="_blank" rel="noopener noreferrer" className="text-blue-700 font-semibold no-underline">Open resume PDF &rarr;</a>
-              </div>
-            </object>
-          </div>
+          <a href={`/api/kit/${app.id}/file/resume.pdf`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white shadow-sm px-5 py-4 mb-3.5 no-underline hover:bg-gray-50">
+            <span className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-50 text-red-600 text-[10px] font-bold shrink-0">PDF</span>
+            <span className="min-w-0 leading-tight">
+              <span className="block text-[14px] font-bold text-[#1f2328]">Resume PDF (as submitted)</span>
+              <span className="block text-[12px] text-blue-700">Tap to open the exact file &rarr;</span>
+            </span>
+          </a>
         ) : null}
-        <Section title="Cover letter" grad="from-purple-500 to-violet-600" html={kit.coverHtml} />
-        <Section title="Screening answers" grad="from-amber-400 to-orange-500" html={kit.screeningHtml} />
+        {/* Hacker News = apply by email: show ONE ready-to-send email (subject + body +
+            links + invite), not a separate cover letter. Otherwise the normal cover. */}
+        {isEmailApply && kit.coverText ? (
+          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden mb-3.5">
+            <div className="bg-gradient-to-r from-slate-600 to-slate-800 px-4 py-2.5 flex items-center justify-between gap-2">
+              <h2 className="text-sm text-white tracking-wide">Email to recruiter<span className="text-xs text-white/80 ml-2">Hacker News - ready to send</span></h2>
+              <span className="flex items-center gap-1.5 shrink-0">
+                <a href={gmailComposeUrl} target="_blank" rel="noopener noreferrer" className="text-[11px] font-bold text-white bg-green-600 hover:bg-green-700 rounded px-2.5 py-0.5 no-underline">Apply now (Gmail)</a>
+                <CopyButton text={emailBody} label="Copy" />
+              </span>
+            </div>
+            <div className="px-6 py-5">
+              <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-100">
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wide shrink-0 w-12">Subject</span>
+                <span className="flex-1 min-w-0 text-[14px] text-[#1f2328]">{emailSubject}</span>
+                <CopyButton text={emailSubject} tone="onLight" />
+              </div>
+              <pre className="whitespace-pre-wrap text-[14px] leading-relaxed text-[#1f2328]" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>{emailBody}</pre>
+              <p className="text-[11px] text-gray-400 mt-4 pt-3 border-t border-gray-100">Your Gmail signature (Best regard, Bunlong Heng + contact) appends below this automatically.</p>
+            </div>
+          </div>
+        ) : (
+          <Section title="Cover letter" grad="from-purple-500 to-violet-600" html={kit.coverHtml} copyText={kit.coverText} />
+        )}
+        <Section title="Screening answers" grad="from-amber-400 to-orange-500" html={kit.screeningHtml} copyText={kit.screeningText} />
 
         {(() => {
           const isRed = (f: Field) => String(f[1] ?? "").trim().toUpperCase().startsWith("MANUAL");

@@ -85,11 +85,13 @@ function agoLabel(d?: string | null): string {
 }
 
 // A consistent status pill (same shape everywhere) so Applied reads like Rejected does.
+// Fixed-width pill + fixed-width "ago" slot so the column aligns cleanly: every pill
+// lines up, every date lines up, whether or not a date is present. (owner request 2026-08-05)
 function statusPill(label: string, cls: string, ago?: string | null) {
   return (
-    <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-      <span className={`text-[9px] font-bold uppercase tracking-wide rounded px-1.5 py-0.5 ${cls}`}>{label}</span>
-      {ago ? <span className="text-[11px] text-gray-400 font-normal">{ago}</span> : null}
+    <span className="inline-flex items-center justify-end gap-1.5 whitespace-nowrap">
+      <span className={`text-[9px] font-bold uppercase tracking-wide rounded px-1.5 py-0.5 text-center ${cls}`} style={{ width: 66 }}>{label}</span>
+      <span className="text-[11px] text-gray-400 font-normal text-left inline-block" style={{ width: 48 }}>{ago || ""}</span>
     </span>
   );
 }
@@ -114,15 +116,22 @@ function pfBadge(r: AppRow) {
       </span>
     );
   }
-  // Listing sources have no external form to pre-run - show the apply path by source
-  // instead of a misleading "pre-run needed". (2026-08-02)
+  // Listing sources (LinkedIn/Indeed/HN) have no external form to pre-run - show the
+  // SOURCE LOGO (not the word "source"/"apply"), plus a blue "easy" pill for LinkedIn
+  // Easy Apply so those are easy to spot and bang out first. (owner request 2026-08-05)
   const u = (r.url || "").toLowerCase();
+  const src = jobSource(r.url);
+  const uri = getLogo(`src:${src}`);
+  const logo = uri
+    // eslint-disable-next-line @next/next/no-img-element
+    ? <img src={uri} alt={src} title={src} width={18} height={18} className="w-[18px] h-[18px] rounded-full object-contain inline-block align-middle" />
+    : <span className="text-[10px] text-gray-400">{src}</span>;
   if (u.includes("news.ycombinator.com"))
-    return <span className="text-orange-600 font-semibold whitespace-nowrap" title="Apply via the Hacker News post">HN</span>;
+    return <span className="inline-flex items-center justify-end whitespace-nowrap" title="Apply via the Hacker News post">{logo}</span>;
   if (u.includes("linkedin.com") || u.includes("indeed.com")) {
-    if (r.easy_apply) return <span className="text-blue-600 font-semibold whitespace-nowrap" title="Easy / Quick Apply">easy</span>;
-    if (r.easy_apply_checked) return <span className="text-amber-600 whitespace-nowrap" title="Full external application">apply</span>;
-    return <span className="text-gray-400 whitespace-nowrap" title="Apply on the source site (LinkedIn/Indeed), not Easy Apply">source</span>;
+    if (r.easy_apply)
+      return <span className="inline-flex items-center justify-end gap-1 whitespace-nowrap" title="Easy / Quick Apply - bang these out first">{logo}<span className="text-[9px] font-bold uppercase tracking-wide rounded px-1 py-0.5 bg-blue-100 text-blue-700">easy</span></span>;
+    return <span className="inline-flex items-center justify-end whitespace-nowrap" title="Apply on the source site">{logo}</span>;
   }
   // A real ATS form that has not been pre-tested yet (none currently - all 11 are green).
   return <span className="text-gray-400 whitespace-nowrap" title="ATS form not yet pre-tested">pre-run needed</span>;
@@ -202,11 +211,14 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
               </div>
             </div>
             <table className="w-full table-fixed border-collapse text-[11px] sm:text-[13px]">
-              <colgroup><col className="w-[30px] sm:w-[44px]" /><col className="w-[21%]" /><col className={g.status === "planned" ? "w-[69%]" : g.status === "applied" ? "w-[47%]" : g.status === "archived" ? "w-[45%]" : "w-[61%]"} />{g.status !== "planned" ? <col className={g.status === "applied" ? "w-[22%]" : g.status === "archived" ? "w-[24%]" : "w-[8%]"} /> : null}<col className="w-[10%]" /></colgroup>
+              {/* ONE fixed colgroup on EVERY panel so all columns align top-down across
+                  panels - Src, Company, Role (arrow pinned to its right edge), Status
+                  (reserved even on New/planned), Score. (owner request 2026-08-05) */}
+              <colgroup><col className="w-[30px] sm:w-[44px]" /><col className="w-[21%]" /><col className="w-[46%]" /><col className="w-[17%]" /><col className="w-[10%]" /></colgroup>
               <thead><tr className="bg-[#f6f8fa] text-gray-400 text-[11px] text-left">
                 <th className="pl-3 pr-1 py-2 font-medium">Src</th>
                 <th className="px-1 py-2 font-medium">Company</th><th className="px-2.5 py-2 font-medium">Role</th>
-                {g.status !== "planned" ? <th className="px-1.5 py-2 font-medium text-right">Status</th> : null}<th className="pl-1 pr-3 py-2 font-medium text-right">Score</th>
+                <th className="px-1.5 py-2 font-medium text-left">Status</th><th className="pl-1 pr-3 py-2 font-medium text-right">Score</th>
               </tr></thead>
               <tbody>
                 {g.rows.map((r) => (
@@ -232,11 +244,13 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
                         <span className="truncate">{r.company || "?"}</span>
                       </span>
                     </td>
-                    <td className="px-2.5 py-2 truncate">
-                      <span className="text-[#1f2328]">{r.title}</span>
-                      {r.url ? <a data-external href={r.url} target="_blank" rel="noopener noreferrer" title="Open posting" className="text-blue-700 no-underline ml-1.5 align-middle">&#8599;</a> : null}
+                    <td className="px-2.5 py-2">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="flex-1 min-w-0 truncate text-[#1f2328]">{r.title}</span>
+                        {r.url ? <a data-external href={r.url} target="_blank" rel="noopener noreferrer" title="Open posting" className="shrink-0 text-blue-700 no-underline align-middle">&#8599;</a> : null}
+                      </div>
                     </td>
-                    {g.status !== "planned" ? <td className="px-1.5 py-2 text-right">{g.status === "archived" ? (r.status === "rejected" ? statusPill("rejected", "bg-rose-100 text-rose-500", agoLabel(r.rejected_at)) : r.status === "expired" ? statusPill("expired", "bg-amber-100 text-amber-700", agoLabel(r.updated_at)) : statusPill("disliked", "bg-gray-200 text-gray-500")) : pfBadge(r)}</td> : null}
+                    <td className="px-1.5 py-2 text-left">{g.status === "archived" ? (r.status === "rejected" ? statusPill("rejected", "bg-rose-100 text-rose-500", agoLabel(r.rejected_at)) : r.status === "expired" ? statusPill("expired", "bg-amber-100 text-amber-700", agoLabel(r.updated_at)) : statusPill("disliked", "bg-gray-200 text-gray-500")) : pfBadge(r)}</td>
                     <td className="pl-1 pr-3 py-2 text-right" style={{ color: DOT[g.status] }}>{r.score ?? "-"}</td>
                   </RowLink>
                 ))}

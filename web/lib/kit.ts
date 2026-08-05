@@ -17,6 +17,9 @@ export type Kit = {
   resumeHtml: string;
   coverHtml: string;
   screeningHtml: string;
+  resumeText: string;
+  coverText: string;
+  screeningText: string;
   hasResumePdf: boolean;
   usedMaster: boolean;
 };
@@ -30,6 +33,9 @@ export function getKit(id: string): Kit {
     resumeHtml,
     coverHtml: md(row?.cover_md ?? null),
     screeningHtml: md(row?.screening_md ?? null),
+    resumeText: row?.resume_md ?? "",
+    coverText: row?.cover_md ?? "",
+    screeningText: row?.screening_md ?? "",
     hasResumePdf: !!row?.has_resume_pdf,
     usedMaster: !resumeHtml && !row?.has_resume_pdf,
   };

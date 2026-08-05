@@ -366,6 +366,34 @@
     return new File([bytes], name, { type: "application/pdf" });
   }
 
+  // Infer standard EEO / demographic / phone-country answers from a dropdown's OPTION
+  // SET, for react-select controls (Rippling, etc.) that mangle the field label to a
+  // placeholder like "search"/"select..." so label rules can't match. Returns the exact
+  // option text to pick, or null. Owner's stable answers. (owner request 2026-08-05)
+  function inferByOptions(opts) {
+    if (!opts || !opts.length) return null;
+    const low = opts.map((o) => (o || "").toLowerCase().trim());
+    const has = (s) => low.some((o) => o.includes(s));
+    const pick = (pred) => opts[low.findIndex(pred)] || null;
+    // Pronouns
+    if (has("he/him") || has("she/her") || has("they/them"))
+      return pick((o) => o === "he/him/his") || pick((o) => o.startsWith("he/him"));
+    // Race / ethnicity (unmistakable multi-race option set) -> Asian
+    if (has("black or african american") || has("native hawaiian") || has("alaskan native") || has("two or more races"))
+      return pick((o) => o === "asian") || pick((o) => /\basian\b/.test(o) && !o.includes("caucasian"));
+    // Phone country code -> +1 US - United States
+    if (has("+1 us") || (low.some((o) => /^\+\d/.test(o)) && has("united states")))
+      return pick((o) => o.includes("+1") && o.includes("united states")) || pick((o) => o.startsWith("+1 us"));
+    // Gender -> Male
+    if (has("male") && has("female"))
+      return pick((o) => o === "male");
+    // Hispanic / Latino / veteran / disability yes-no-decline -> conservative "No"
+    // only when it is clearly that kind of yes/no/decline set (avoid generic yes/no).
+    if (has("no") && (has("decline") || has("prefer not") || has("do not wish")) && low.length <= 4)
+      return pick((o) => o === "no");
+    return null;
+  }
+
   async function fill(data) {
     seen = new WeakSet();
     banner("JobFill: filling this form...");
@@ -424,14 +452,21 @@
         const already = displayedValue(el);
         if (already) { if (short) report.push([short, "already: " + already.slice(0, 40), "dropdown"]); continue; }
         if (!r) {
-          // no rule -> PROBE the menu anyway and report its options, so a rule
-          // can be written from one run's evidence. Leave the field untouched.
+          // no rule -> PROBE the menu, read options. First try to INFER a standard
+          // demographic/country answer from the option set (react-select controls
+          // mangle the label so label rules miss). Else report options as evidence.
           if (short) {
             await settleMenus();
             const pctl = comboControl(el);
             await openMenu(el, pctl);
             const opts = listOptions(pctl).map((o) => o.textContent.trim()).slice(0, 20);
             closeAllMenus();
+            const inferred = inferByOptions(opts);
+            if (inferred) {
+              const res = await fillCombobox(el, [inferred], { contains: false });
+              flash(el, !!res.picked);
+              if (res.picked) { report.push([short, res.picked, "dropdown", opts]); continue; }
+            }
             report.push([short, "MANUAL - pick one", "dropdown", opts]);
             debug.push({ label: short, options: opts, html: pctl.outerHTML.slice(0, 600) });
           }
