@@ -119,7 +119,7 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
             <div className="bg-gradient-to-r from-slate-600 to-slate-800 px-4 py-2.5">
               <h2 className="text-sm text-white tracking-wide">Job description</h2>
             </div>
-            <div className="text-[13px] leading-relaxed px-6 py-5 whitespace-pre-wrap text-[#1f2328]">{app.jd}</div>
+            <div className="text-[13px] leading-relaxed px-6 py-5 whitespace-pre-wrap text-[#1f2328]">{typeof app.jd === "string" ? app.jd : String(app.jd ?? "")}</div>
           </div>
         ) : null}
 
