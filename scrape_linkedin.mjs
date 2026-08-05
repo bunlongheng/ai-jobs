@@ -28,6 +28,9 @@ const QUERIES = [
   "staff frontend engineer react",
   "principal software engineer node",
   "senior software engineer react node",
+  // PHP / Laravel full-stack (owner: Laravel 4->13, 12+ yrs; wants these surfaced 2026-08-05)
+  "senior php laravel engineer",
+  "full stack laravel developer",
   // AI-assisted / build-with-AI product roles (owner target 2026-08-03, e.g. Origami "AI Product Engineer")
   "AI product engineer",
   "AI engineer full stack",

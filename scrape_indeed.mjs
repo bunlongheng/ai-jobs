@@ -45,6 +45,14 @@ const QUERIES = override ? [{ q: override, l: 'Remote' }] : [
   { q: 'senior software engineer typescript react', l: 'Remote' },
   { q: 'software engineer remote 140000', l: 'United States' },
   { q: 'senior full stack engineer hybrid', l: 'United States' },
+  // PHP / Laravel full-stack (owner: Laravel 4->13, 12+ yrs; wants these surfaced 2026-08-05)
+  { q: 'senior php laravel engineer', l: 'Remote' },
+  { q: 'full stack laravel developer', l: 'United States' },
+  // New Hampshire local - owner is in Pelham NH and will consider on-site/hybrid within
+  // ~10mi (Nashua/Salem/Windham/Hudson NH + Lowell/Dracut MA). (owner 2026-08-05)
+  { q: 'software engineer', l: 'Nashua, NH' },
+  { q: 'full stack developer', l: 'Salem, NH' },
+  { q: 'software engineer', l: 'Pelham, NH' },
   // AI-assisted / build-with-AI product roles (owner target 2026-08-03, e.g. Origami "AI Product Engineer")
   { q: 'AI product engineer', l: 'Remote' },
   { q: 'forward deployed engineer', l: 'Remote' },
