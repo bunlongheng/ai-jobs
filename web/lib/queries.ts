@@ -21,8 +21,8 @@ export function getBoard(minScore = 0): {
   // "Archived" bucket = disliked (liked = -1) OR rejected - one muted panel at the bottom,
   // each row tagged rejected/disliked in the UI. Rejected gets NO separate red panel.
   // (owner request 2026-07-24)
-  const archived = all.filter((r) => r.liked === -1 || r.status === "rejected");
-  const rows = all.filter((r) => r.liked !== -1 && r.status !== "rejected");
+  const archived = all.filter((r) => r.liked === -1 || r.status === "rejected" || r.status === "expired");
+  const rows = all.filter((r) => r.liked !== -1 && r.status !== "rejected" && r.status !== "expired");
 
   // per-tier counts across all active (non-archived) jobs, for the score menu
   const buckets: Record<number, number> = {};
@@ -33,8 +33,11 @@ export function getBoard(minScore = 0): {
   const counts: Record<string, number> = {};
   for (const r of rows) { if (!keep(r)) continue; counts[r.status || "planned"] = (counts[r.status || "planned"] || 0) + 1; }
   // Applied tile counts jobs you applied to, including those later rejected.
-  counts.rejected = all.filter((r) => r.status === "rejected").length;
-  if (archived.length) counts.archived = archived.length;
+  // EVERY count is scoped to the active min-score filter (owner request 2026-08-05):
+  // hero total, panel tiles, rejected, and archived all reflect the same score cutoff.
+  counts.rejected = all.filter((r) => r.status === "rejected" && keep(r)).length;
+  const archivedKept = archived.filter(keep);
+  if (archivedKept.length) counts.archived = archivedKept.length;
   const groups: BoardGroup[] = [];
   for (const st of STAGES) {
     // Applied list is ordered newest-applied first (recent on top, old at the bottom);
@@ -45,10 +48,10 @@ export function getBoard(minScore = 0): {
     const g = rows.filter((r) => (r.status || "planned") === st && keep(r)).sort(sort);
     if (g.length) groups.push({ status: st, label: LABEL[st] || st, rows: g });
   }
-  // Archived always renders last (below Rejected).
-  if (archived.length) {
-    archived.sort((a, b) => (b.score || 0) - (a.score || 0));
-    groups.push({ status: "archived", label: LABEL.archived, rows: archived });
+  // Archived always renders last (below Rejected) - also score-scoped.
+  if (archivedKept.length) {
+    archivedKept.sort((a, b) => (b.score || 0) - (a.score || 0));
+    groups.push({ status: "archived", label: LABEL.archived, rows: archivedKept });
   }
   return { groups, counts, buckets };
 }

@@ -21,9 +21,10 @@ function Section({ title, sub, html, grad = "from-blue-500 to-blue-700" }: { tit
 }
 
 const STBG: Record<string, string> = {
-  applied: "from-blue-500 to-blue-700", kit_ready: "from-emerald-500 to-green-600",
-  rejected: "from-rose-500 to-red-600", interviewing: "from-purple-500 to-violet-600",
-  manual_only: "from-amber-400 to-orange-500", planned: "from-gray-400 to-gray-500",
+  planned: "from-sky-400 to-sky-500", kit_ready: "from-blue-600 to-blue-800",
+  applied: "from-green-600 to-emerald-700", rejected: "from-rose-500 to-red-600",
+  interviewing: "from-purple-500 to-violet-600", manual_only: "from-amber-400 to-orange-500",
+  expired: "from-amber-500 to-orange-600",
 };
 
 export default async function JobDetail({ params }: { params: Promise<{ id: string }> }) {
@@ -103,7 +104,7 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
             <div className="text-right shrink-0">
               <span className={`inline-block text-xs px-3 py-1 rounded-lg uppercase font-bold tracking-wide text-white bg-gradient-to-r ${STBG[app.status || "planned"] || "from-gray-400 to-gray-500"}`}>{app.status}</span>
               <div className="text-[26px] font-extrabold text-blue-700 mt-2 leading-none">{app.score ?? "-"}</div>
-              <div className="mt-2.5 flex justify-end items-center gap-1"><Reactions id={app.id} liked={app.liked} /></div>
+              <div className="mt-2.5 flex justify-end items-center gap-1"><Reactions id={app.id} liked={app.liked} status={app.status} /></div>
             </div>
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -142,7 +143,12 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
               <h2 className="text-sm text-white tracking-wide">Resume PDF (as submitted)</h2>
               <a href={`/api/kit/${app.id}/file/resume.pdf`} target="_blank" rel="noopener noreferrer" className="text-xs text-white/90 no-underline shrink-0">Open in new tab &rarr;</a>
             </div>
-            <iframe src={`/api/kit/${app.id}/file/resume.pdf`} title="Resume PDF" className="w-full bg-gray-100" style={{ height: "80vh", border: 0 }} />
+            <object data={`/api/kit/${app.id}/file/resume.pdf`} type="application/pdf" className="w-full bg-gray-100 block" style={{ height: "80vh" }}>
+              <div className="px-6 py-6 text-[13px] text-gray-600">
+                Inline preview is not supported on this device.{" "}
+                <a href={`/api/kit/${app.id}/file/resume.pdf`} target="_blank" rel="noopener noreferrer" className="text-blue-700 font-semibold no-underline">Open resume PDF &rarr;</a>
+              </div>
+            </object>
           </div>
         ) : null}
         <Section title="Cover letter" grad="from-purple-500 to-violet-600" html={kit.coverHtml} />

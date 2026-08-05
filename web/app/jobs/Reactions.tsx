@@ -2,11 +2,13 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
-// Heart to keep, thumbs-down to hide ("don't show me again"). liked: 1 hearted, -1
-// disliked (row vanishes - board filters it), 0 neutral. (owner request 2026-07-24)
-export default function Reactions({ id, liked }: { id: string; liked: number | null }) {
+// Heart to keep, thumbs-down to hide, clock to mark EXPIRED. liked: 1 hearted, -1
+// disliked (row vanishes), 0 neutral. Expire sets status='expired' -> Archived list.
+// (owner request 2026-07-24, expire added 2026-08-05)
+export default function Reactions({ id, liked, status }: { id: string; liked: number | null; status?: string | null }) {
   const router = useRouter();
   const [val, setVal] = useState<number>(liked ?? 0);
+  const [expired, setExpired] = useState<boolean>(status === "expired");
   const [, start] = useTransition();
 
   function set(next: number, e: React.MouseEvent) {
@@ -18,6 +20,18 @@ export default function Reactions({ id, liked }: { id: string; liked: number | n
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, liked: v }),
+    }).then(() => start(() => router.refresh()));
+  }
+
+  function toggleExpire(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    const next = !expired;
+    setExpired(next);
+    fetch("/api/jobs/like", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, expired: next }),
     }).then(() => start(() => router.refresh()));
   }
 
@@ -41,6 +55,17 @@ export default function Reactions({ id, liked }: { id: string; liked: number | n
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill={val === -1 ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17" />
+        </svg>
+      </button>
+      <button
+        onClick={toggleExpire}
+        title="Expired - move to Archive"
+        aria-label="Mark expired"
+        className={`transition-colors ${expired ? "text-amber-600" : "text-gray-300 hover:text-amber-500"}`}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="9" />
+          <polyline points="12 7 12 12 15 14" />
         </svg>
       </button>
     </span>

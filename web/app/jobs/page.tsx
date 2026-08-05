@@ -1,7 +1,7 @@
 import { getBoard, SCORE_TIERS } from "@/lib/queries";
 import type { AppRow } from "@/lib/db";
 import { getLogo } from "@/lib/logos";
-import Link from "next/link";
+import RowLink from "./RowLink";
 import AutoRefresh from "./AutoRefresh";
 import JobsMenu from "./JobsMenu";
 import ScoreMenu from "./ScoreMenu";
@@ -30,14 +30,16 @@ const TILE: Record<string, string> = {
   interviewing: "bg-purple-50 border-purple-200 text-purple-700",
 };
 const DOT: Record<string, string> = {
-  kit_ready: "#1a7f37", applied: "#0969da", manual_only: "#9a6700",
+  planned: "#0284c7", kit_ready: "#1d4ed8", applied: "#16a34a", manual_only: "#9a6700",
   rejected: "#cf222e", skipped: "#8a949e", interviewing: "#8250df",
 };
-// Color-coded gradient header per bucket (green / black / orange / red)
+// Color-coded gradient header per bucket (owner scheme 2026-08-05):
+// New = light/baby blue (just arrived) -> Ready = dark blue (real, pre-scanned) ->
+// Applied = green (done). Manual amber, Rejected/Archived rose/gray, Interviewing purple.
 const HGRAD: Record<string, string> = {
-  planned: "from-cyan-500 to-sky-600",
-  kit_ready: "from-emerald-500 to-green-600",
-  applied: "from-blue-500 to-blue-700",
+  planned: "from-sky-400 to-sky-500",
+  kit_ready: "from-blue-600 to-blue-800",
+  applied: "from-green-600 to-emerald-700",
   manual_only: "from-amber-400 to-orange-500",
   rejected: "from-rose-300 to-rose-400",
   interviewing: "from-purple-500 to-violet-600",
@@ -47,8 +49,8 @@ const HGRAD: Record<string, string> = {
 // Row hover tint matching each panel's color
 const HOVER: Record<string, string> = {
   planned: "hover:bg-sky-50",
-  kit_ready: "hover:bg-green-50",
-  applied: "hover:bg-blue-50",
+  kit_ready: "hover:bg-blue-50",
+  applied: "hover:bg-green-50",
   manual_only: "hover:bg-amber-50",
   rejected: "hover:bg-red-50",
   interviewing: "hover:bg-purple-50",
@@ -73,9 +75,29 @@ function jobSource(url: string | null): string {
   }
 }
 
+// Relative "how long ago" from a YYYY-MM-DD date. "today" / "1d ago" / "12d ago".
+function agoLabel(d?: string | null): string {
+  if (!d) return "";
+  const t = new Date(`${String(d).slice(0, 10)}T00:00:00`).getTime();
+  if (Number.isNaN(t)) return "";
+  const days = Math.max(0, Math.floor((Date.now() - t) / 86400000));
+  return days === 0 ? "today" : `${days}d ago`;
+}
+
+// A consistent status pill (same shape everywhere) so Applied reads like Rejected does.
+function statusPill(label: string, cls: string, ago?: string | null) {
+  return (
+    <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+      <span className={`text-[9px] font-bold uppercase tracking-wide rounded px-1.5 py-0.5 ${cls}`}>{label}</span>
+      {ago ? <span className="text-[11px] text-gray-400 font-normal">{ago}</span> : null}
+    </span>
+  );
+}
+
 function pfBadge(r: AppRow) {
   if (r.status !== "kit_ready" && r.status !== "manual_only") {
-    if (r.status === "applied" && r.applied_at) return <span className="text-gray-400 whitespace-nowrap">{r.applied_at.slice(5).replace("-", "/").replace(/^0/, "")}</span>;
+    // Applied: green pill + how long ago (consistent with the rejected pill). (2026-08-05)
+    if (r.status === "applied") return statusPill("applied", "bg-green-100 text-green-700", agoLabel(r.applied_at));
     return null;
   }
   // Green ONLY when the Chrome plugin pre-ran the real form and reported ZERO red
@@ -180,7 +202,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
               </div>
             </div>
             <table className="w-full table-fixed border-collapse text-[11px] sm:text-[13px]">
-              <colgroup><col className="w-[30px] sm:w-[44px]" /><col className="w-[21%]" /><col className={g.status === "planned" ? "w-[69%]" : g.status === "archived" ? "w-[53%]" : "w-[61%]"} />{g.status !== "planned" ? <col className={g.status === "archived" ? "w-[16%]" : "w-[8%]"} /> : null}<col className="w-[10%]" /></colgroup>
+              <colgroup><col className="w-[30px] sm:w-[44px]" /><col className="w-[21%]" /><col className={g.status === "planned" ? "w-[69%]" : g.status === "applied" ? "w-[47%]" : g.status === "archived" ? "w-[45%]" : "w-[61%]"} />{g.status !== "planned" ? <col className={g.status === "applied" ? "w-[22%]" : g.status === "archived" ? "w-[24%]" : "w-[8%]"} /> : null}<col className="w-[10%]" /></colgroup>
               <thead><tr className="bg-[#f6f8fa] text-gray-400 text-[11px] text-left">
                 <th className="pl-3 pr-1 py-2 font-medium">Src</th>
                 <th className="px-1 py-2 font-medium">Company</th><th className="px-2.5 py-2 font-medium">Role</th>
@@ -188,9 +210,8 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
               </tr></thead>
               <tbody>
                 {g.rows.map((r) => (
-                  <tr key={r.id} className={`border-t border-gray-100 cursor-pointer ${HOVER[g.status] || "hover:bg-gray-50"}`}>
-                    <td className="p-0">
-                      <Link href={`/jobs/${r.id}`} className="block no-underline pl-3 pr-1 py-2">
+                  <RowLink key={r.id} id={r.id} className={`border-t border-gray-100 cursor-pointer ${HOVER[g.status] || "hover:bg-gray-50"}`}>
+                    <td className="pl-3 pr-1 py-2">
                       {(() => {
                         const src = jobSource(r.url);
                         const uri = getLogo(`src:${src}`);
@@ -204,21 +225,20 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
                           <span className="text-[10px] text-gray-400" title={src}>{src}</span>
                         );
                       })()}
-                      </Link>
                     </td>
-                    <td className="p-0 truncate">
-                      <Link href={`/jobs/${r.id}`} className="flex items-center gap-1.5 text-[#1f2328] no-underline hover:text-blue-700 px-1 py-2">
+                    <td className="px-1 py-2 truncate">
+                      <span className="flex items-center gap-1.5 text-[#1f2328]">
                         <Logo company={r.company} />
                         <span className="truncate">{r.company || "?"}</span>
-                      </Link>
+                      </span>
                     </td>
                     <td className="px-2.5 py-2 truncate">
-                      <Link href={`/jobs/${r.id}`} className="inline-block py-2 text-[#1f2328] no-underline hover:text-blue-700 align-middle">{r.title}</Link>
-                      {r.url ? <a href={r.url} target="_blank" rel="noopener noreferrer" title="Open posting" className="text-blue-700 no-underline ml-1.5 py-2 align-middle">&#8599;</a> : null}
+                      <span className="text-[#1f2328]">{r.title}</span>
+                      {r.url ? <a data-external href={r.url} target="_blank" rel="noopener noreferrer" title="Open posting" className="text-blue-700 no-underline ml-1.5 align-middle">&#8599;</a> : null}
                     </td>
-                    {g.status !== "planned" ? <td className="px-1.5 py-2 text-right"><Link href={`/jobs/${r.id}`} className="no-underline">{g.status === "archived" ? (r.status === "rejected" ? <span className="text-[9px] font-bold uppercase tracking-wide bg-rose-100 text-rose-500 rounded px-1.5 py-0.5 whitespace-nowrap">rejected</span> : <span className="text-[9px] font-bold uppercase tracking-wide bg-gray-200 text-gray-500 rounded px-1.5 py-0.5 whitespace-nowrap">disliked</span>) : pfBadge(r)}</Link></td> : null}
-                    <td className="p-0 text-right" style={{ color: DOT[g.status] }}><Link href={`/jobs/${r.id}`} className="block no-underline pl-1 pr-3 py-2" style={{ color: "inherit" }}>{r.score ?? "-"}</Link></td>
-                  </tr>
+                    {g.status !== "planned" ? <td className="px-1.5 py-2 text-right">{g.status === "archived" ? (r.status === "rejected" ? statusPill("rejected", "bg-rose-100 text-rose-500", agoLabel(r.rejected_at)) : r.status === "expired" ? statusPill("expired", "bg-amber-100 text-amber-700", agoLabel(r.updated_at)) : statusPill("disliked", "bg-gray-200 text-gray-500")) : pfBadge(r)}</td> : null}
+                    <td className="pl-1 pr-3 py-2 text-right" style={{ color: DOT[g.status] }}>{r.score ?? "-"}</td>
+                  </RowLink>
                 ))}
               </tbody>
             </table>
