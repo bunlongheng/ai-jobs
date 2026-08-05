@@ -17,7 +17,8 @@ export const SCORE_TIERS = [90, 80, 70, 60, 50];
 export function getBoard(minScore = 0): {
   groups: BoardGroup[]; counts: Record<string, number>; buckets: Record<number, number>;
 } {
-  const all = db().prepare("SELECT * FROM applications").all() as AppRow[];
+  // status='deleted' is a full removal - excluded from EVERY panel incl. Archived. (2026-08-05)
+  const all = (db().prepare("SELECT * FROM applications").all() as AppRow[]).filter((r) => r.status !== "deleted");
   // "Archived" bucket = disliked (liked = -1) OR rejected - one muted panel at the bottom,
   // each row tagged rejected/disliked in the UI. Rejected gets NO separate red panel.
   // (owner request 2026-07-24)
@@ -57,8 +58,9 @@ export function getBoard(minScore = 0): {
     if (st === "kit_ready") {
       const ready = g.filter(preScanned);
       const kitOnly = g.filter((r) => !preScanned(r));
-      if (ready.length) groups.push({ status: "kit_ready", label: LABEL.kit_ready, rows: ready });
+      // Not-ready pile renders ABOVE Ready (owner request 2026-08-05).
       if (kitOnly.length) groups.push({ status: "kit_only", label: "Not ready · needs pre-scan", rows: kitOnly });
+      if (ready.length) groups.push({ status: "kit_ready", label: LABEL.kit_ready, rows: ready });
     } else {
       groups.push({ status: st, label: LABEL[st] || st, rows: g });
     }

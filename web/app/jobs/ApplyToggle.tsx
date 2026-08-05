@@ -1,6 +1,7 @@
 "use client";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "./Toast";
 
 // One-click "Applied" toggle on the detail page - manual + instant, no waiting on Gmail
 // detection. Checked -> status=applied + applied_at=today; undo -> back to kit_ready.
@@ -12,6 +13,7 @@ export default function ApplyToggle({ id, status, appliedAt }: { id: string; sta
 
   function set(next: boolean) {
     setApplied(next);
+    toast(next ? "Marked applied" : "Back to Ready", next ? "#16a34a" : "#2563eb");
     fetch("/api/jobs/applied", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

@@ -109,6 +109,16 @@
     return r.width > 0 && r.height > 0;
   }
 
+  // A field is a real RED only if it's REQUIRED. An unmatched OPTIONAL field (name
+  // pronunciation, other links, "upload anything") never blocks submit, so it must not
+  // count as a gap - it inflated the red counts across every prescan. (owner 2026-08-05)
+  function isRequired(el) {
+    if (el.required || el.getAttribute("aria-required") === "true") return true;
+    if (/\*/.test(labelFor(el) || "")) return true;      // ATS mark required with an asterisk
+    return /\*/.test(questionLabel(el) || "");
+  }
+  const manual = (el, msg) => (isRequired(el) ? msg : "skipped (optional)");
+
   // ---- visual overlay: see exactly where the filler is working ----
   // ---- SPOTLIGHT: dim the whole page, keep a bright circle on the field being
   // filled - the closer to the current input, the brighter (owner request). ----
@@ -185,7 +195,7 @@
   function displayedValue(el) {
     const ctl = comboControl(el);
     const t = (ctl.textContent || "").replace(/\s+/g, " ").trim();
-    return /^(select|search|choose)\b|^$/i.test(t) ? "" : t;
+    return /^(select|search|choose|no options?)\b|^$/i.test(t) ? "" : t;
   }
 
   // serverRules come from the Jobs app /api/jobfill/rules (rules.json) and take precedence -
@@ -489,7 +499,7 @@
               flash(el, !!res.picked);
               if (res.picked) { report.push([short, res.picked, "dropdown", opts]); continue; }
             }
-            report.push([short, "MANUAL - pick one", "dropdown", opts]);
+            report.push([short, manual(el, "MANUAL - pick one"), "dropdown", opts]);
             debug.push({ label: short, options: opts, html: pctl.outerHTML.slice(0, 600) });
           }
           continue;
@@ -541,10 +551,10 @@
             setNative(el, r.freeText);
             report.push([short, r.freeText, "text"]);
           } else {
-            report.push([short, "MANUAL - no rule matched these options", "autocomplete", res.options]);
+            report.push([short, manual(el, "MANUAL - no rule matched these options"), "autocomplete", res.options]);
             debug.push({ label: short, options: res.options, html: (el.closest("div")?.outerHTML || "").slice(0, 500) });
           }
-        } else if (short) report.push([short, "MANUAL", ftype]);
+        } else if (short) report.push([short, manual(el, "MANUAL"), ftype]);
       }
     }
 
@@ -571,7 +581,7 @@
           flash(el, true);
           report.push([short, el.options[idx].text, "select", allOpts]);
         } else { flash(el, false); report.push([short, "MANUAL - no rule matched these options", "select", allOpts]); }
-      } else if (short && !current) report.push([short, "MANUAL - pick one", "select", allOpts]);
+      } else if (short && !current) report.push([short, manual(el, "MANUAL - pick one"), "select", allOpts]);
     }
 
     // group radios by name, else by CONTAINER (Ashby renders nameless radios -
@@ -702,6 +712,14 @@
     for (const el of deepQuery(REQ_SEL)) {
       if (!visible(el) || el.disabled || el.type === "hidden" || el.type === "file") continue;
       if (el.type === "radio" || el.type === "checkbox") continue; // radio/button group loops handle these
+      // react-select/combobox keeps its value in React state, so the backing input's
+      // .value is ALWAYS "" even after a pick - reading it here re-flagged every filled
+      // dropdown as "required, still empty" (Gusto: 7 false rows). Trust the fill loops:
+      // if we already handled this control, or a value is visibly shown, it's done.
+      // (owner bug 2026-08-05)
+      if (isCombobox(el)) {
+        if (seen.has(el) || seen.has(comboControl(el)) || displayedValue(el)) continue;
+      }
       const tag = (el.tagName || "").toLowerCase();
       const empty = tag === "select" ? !el.value : !String(el.value || "").trim();
       if (!empty) continue;

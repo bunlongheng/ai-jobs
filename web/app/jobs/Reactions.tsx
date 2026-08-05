@@ -1,6 +1,7 @@
 "use client";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "./Toast";
 
 // Heart to keep, thumbs-down to hide, clock to mark EXPIRED. liked: 1 hearted, -1
 // disliked (row vanishes), 0 neutral. Expire sets status='expired' -> Archived list.
@@ -16,6 +17,7 @@ export default function Reactions({ id, liked, status }: { id: string; liked: nu
     e.stopPropagation();
     const v = val === next ? 0 : next; // click again to undo
     setVal(v);
+    toast(v === 1 ? "Hearted" : v === -1 ? "Not interested - hidden" : "Cleared", v === 1 ? "#e11d48" : v === -1 ? "#64748b" : "#94a3b8");
     fetch("/api/jobs/like", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -28,10 +30,23 @@ export default function Reactions({ id, liked, status }: { id: string; liked: nu
     e.stopPropagation();
     const next = !expired;
     setExpired(next);
+    toast(next ? "Marked expired" : "Restored to Ready", next ? "#d97706" : "#2563eb");
     fetch("/api/jobs/like", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, expired: next }),
+    }).then(() => start(() => router.refresh()));
+  }
+
+  function deleteJob(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!window.confirm("Delete this job completely? It will be removed from every panel, including Archived.")) return;
+    toast("Deleted", "#ef4444");
+    fetch("/api/jobs/like", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, deleted: true }),
     }).then(() => start(() => router.refresh()));
   }
 
@@ -66,6 +81,16 @@ export default function Reactions({ id, liked, status }: { id: string; liked: nu
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="9" />
           <polyline points="12 7 12 12 15 14" />
+        </svg>
+      </button>
+      <button
+        onClick={deleteJob}
+        title="Delete - remove completely (incl. Archived)"
+        aria-label="Delete"
+        className="transition-colors text-gray-300 hover:text-red-600"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
         </svg>
       </button>
     </span>

@@ -6,6 +6,7 @@ import AutoRefresh from "./AutoRefresh";
 import JobsMenu from "./JobsMenu";
 import ScoreMenu from "./ScoreMenu";
 import CommandK from "./CommandK";
+import Toast from "./Toast";
 
 export const dynamic = "force-dynamic"; // always read live SQLite
 
@@ -194,12 +195,13 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
   // Total excludes skipped so the tiles reconcile: New + Ready + Manual + Applied = Total.
   // Applied folds in rejected (they were applied to), and there is no separate Rejected tile.
   const total = Object.entries(counts).reduce((a, [k, v]) => a + (k === "skipped" || k === "archived" ? 0 : v), 0);
-  const tiles = ["planned", "kit_ready", "kit_only", "manual_only", "applied"].filter((s) => counts[s]);
+  const tiles = ["planned", "kit_only", "kit_ready", "manual_only", "applied"].filter((s) => counts[s]);
 
   return (
     <main className="min-h-screen bg-[#f6f8fa] text-[#1f2328]" style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" }}>
       <div className="max-w-[900px] mx-auto px-5 py-7 pb-16">
         <AutoRefresh />
+        <Toast />
         <div className="mb-4 flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -263,11 +265,11 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
               {/* ONE fixed colgroup on EVERY panel so all columns align top-down across
                   panels - Src, Company, Role (arrow pinned to its right edge), Status
                   (reserved even on New/planned), Score. (owner request 2026-08-05) */}
-              <colgroup><col className="w-[30px] sm:w-[44px]" /><col className="w-[20%]" /><col className="w-[40%]" /><col className="w-[16%]" /><col className="w-[8%]" /><col className="w-[10%]" /></colgroup>
+              <colgroup><col className="w-[30px] sm:w-[44px]" /><col className="w-[20%]" /><col className="w-[48%]" /><col className="w-[16%]" /><col className="w-[10%]" /></colgroup>
               <thead><tr className="bg-[#f6f8fa] text-gray-400 text-[11px] text-left">
                 <th className="pl-3 pr-1 py-2 font-medium">Src</th>
                 <th className="px-1 py-2 font-medium">Company</th><th className="px-2.5 py-2 font-medium">Role</th>
-                <th className="px-1.5 py-2 font-medium text-left">Status</th><th className="px-1 py-2 font-medium text-center">Via</th><th className="pl-1 pr-3 py-2 font-medium text-right">Score</th>
+                <th className="px-1.5 py-2 font-medium text-left">Status</th><th className="pl-1 pr-3 py-2 font-medium text-right">Score</th>
               </tr></thead>
               <tbody>
                 {g.rows.map((r) => (
@@ -300,7 +302,6 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
                       </div>
                     </td>
                     <td className="px-1.5 py-2 text-left">{g.status === "archived" ? (r.status === "rejected" ? statusPill("rejected", "bg-gray-100 text-gray-500", agoLabel(r.rejected_at) || agoLabel(r.updated_at)) : r.status === "expired" ? statusPill("expired", "bg-amber-100 text-amber-700", agoLabel(r.updated_at)) : statusPill("disliked", "bg-rose-100 text-rose-600", agoLabel(r.updated_at))) : pfBadge(r)}</td>
-                    <td className="px-1 py-2 text-center"><ViaCell r={r} /></td>
                     <td className="pl-1 pr-3 py-2 text-right" style={{ color: DOT[g.status] }}>{r.score ?? "-"}</td>
                   </RowLink>
                 ))}
