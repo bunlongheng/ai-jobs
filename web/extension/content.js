@@ -448,9 +448,8 @@
       const chip = ((sec?.textContent || "").match(/([\w\-. ()&']{3,60}\.(pdf|docx?|txt|rtf))/i) || [])[1];
 
       if (isCover) {
-        // A cover slot NEVER gets the resume. A chip here that isn't a cover file is the
-        // resume misfiled by hand or a prior bug - flag it (filename has no "resume"/"cv"
-        // token, so match on the ABSENCE of "cover" instead). (owner bug 2026-08-05)
+        // Cover slot gets the per-job TAILORED cover letter, NEVER the resume. (owner
+        // 2026-08-05: uploading the resume as a cover reads as careless.)
         if (chip && !/cover/i.test(chip))
           report.push(["cover letter", "MANUAL - WRONG FILE attached: " + chip.trim() + " (remove it, then Fill again)", "file"]);
         else if (chip)
@@ -472,8 +471,7 @@
         continue;
       }
 
-      // Unlabeled upload we can't confidently classify: do NOT guess - a wrong guess is
-      // exactly how the resume ended up in the cover slot. Leave it for the human.
+      // Unlabeled upload we can't confidently classify: do NOT guess - leave it for the human.
       report.push([norm(questionLabel(fi)).slice(0, 40) || "attachment", "MANUAL - unlabeled upload, attach by hand", "file"]);
     }
 
