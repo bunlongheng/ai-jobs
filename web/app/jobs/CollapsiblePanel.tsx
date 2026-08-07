@@ -1,29 +1,52 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
-// Collapsible board panel - click the header to fold a whole pile away so you can focus
-// on one panel at a time. Collapsed state is remembered per-panel in localStorage, so a
-// panel you close stays closed across refreshes. (owner request 2026-08-05)
+// Piles the board expands when the URL carries no ?open= choice. Owner's default landing is
+// the READY pile at 60+ (score default handled server-side) - so a fresh visit opens Ready
+// and folds everything else. (owner request 2026-08-06)
+const DEFAULT_OPEN = ["kit_ready"];
+
+// One clean icon per panel - a bit of character, consistent across the board. White stroke
+// so it sits on the gradient header. (owner request 2026-08-06)
+function PanelIcon({ status }: { status: string }) {
+  const p: Record<string, string> = {
+    kit_only: "M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7zM15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0M3 3l18 18", // eye crossed out - not ready to look at
+    kit_ready: "M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7zM15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0",         // eye - ready to look at
+    applied: "M22 2 11 13M22 2l-7 20-4-9-9-4z",                                                      // paper plane - applied
+    manual_only: "M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2 2-2.6-.7-.7-2.7z", // wrench - manual
+    archived: "M3 5h18v4H3zM5 9v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9M9 13h6",                          // archive box
+  };
+  const d = p[status];
+  if (!d) return null;
+  return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white shrink-0" aria-hidden><path d={d} /></svg>;
+}
+
+// Collapsible board panel - click the header to fold a whole pile away. Open/closed
+// state lives ENTIRELY in the URL (?open=kit_only,applied) so the address bar is the
+// single source of truth: reloadable, bookmarkable, and back-button friendly. When the
+// ?open param is absent we fall back to DEFAULT_OPEN; when it is present (even empty) it
+// is taken literally. Score stays on ?min, so the whole view reads off the URL. (owner
+// request 2026-08-05)
 export default function CollapsiblePanel({
-  status, label, count, gradient, archived, defaultCollapsed, breakdown, children,
+  status, label, count, gradient, archived, breakdown, action, children,
 }: {
   status: string; label: string; count: number; gradient: string;
-  archived?: boolean; defaultCollapsed?: boolean; breakdown: React.ReactNode; children: React.ReactNode;
+  archived?: boolean; breakdown: React.ReactNode; action?: React.ReactNode; children: React.ReactNode;
 }) {
-  const key = `jobs-panel-collapsed:${status}`;
-  const [open, setOpen] = useState(!defaultCollapsed);
-  useEffect(() => {
-    // Respect a saved choice; otherwise fall back to the panel's default (Not-ready starts
-    // collapsed so Ready is the focus). (owner request 2026-08-05)
-    try { const v = localStorage.getItem(key); setOpen(v === null ? !defaultCollapsed : v !== "1"); } catch {}
-  }, [key, defaultCollapsed]);
+  const router = useRouter();
+  const sp = useSearchParams();
+  const raw = sp.get("open");
+  const openSet = raw === null ? new Set(DEFAULT_OPEN) : new Set(raw.split(",").filter(Boolean));
+  const open = openSet.has(status);
 
   function toggle() {
-    setOpen((o) => {
-      const next = !o;
-      try { localStorage.setItem(key, next ? "0" : "1"); } catch {}
-      return next;
-    });
+    const next = new Set(openSet);
+    if (next.has(status)) next.delete(status); else next.add(status);
+    const params = new URLSearchParams(sp.toString());
+    params.set("open", Array.from(next).join(","));
+    // replace (not push) so accordion clicks don't flood the back stack; the URL still
+    // reflects the exact open set for reload/share.
+    router.replace(`/jobs?${params.toString()}`, { scroll: false });
   }
 
   return (
@@ -38,8 +61,10 @@ export default function CollapsiblePanel({
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-200 text-white/90" style={{ transform: open ? "rotate(90deg)" : "none" }}>
             <polyline points="9 18 15 12 9 6" />
           </svg>
+          <PanelIcon status={status} />
           <h3 className="text-sm font-bold tracking-wide text-white">{label}</h3>
           <span className="text-xs font-bold rounded-full px-2.5 py-0.5 bg-white/30 text-white">{count}</span>
+          {action}
         </div>
         <div className="flex items-center gap-1.5 flex-wrap justify-end">{breakdown}</div>
       </button>

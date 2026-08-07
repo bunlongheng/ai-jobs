@@ -2,20 +2,55 @@ import { getApp, type Field } from "@/lib/queries";
 import { getKit } from "@/lib/kit";
 import { getLogo } from "@/lib/logos";
 import { nearHome } from "@/lib/near-home";
+import { altitude, ALT_META } from "@/lib/altitude";
+import ReachOut from "../ReachOut";
 import Reactions from "../Reactions";
-import ApplyToggle from "../ApplyToggle";
 import CopyButton from "../CopyButton";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import fs from "fs";
+import path from "path";
 
 export const dynamic = "force-dynamic";
 
-function Section({ title, sub, html, grad = "from-blue-500 to-blue-700", copyText }: { title: string; sub?: string; html: string; grad?: string; copyText?: string }) {
+// Load the JobFill rules once so we can resolve a paste-ready ANSWER for each screening
+// question the prescan flagged MANUAL - the owner wants an answer to copy, not just a flag.
+// (owner request 2026-08-06)
+const RULES: { match: string; kind?: string; v?: string; opts?: string[] }[] = (() => {
+  for (const p of [path.join(process.cwd(), "..", "jobfill", "rules.json"), path.join(process.cwd(), "jobfill", "rules.json")]) {
+    try { return JSON.parse(fs.readFileSync(p, "utf8")); } catch { /* next */ }
+  }
+  return [];
+})();
+function resolveAnswer(label: string): string {
+  const l = String(label || "").toLowerCase().trim();
+  for (const r of RULES) {
+    try { if (new RegExp(r.match, "i").test(l)) return r.kind === "text" ? String(r.v || "") : (Array.isArray(r.opts) ? String(r.opts[0] || "") : ""); } catch { /* bad regex */ }
+  }
+  return "";
+}
+
+// Clean, consistent header icons for every detail-page section. White stroke, 15px.
+function HIcon({ d }: { d: string }) {
+  return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white shrink-0" aria-hidden><path d={d} /></svg>;
+}
+const HD = {
+  resume: "M14 3v4a1 1 0 0 0 1 1h4M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2zM9 13h6M9 17h6",
+  cover: "M3 7l9 6 9-6M3 5h18v14H3z",
+  screening: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z",
+  jd: "M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2M9 12h6M9 16h6",
+  email: "M22 2 11 13M22 2l-7 20-4-9-9-4z",
+  red: "M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01",
+  files: "M21 11l-8.5 8.5a5 5 0 0 1-7-7L14 4a3 3 0 0 1 4 4l-8.5 8.5a1 1 0 0 1-1.4-1.4L15 8",
+  filled: "M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M8 12l2.5 2.5L16 9",
+};
+
+function Section({ title, sub, html, grad = "from-blue-500 to-blue-700", copyText, icon }: { title: string; sub?: string; html: string; grad?: string; copyText?: string; icon?: string }) {
   if (!html) return null;
   return (
     <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden mb-3.5">
-      <div className={`bg-gradient-to-r ${grad} px-4 py-2.5 flex items-center justify-between gap-2`}>
-        <h2 className="text-sm text-white tracking-wide">{title}{sub ? <span className="text-xs text-white/80 ml-2">{sub}</span> : null}</h2>
+      <div className={`group bg-gradient-to-r ${grad} px-4 py-2.5 flex items-center justify-between gap-2`}>
+        <h2 className="text-sm text-white tracking-wide flex items-center gap-2">{icon ? <HIcon d={icon} /> : null}{title}{sub ? <span className="text-xs text-white/80 ml-2">{sub}</span> : null}</h2>
         {copyText ? <CopyButton text={copyText} /> : null}
       </div>
       <div className="prose-kit text-[13px] leading-relaxed px-6 py-5" dangerouslySetInnerHTML={{ __html: html }} />
@@ -23,11 +58,18 @@ function Section({ title, sub, html, grad = "from-blue-500 to-blue-700", copyTex
   );
 }
 
-const STBG: Record<string, string> = {
-  planned: "from-sky-400 to-sky-500", kit_ready: "from-blue-600 to-blue-800",
-  applied: "from-green-600 to-emerald-700", rejected: "from-rose-500 to-red-600",
-  interviewing: "from-purple-500 to-violet-600", manual_only: "from-amber-400 to-orange-500",
-  expired: "from-amber-500 to-orange-600",
+// Light, bordered status badge - the SAME look as the board's listing pills (not a solid
+// fill), so the detail header reads consistently with the board. (owner request 2026-08-06)
+const STPILL: Record<string, string> = {
+  planned: "bg-sky-50 text-sky-600 border-sky-200",
+  kit_ready: "bg-blue-50 text-blue-700 border-blue-200",
+  kit_only: "bg-sky-50 text-sky-500 border-sky-200",
+  applied: "bg-green-100 text-green-700 border-green-200",
+  manual_only: "bg-amber-100 text-amber-700 border-amber-200",
+  interviewing: "bg-violet-100 text-violet-700 border-violet-200",
+  rejected: "bg-gray-100 text-gray-500 border-gray-200",
+  expired: "bg-amber-100 text-amber-700 border-amber-200",
+  hold: "bg-indigo-50 text-indigo-600 border-indigo-200",
 };
 
 export default async function JobDetail({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ min?: string }> }) {
@@ -86,11 +128,12 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
     return [];
   })();
 
+  // Only genuinely-needed context stays in the top-left meta. "Applied on" is redundant
+  // (the APPLIED badge shows it), and the preflight status + LinkedIn-scrape note are moved
+  // to a quiet bottom-right timestamp. (owner request 2026-08-06)
   const meta: string[] = [];
-  if (app.applied_at) meta.push(`Applied ${app.applied_at}`);
   if (app.rejected_at) meta.push(`Rejected ${app.rejected_at}`);
-  if (app.pf_status) meta.push(`Preflight: ${app.pf_status}${app.pf_total ? ` ${app.pf_covered}/${app.pf_total}` : ""}`);
-  if (app.notes) meta.push(app.notes);
+  const prescan = app.pf_status ? `Prescan: ${app.pf_status}${app.pf_total ? ` ${app.pf_covered}/${app.pf_total}` : ""}` : "";
 
   // Posting age from the scan date (source_run = "linkedin-YYYY-MM-DD"). LinkedIn/Indeed
   // publish no hard "apply by" deadline, so we surface how long it has sat instead - the
@@ -134,17 +177,20 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
                 })()}
               </span>
               <div className="min-w-0">
-                <div className="text-[22px] font-extrabold truncate leading-tight">{app.company || "?"}</div>
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-[22px] font-extrabold truncate leading-tight">{app.company || "?"}</span>
+                  {app.url ? <a href={app.url} target="_blank" rel="noopener noreferrer" title="Open apply page" className="shrink-0 text-blue-600 hover:text-blue-800 font-bold text-[18px] leading-none no-underline">&#8599;</a> : null}
+                </div>
                 <div className="text-[15px] text-gray-500 mt-0.5 leading-snug">{app.title}</div>
                 <div className="flex flex-wrap items-center gap-2 mt-2">
                   {src ? (
-                    <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-gray-500 bg-gray-100 rounded-full pl-1 pr-2.5 py-0.5">
+                    <a href={app.url || "#"} target="_blank" rel="noopener noreferrer" title={`Open on ${src}`} className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-gray-500 bg-gray-100 hover:bg-gray-200 rounded-full pl-1 pr-2.5 py-0.5 no-underline">
                       {srcUri
                         /* eslint-disable-next-line @next/next/no-img-element */
                         ? <img src={srcUri} alt={src} width={16} height={16} className="w-4 h-4 rounded-full object-contain" />
                         : null}
                       {src}
-                    </span>
+                    </a>
                   ) : null}
                   {(() => {
                     const nh = nearHome(app.location);
@@ -156,33 +202,46 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
                       </span>
                     );
                   })()}
+                  {(() => {
+                    const alt = altitude(app.company, app.title, !!nearHome(app.location));
+                    if (alt === "near-home") return null; // near-home already shows its own badge
+                    const m = ALT_META[alt];
+                    return <span title={m.hint} className={`inline-flex items-center text-[11px] font-bold border rounded-full px-2.5 py-0.5 ${m.cls}`}>{m.label}</span>;
+                  })()}
                 </div>
               </div>
             </div>
             <div className="text-right shrink-0">
-              <span className={`inline-block text-xs px-3 py-1 rounded-lg uppercase font-bold tracking-wide text-white bg-gradient-to-r ${STBG[app.status || "planned"] || "from-gray-400 to-gray-500"}`}>{app.status}</span>
+              <span className={`inline-block text-[11px] px-2.5 py-1 rounded-md uppercase font-bold tracking-wide border ${STPILL[app.status || "planned"] || "bg-gray-100 text-gray-500 border-gray-200"}`}>{app.status}</span>
               <div className="text-[26px] font-extrabold text-blue-700 mt-2 leading-none">{app.score ?? "-"}</div>
-              <div className="mt-2.5 flex justify-end items-center gap-1"><Reactions id={app.id} liked={app.liked} status={app.status} /></div>
+              <div className="mt-2.5 flex justify-end items-center"><Reactions id={app.id} liked={app.liked} status={app.status} appliedAt={app.applied_at} company={app.company} /></div>
             </div>
           </div>
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            {app.url ? <a href={app.url} target="_blank" rel="noopener noreferrer" className="inline-block bg-green-700 text-white font-bold text-[13px] px-4 py-2 rounded-lg no-underline">Open apply page</a> : null}
-            <ApplyToggle id={app.id} status={app.status} appliedAt={app.applied_at} />
-            {showAge ? <span className={`inline-flex items-center text-[12px] font-semibold px-3 py-2 rounded-lg ${ageCls}`} title={`First scanned ${seenIso}. LinkedIn/Indeed publish no hard deadline; this is how long it has been on the board.`}>{ageLabel}</span> : null}
-          </div>
+          {/* Every action now lives in the icon row above (Applied + Hold-off included), so the
+              button row is gone. Quiet context (prescan status + how long it has sat) goes
+              bottom-right, out of the way. (owner request 2026-08-06) */}
           {meta.length ? <div className="mt-3 text-xs text-gray-600 leading-relaxed">{meta.map((m, i) => <div key={i}>{m}</div>)}</div> : null}
+          {(prescan || showAge) ? (
+            <div className="mt-3 flex justify-end items-center gap-2 text-[11px] text-gray-400">
+              {prescan ? <span>{prescan}</span> : null}
+              {prescan && showAge ? <span className="text-gray-300">·</span> : null}
+              {showAge ? <span title={`First scanned ${seenIso}.`}>{ageLabel}</span> : null}
+            </div>
+          ) : null}
         </div>
+
+        <ReachOut company={app.company || ""} title={app.title || ""} jd={typeof app.jd === "string" ? app.jd : ""} />
 
         {app.jd ? (
           <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden mb-3.5">
             <div className="bg-gradient-to-r from-slate-600 to-slate-800 px-4 py-2.5">
-              <h2 className="text-sm text-white tracking-wide">Job description</h2>
+              <h2 className="text-sm text-white tracking-wide flex items-center gap-2"><HIcon d={HD.jd} />Job description</h2>
             </div>
             <div className="text-[13px] leading-relaxed px-6 py-5 whitespace-pre-wrap text-[#1f2328]">{typeof app.jd === "string" ? app.jd : String(app.jd ?? "")}</div>
           </div>
         ) : null}
 
-        <Section title="Resume (this version)" grad="from-blue-500 to-blue-700" html={kit.resumeHtml} copyText={kit.resumeText} />
+        <Section title="Resume (this version)" grad="from-blue-500 to-blue-700" html={kit.resumeHtml} copyText={kit.resumeText} icon={HD.resume} />
         {!kit.resumeHtml && kit.hasResumePdf ? (
           <div className="bg-white border border-gray-300 rounded-xl px-6 py-5 mb-3.5">
             <h2 className="text-[15px] font-bold mb-2.5">Resume (this version)</h2>
@@ -209,7 +268,7 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
         {isEmailApply && kit.coverText ? (
           <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden mb-3.5">
             <div className="bg-gradient-to-r from-slate-600 to-slate-800 px-4 py-2.5 flex items-center justify-between gap-2">
-              <h2 className="text-sm text-white tracking-wide">Email to recruiter<span className="text-xs text-white/80 ml-2">Hacker News - ready to send</span></h2>
+              <h2 className="text-sm text-white tracking-wide flex items-center gap-2"><HIcon d={HD.email} />Email to recruiter<span className="text-xs text-white/80 ml-2">Hacker News - ready to send</span></h2>
               <span className="flex items-center gap-1.5 shrink-0">
                 <a href={gmailComposeUrl} target="_blank" rel="noopener noreferrer" className="text-[11px] font-bold text-white bg-green-600 hover:bg-green-700 rounded px-2.5 py-0.5 no-underline">Apply now (Gmail)</a>
                 <CopyButton text={emailBody} label="Copy" />
@@ -232,19 +291,44 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
             </div>
           </div>
         ) : (
-          <Section title="Cover letter" grad="from-purple-500 to-violet-600" html={kit.coverHtml} copyText={kit.coverText} />
+          <Section title="Cover letter" grad="from-purple-500 to-violet-600" html={kit.coverHtml} copyText={kit.coverText} icon={HD.cover} />
         )}
-        <Section title="Screening answers" grad="from-amber-400 to-orange-500" html={kit.screeningHtml} copyText={kit.screeningText} />
+        <Section title="Screening answers" grad="from-amber-400 to-orange-500" html={kit.screeningHtml} copyText={kit.screeningText} icon={HD.screening} />
 
         {(() => {
           const isRed = (f: Field) => String(f[1] ?? "").trim().toUpperCase().startsWith("MANUAL");
-          const reds = fields.filter(isRed);
+          // File uploads are NOT real gaps: resume + cover attach automatically when you apply,
+          // and "attach / upload anything" are optional extras. Never lump them into the red
+          // "needs a rule or you" list - that reads as broken. (owner request 2026-08-06)
+          const isFile = (f: Field) => f[2] === "file"
+            || /attach|resume|\bcv\b|curriculum|cover letter|upload|portfolio/i.test(String(f[0]))
+            || /unlabeled upload/i.test(String(f[1]));
+          const manualNonFile = fields.filter((f) => isRed(f) && !isFile(f));
+          const answered = manualNonFile.map((f) => ({ q: String(f[0] ?? ""), a: resolveAnswer(String(f[0] ?? "")) })).filter((x) => x.a);
+          const reds = manualNonFile.filter((f) => !resolveAnswer(String(f[0] ?? "")));
+          const files = fields.filter((f) => isRed(f) && isFile(f));
           const greens = fields.filter((f) => !isRed(f));
           return (
             <>
+              {answered.length ? (
+                <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden mb-3.5">
+                  <h2 className="bg-gradient-to-r from-sky-500 to-blue-600 text-white text-sm tracking-wide px-4 py-2.5 flex items-center gap-2"><HIcon d={HD.screening} />Answers to paste <span className="text-xs font-bold text-white bg-blue-700 rounded-full px-2 py-0.5 ml-1">{answered.length}</span></h2>
+                  <div className="divide-y divide-gray-100">
+                    {answered.map((x, i) => (
+                      <div key={i} className="group px-4 py-3">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="text-[13px] font-semibold text-gray-800">{x.q}</div>
+                          <CopyButton text={x.a} tone="onLight" />
+                        </div>
+                        <div className="text-[13px] text-gray-600 mt-1 whitespace-pre-wrap leading-relaxed">{x.a}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
               {reds.length ? (
                 <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden mb-3.5">
-                  <h2 className="bg-gradient-to-r from-rose-500 to-red-600 text-white text-sm tracking-wide px-4 py-2.5">Red - needs a rule or you <span className="text-xs font-bold text-white bg-red-600 rounded-full px-2 py-0.5 ml-2">{reds.length}</span></h2>
+                  <h2 className="bg-gradient-to-r from-rose-500 to-red-600 text-white text-sm tracking-wide px-4 py-2.5 flex items-center gap-2"><HIcon d={HD.red} />Needs an answer <span className="text-xs font-bold text-white bg-red-600 rounded-full px-2 py-0.5 ml-1">{reds.length}</span></h2>
                   <table className="w-full border-collapse">
                     <tbody>
                       {reds.map((f: Field, i: number) => (
@@ -257,15 +341,36 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
                   </table>
                 </div>
               ) : null}
+              {files.length ? (
+                <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden mb-3.5">
+                  <h2 className="bg-gradient-to-r from-slate-500 to-slate-600 text-white text-sm tracking-wide px-4 py-2.5 flex items-center gap-2"><HIcon d={HD.files} />Files - handled when you apply <span className="text-xs font-bold text-white bg-slate-700 rounded-full px-2 py-0.5 ml-1">{files.length}</span></h2>
+                  <div className="px-4 py-2.5 text-[12px] text-gray-500 border-b border-gray-100">Your resume and cover letter attach automatically when the extension fills the form. The rest are optional extra uploads - nothing to fix here.</div>
+                  <table className="w-full border-collapse">
+                    <tbody>
+                      {files.map((f: Field, i: number) => (
+                        <tr key={i}>
+                          <td className="px-2.5 py-1.5 border-b border-gray-100 text-gray-700 text-[13px] font-semibold w-[42%]">{f[0]}</td>
+                          <td className="px-2.5 py-1.5 border-b border-gray-100 text-xs text-gray-400">attaches at apply time</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : null}
               {greens.length ? (
-                <div className="bg-white border border-gray-300 rounded-xl px-5 py-4 mb-3.5">
-                  <h2 className="text-[15px] font-bold mb-2.5">Filled by JobFill <span className="text-xs font-bold text-white bg-green-600 rounded-full px-2 py-0.5 ml-2">{greens.length}</span><span className="text-xs text-gray-400 font-normal ml-2">latest pre-run</span></h2>
+                <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden mb-3.5">
+                  <h2 className="bg-gradient-to-r from-green-600 to-emerald-700 text-white text-sm tracking-wide px-4 py-2.5 flex items-center gap-2"><HIcon d={HD.filled} />Filled by JobFill <span className="text-xs font-bold text-white bg-green-700 rounded-full px-2 py-0.5 ml-1">{greens.length}</span><span className="text-xs text-white/70 font-normal ml-1">latest pre-run</span></h2>
                   <table className="w-full border-collapse">
                     <tbody>
                       {greens.map((f: Field, i: number) => (
-                        <tr key={i}>
-                          <td className="px-2.5 py-1.5 border-b border-gray-100 text-gray-500 text-xs w-[42%]">{f[0]}</td>
-                          <td className="px-2.5 py-1.5 border-b border-gray-100 text-[13px]">{f[1]}</td>
+                        <tr key={i} className="group">
+                          <td className="px-2.5 py-1.5 border-b border-gray-100 text-gray-500 text-xs w-[42%] align-top">{f[0]}</td>
+                          <td className="px-2.5 py-1.5 border-b border-gray-100 text-[13px]">
+                            <div className="flex items-start justify-between gap-2">
+                              <span className="whitespace-pre-wrap">{f[1]}</span>
+                              <CopyButton text={String(f[1] ?? "")} tone="onLight" />
+                            </div>
+                          </td>
                         </tr>
                       ))}
                     </tbody>

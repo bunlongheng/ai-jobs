@@ -47,3 +47,8 @@ resume-master.md
 
 # captured application answers (PII - never commit)
 jobfill/captured-answers.jsonl
+
+# runtime scan state + generated eval reports (churn every run)
+web/public/scan-status.json
+.ready-eval.json
+.ready-report.json

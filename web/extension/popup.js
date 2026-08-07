@@ -1,5 +1,26 @@
 const $ = (id) => document.getElementById(id);
 const send = (msg) => new Promise((res) => chrome.runtime.sendMessage(msg, res));
+const BOARD_URL = "http://localhost:3017/jobs";
+
+// Inline SVG icons (real icons, never emoji) reused across the rendered UI.
+const IC = {
+  check: '<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></svg>',
+  minus: '<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg>',
+  alert: '<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 15.6h.01"/></svg>',
+  list: '<svg class="icon" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>',
+  briefcase: '<svg class="icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>',
+  chevR: '<svg class="icon chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>',
+  down: '<svg class="icon" viewBox="0 0 24 24"><path d="M12 5v13M6 12l6 6 6-6"/></svg>',
+  lines: '<svg class="icon" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg>',
+  clip: '<svg class="icon" viewBox="0 0 24 24"><path d="M21 11l-8.5 8.5a5 5 0 0 1-7-7L14 4a3 3 0 0 1 4 4l-8.5 8.5a1 1 0 0 1-1.4-1.4L15 8"/></svg>',
+};
+const tGlyph = (t) => ({ text: '<span class="glyph">T</span>', textarea: IC.lines, dropdown: IC.down, choice: IC.check, file: IC.clip, skip: IC.minus }[t] || '<span class="glyph">?</span>');
+const typeBadge = (t) => `<span class="tbadge">${tGlyph(t)}${t || "?"}</span>`;
+const rowStatus = (bad, val) => bad
+  ? `<span class="row-st st-manual">${IC.alert}</span>`
+  : String(val).startsWith("skipped") ? `<span class="row-st st-skip">${IC.minus}</span>` : `<span class="row-st st-ok">${IC.check}</span>`;
+const statCard = (cls, icon, n, label) => `<div class="stat ${cls}">${icon || ""}<div><b>${n}</b><span>${label}</span></div></div>`;
+const openBoard = () => chrome.tabs.create({ url: BOARD_URL });
 
 async function activeTab() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -44,14 +65,36 @@ async function init() {
   if (hit) {
     box.innerHTML =
       `<input type="hidden" id="kit" value="${hit.id}">` +
-      `<div style="padding:6px 9px;border:1px solid #16a34a;background:#f0fdf4;border-radius:6px;font-weight:400;color:#166534;font-size:9px;">${hit.company || "?"} - ${hit.title || hit.id}</div>`;
+      `<div class="kit-chip">${IC.briefcase}<span class="kit-name">${hit.company || "?"} - ${hit.title || hit.id}</span>${IC.chevR}</div>`;
     st.textContent = "";
   } else {
     box.innerHTML =
       `<select id="kit">${KITS.map((k) => `<option value="${k.id}">${k.score ?? "-"} | ${k.company || "?"} - ${(k.title || k.id).slice(0, 40)}</option>`).join("")}</select>` +
-      `<div style="color:#b91c1c;font-size:11px;margin-top:2px;">No auto-match - pick the right kit.</div>`;
+      `<div class="kit-warn">No auto-match - pick the right kit.</div>`;
     st.textContent = "";
   }
+  // header + footer icon buttons; gear -> settings page, others -> board; reload -> reload ext
+  ["btn-help", "foot-link"].forEach((id) => { const el = $(id); if (el) el.onclick = (e) => { e.preventDefault(); openBoard(); }; });
+  const sg = $("btn-settings"); if (sg) sg.onclick = () => chrome.tabs.create({ url: BOARD_URL.replace(/\/jobs$/, "/jobs/settings") });
+  const rl = $("btn-reload"); if (rl) rl.onclick = () => chrome.runtime.reload();
+
+  // Version freshness: compare the LOADED runtime version to the latest on-disk manifest.
+  // Match -> subtle version pill. Stale -> red "(!)" + "reload" hint so you KNOW to reload.
+  try {
+    const loaded = chrome.runtime.getManifest().version;
+    const latest = (await send({ type: "version" }))?.data?.version;
+    const ver = $("ver");
+    if (latest && latest !== loaded) {
+      ver.textContent = `v${loaded} (!)`;
+      ver.classList.add("stale");
+      ver.title = `Outdated - latest is v${latest}. Click to reload.`;
+      ver.style.cursor = "pointer";
+      ver.onclick = () => chrome.runtime.reload();
+      if (rl) rl.classList.add("stale");
+    } else {
+      ver.title = "Up to date";
+    }
+  } catch { /* server offline - leave the plain version */ }
 }
 
 let lastRun = null;
@@ -113,27 +156,21 @@ $("fill").onclick = async () => {
   // summary: counts by field type
   const byType = {};
   merged.forEach((r) => { const t = r[2] || "?"; byType[t] = (byType[t] || 0) + 1; });
-  const chip = (val, label, bg, fg) => `<span style="display:inline-block;margin:0 4px 4px 0;padding:2px 8px;border-radius:6px;background:${bg};color:${fg};font-size:11px;font-weight:700;white-space:nowrap">${val} ${label}</span>`;
-  const typeChips = Object.entries(byType).map(([t, n]) =>
-    `<span style="display:inline-block;margin:0 4px 4px 0;padding:2px 7px;border-radius:6px;background:#f1f5f9;color:#475569;font-size:10px;font-weight:600;white-space:nowrap">${n} ${t}</span>`).join("");
-  st.innerHTML =
-    `<div>` +
-      chip(merged.length - manual.length, "filled", "#dcfce7", "#166534") +
-      chip(manual.length, "need you", manual.length ? "#fee2e2" : "#f1f5f9", manual.length ? "#b91c1c" : "#9ca3af") +
-      chip(merged.length, "fields", "#e0f2fe", "#075985") +
-    `</div>` +
-    `<div style="margin-top:1px">${typeChips}</div>` +
-    `<div style="color:#6b7280;font-size:11px;margin-top:3px">Review, captcha, Submit.${warn}</div>`;
-  $("copy").style.display = "block"; // report button only appears after a fill run
+  $("stats").innerHTML =
+    statCard("green", IC.check, merged.length - manual.length, "filled") +
+    statCard(manual.length ? "red" : "", manual.length ? IC.alert : IC.minus, manual.length, "need you") +
+    statCard("blue", IC.list, merged.length, "fields") +
+    Object.entries(byType).map(([t, n]) => statCard("mini", "", n, t)).join("");
+  st.innerHTML = `<div class="review">${IC.check}Review, captcha, Submit.${warn}</div>`;
+  $("copy").style.display = "flex"; // report button only appears after a fill run
   $("report").innerHTML = merged.map((row) => {
     const [k, v, t, opts] = row;
     const bad = String(v).startsWith("MANUAL");
-    // Only show the other options for RED fields (helps you pick). On a field that
-    // filled fine it is just noise, so hide it. (owner request 2026-08-04)
     const optLine = bad && opts?.length
-      ? `<div style="color:#9ca3af;font-size:11px;padding-left:44px">${opts.join(" | ").slice(0, 120)}</div>` : "";
-    return `<div class="row"><span class="badge">${t || "?"}</span>` +
-      `<span class="${bad ? "manual" : "ok"}">${v}</span> - ${k}${optLine}</div>`;
+      ? `<div class="opts">${opts.join(" | ").slice(0, 120)}</div>` : "";
+    return `<div class="row">${typeBadge(t)}` +
+      `<span class="row-txt"><span class="val ${bad ? "manual" : "ok"}">${v}</span> <span class="lbl">- ${k}</span>${optLine}</span>` +
+      `${rowStatus(bad, v)}</div>`;
   }).join("");
 };
 
@@ -174,7 +211,7 @@ $("capture").onclick = async () => {
   const saved = await send({ type: "event", data: { id: kitId, outcome: "captured_answers", url: tab.url, answers } });
   st.textContent = `Captured ${answers.length} Q&A - copied for Claude${saved?.ok ? " + saved to learn file" : ""}. Paste it to Claude.`;
   $("report").innerHTML = answers.map((a) =>
-    `<div class="row"><span class="badge">${a.type || "?"}</span><span class="ok">${(a.value || "").slice(0, 80)}</span> - ${a.label}</div>`).join("");
+    `<div class="row">${typeBadge(a.type)}<span class="row-txt"><span class="val ok">${(a.value || "").slice(0, 80)}</span> <span class="lbl">- ${a.label}</span></span>${rowStatus(false, a.value)}</div>`).join("");
 };
 
 $("copy").onclick = async () => {

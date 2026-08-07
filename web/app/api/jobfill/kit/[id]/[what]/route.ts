@@ -21,6 +21,16 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     return new NextResponse(new Uint8Array(buf), { headers: { "Content-Type": "application/pdf" } });
   }
   if (what === "cover") {
+    // Prefer the rendered per-job cover PDF (applications/<id>/cover-letter.pdf) so the
+    // extension attaches a real PDF to the Cover Letter slot - NEVER the resume, never a
+    // .txt. Fall back to the raw cover text only when no PDF has been rendered yet.
+    // (owner bug 2026-08-05)
+    const wantText = new URL(req.url).searchParams.get("format") === "text";
+    const coverPdf = path.join(KITS_DIR, kid, "cover-letter.pdf");
+    if (!wantText && fs.existsSync(coverPdf)) {
+      const buf = fs.readFileSync(coverPdf);
+      return new NextResponse(new Uint8Array(buf), { headers: { "Content-Type": "application/pdf" } });
+    }
     const row = db().prepare("SELECT cover_md FROM applications WHERE id = ?").get(kid) as { cover_md: string | null } | undefined;
     const f = path.join(KITS_DIR, kid, "cover-letter.md");
     const text = row?.cover_md ?? (fs.existsSync(f) ? fs.readFileSync(f, "utf8") : null);

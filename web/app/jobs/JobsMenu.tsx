@@ -3,6 +3,7 @@ import Link from "next/link";
 const LINKS = [
   { href: "/jobs/skills", label: "Skills" },
   { href: "/jobs/answers", label: "Screening answers" },
+  { href: "/jobs/settings", label: "Settings - automations" },
 ];
 
 // Top-right hamburger (owner request 2026-07-24). Native <details> so it opens on tap

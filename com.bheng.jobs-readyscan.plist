@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.bheng.jobs-readyscan</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/bheng/Sites/jobs/run_readyscan.sh</string>
+  </array>
+  <!-- READY-SCAN (cleanliness/reliability): every 30m. No browser, zero AI tokens - re-proves the
+       green pile stays truly ready (cover PDF + resume + answers) and demotes any that drift so the
+       portal's Ready pile is always trustworthy. (owner 2026-08-07) -->
+  <key>StartInterval</key><integer>1800</integer>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key><string>/Users/bheng/.nvm/versions/node/v22.23.1/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+  <key>WorkingDirectory</key><string>/Users/bheng/Sites/jobs</string>
+  <key>StandardOutPath</key><string>/tmp/jobs-readyscan.log</string>
+  <key>StandardErrorPath</key><string>/tmp/jobs-readyscan.log</string>
+</dict>
+</plist>

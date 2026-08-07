@@ -22,8 +22,11 @@ export function getBoard(minScore = 0): {
   // "Archived" bucket = disliked (liked = -1) OR rejected - one muted panel at the bottom,
   // each row tagged rejected/disliked in the UI. Rejected gets NO separate red panel.
   // (owner request 2026-07-24)
-  const archived = all.filter((r) => r.liked === -1 || r.status === "rejected" || r.status === "expired");
-  const rows = all.filter((r) => r.liked !== -1 && r.status !== "rejected" && r.status !== "expired");
+  // "hold" = a company you're still sizing up (put on hold via the detail page) - kept OFF
+  // the working board so it doesn't clutter, tucked into the muted Archived pile, and kept
+  // DISTINCT from disliked (which is a real thumbs-down). (owner request 2026-08-06)
+  const archived = all.filter((r) => r.liked === -1 || r.status === "rejected" || r.status === "expired" || r.status === "hold");
+  const rows = all.filter((r) => r.liked !== -1 && !["rejected", "expired", "hold"].includes(r.status || ""));
 
   // per-tier counts for the score menu - over EVERY job (incl. applied + archived +
   // rejected), so the dropdown numbers match the true universe. (owner request 2026-08-05)
@@ -48,22 +51,29 @@ export function getBoard(minScore = 0): {
   counts.kit_ready = krRows.filter(preScanned).length;
   counts.kit_only = krRows.filter((r) => !preScanned(r)).length;
   const groups: BoardGroup[] = [];
+  // Only the WORK-QUEUE panels (New match, Not ready) rank by score - that is where you
+  // pick what to do next. Every other panel (Ready, Applied, and the rest) ranks by LATEST
+  // ACTION so what you just touched sits on top. (owner request 2026-08-05)
+  const recency = (r: AppRow) => String(r.applied_at || r.rejected_at || r.updated_at || "");
+  const byScore = (a: AppRow, b: AppRow) => (b.score || 0) - (a.score || 0);
+  const byRecency = (a: AppRow, b: AppRow) => recency(b).localeCompare(recency(a));
   for (const st of STAGES) {
-    // Applied list is ordered newest-applied first (recent on top, old at the bottom);
-    // every other stage stays ranked by score. (owner request 2026-07-24)
-    const sort = st === "applied"
-      ? (a: AppRow, b: AppRow) => String(b.applied_at || "").localeCompare(String(a.applied_at || ""))
-      : (a: AppRow, b: AppRow) => (b.score || 0) - (a.score || 0);
-    const g = rows.filter((r) => (r.status || "planned") === st && keep(r)).sort(sort);
+    // "New match" (planned) is hidden from the board entirely - a raw scraped lead with no
+    // kit yet is not actionable. The nightly run writes its kit and it appears as "Not ready".
+    // (owner request 2026-08-06) Board = Not ready -> Ready -> Applied ...
+    if (st === "planned") continue;
+    const g = rows.filter((r) => (r.status || "planned") === st && keep(r));
     if (!g.length) continue;
     if (st === "kit_ready") {
-      const ready = g.filter(preScanned);
-      const kitOnly = g.filter((r) => !preScanned(r));
-      // Not-ready pile renders ABOVE Ready (owner request 2026-08-05).
+      // Not ready ranks by score (work queue); Ready ranks by latest prep. Not-ready
+      // renders ABOVE Ready. (owner request 2026-08-05)
+      const kitOnly = g.filter((r) => !preScanned(r)).sort(byScore);
+      const ready = g.filter(preScanned).sort(byRecency);
       if (kitOnly.length) groups.push({ status: "kit_only", label: "Not ready", rows: kitOnly });
       if (ready.length) groups.push({ status: "kit_ready", label: LABEL.kit_ready, rows: ready });
     } else {
-      groups.push({ status: st, label: LABEL[st] || st, rows: g });
+      // planned (score-sorted) is hidden now; every remaining stage here ranks by latest action.
+      groups.push({ status: st, label: LABEL[st] || st, rows: g.sort(byRecency) });
     }
   }
   // Archived always renders last (below Rejected) - recency-first (latest activity on top,

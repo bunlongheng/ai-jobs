@@ -19,9 +19,23 @@ async function getResumeB64(id) {
   return btoa(s);
 }
 
+// Returns { file: {b64,name}|null, text }. The rendered per-job cover PDF (file) is what
+// gets attached to the Cover Letter UPLOAD slot - never the resume. text is the raw cover
+// for the rarer paste-into-textarea cover fields. (owner bug 2026-08-05)
 async function getCover(id) {
-  const r = await fetch(`${BASE}/kit/${encodeURIComponent(id)}/cover`);
-  return r.ok ? r.text() : "";
+  const base = `${BASE}/kit/${encodeURIComponent(id)}/cover`;
+  let file = null, text = "";
+  try {
+    const r = await fetch(base);
+    if (r.ok && (r.headers.get("content-type") || "").includes("application/pdf")) {
+      const bytes = new Uint8Array(await r.arrayBuffer());
+      let s = "";
+      for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+      file = { b64: btoa(s), name: "cover-letter.pdf" };
+    }
+  } catch { /* no cover file */ }
+  try { const t = await fetch(base + "?format=text"); if (t.ok) text = await t.text(); } catch { /* no cover text */ }
+  return { file, text };
 }
 
 // ---- Claude command channel: poll the local server for queued commands ----
@@ -253,6 +267,38 @@ async function doFill(kitId, overwrite, tabId) {
   return { ok: true, kitId, fields };
 }
 
+// ---- AUTO-FILL on a recognized page: as soon as you land on a job form whose URL
+// confidently matches a kit, fill it automatically (no click). content.js's own banner +
+// focus glow is the "it's working" indication. Only CONFIDENT matches (exact/prefix apply
+// URL, or company slug in the path) auto-run, so we never fire the wrong kit. Never submits.
+// (owner request 2026-08-06) ----
+const autoFilled = new Set(); // "tabId|url" dedupe within this service-worker lifetime
+const coTok = (name) => { const t = (name || "").split(/[\s\/]/)[0].toLowerCase().replace(/[^a-z]/g, ""); return t.length >= 3 ? t : ""; };
+const normUrl = (u) => (u || "").toLowerCase().split("?")[0].replace(/\/application\/?$/, "").replace(/\/$/, "");
+async function matchKitForUrl(url) {
+  const kits = await getJSON("/kits").catch(() => []);
+  const nu = normUrl(url);
+  return kits.find((k) => k.url && normUrl(k.url) && (nu === normUrl(k.url) || nu.startsWith(normUrl(k.url) + "/")))
+    || kits.find((k) => coTok(k.company) && nu.includes(coTok(k.company)));
+}
+async function maybeAutoFill(tabId) {
+  try {
+    const tab = await chrome.tabs.get(tabId).catch(() => null);
+    if (!tab || pageGuard(tab)) return;                 // job pages only, never personal tabs
+    const key = tabId + "|" + normUrl(tab.url);
+    if (autoFilled.has(key)) return;                    // already auto-filled this page
+    const kit = await matchKitForUrl(tab.url);
+    if (!kit) return;                                   // no confident match -> leave it for the popup
+    autoFilled.add(key);
+    setTimeout(() => { doFill(kit.id, [], tabId).catch(() => {}); }, 1600); // let SPA forms render first
+  } catch (_) {}
+}
+if (chrome.webNavigation?.onCompleted) {
+  chrome.webNavigation.onCompleted.addListener((d) => { if (d.frameId === 0) maybeAutoFill(d.tabId); });
+  // SPA route changes (Ashby/Greenhouse click-through to /application) fire history updates, not onCompleted.
+  chrome.webNavigation.onHistoryStateUpdated.addListener((d) => { if (d.frameId === 0) maybeAutoFill(d.tabId); });
+}
+
 async function pollCommands() {
   try {
     const cmds = await getJSON("/commands/poll");
@@ -314,7 +360,8 @@ chrome.alarms.onAlarm.addListener((a) => { if (a.name === "jobfill-poll") pollCo
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   (async () => {
     try {
-      if (msg.type === "profile") sendResponse({ ok: true, data: await getJSON("/profile") });
+      if (msg.type === "version") sendResponse({ ok: true, data: await getJSON("/version") });
+      else if (msg.type === "profile") sendResponse({ ok: true, data: await getJSON("/profile") });
       else if (msg.type === "rules") sendResponse({ ok: true, data: await getJSON("/rules") });
       else if (msg.type === "kits") sendResponse({ ok: true, data: await getJSON("/kits") });
       else if (msg.type === "resume") sendResponse({ ok: true, data: await getResumeB64(msg.id) });

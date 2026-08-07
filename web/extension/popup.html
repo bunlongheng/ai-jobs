@@ -2,27 +2,138 @@
 <html>
 <head><meta charset="utf-8">
 <style>
-  body { font: 13px -apple-system, sans-serif; width: 360px; margin: 0; padding: 12px; color: #111; }
-  h1 { font-size: 15px; margin: 0 0 8px; }
-  select, button { width: 100%; padding: 7px 8px; margin: 4px 0; font-size: 13px; box-sizing: border-box; }
-  button { background: #16a34a; color: #fff; border: 0; border-radius: 6px; cursor: pointer; font-weight: 600; }
-  button.secondary { background: #e5e7eb; color: #111; }
-  #status { margin: 6px 0; font-size: 12px; color: #6b7280; }
-  #report { max-height: 260px; overflow: auto; font-size: 12px; margin-top: 8px; }
-  .row { padding: 3px 0; border-bottom: 1px solid #f3f4f6; }
-  .manual { color: #dc2626; font-weight: 600; }
-  .ok { color: #059669; }
-  .badge { display: inline-block; min-width: 34px; margin-right: 6px; padding: 1px 5px; border-radius: 4px;
-           background: #dcfce7; color: #166534; font-size: 10px; text-align: center; vertical-align: middle; }
+  :root { --green:#16a34a; --green-d:#15803d; --ink:#0f172a; --sub:#64748b; --line:#e5e7eb; --bg:#ffffff; }
+  * { box-sizing: border-box; }
+  body { font: 13px/1.45 -apple-system, "Segoe UI", sans-serif; width: 384px; margin: 0; padding: 14px; color: var(--ink); background: var(--bg); }
+  svg { display: block; }
+  .icon { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* header */
+  .head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .logo { width: 34px; height: 34px; border-radius: 9px; }
+  .title { font-size: 17px; font-weight: 800; letter-spacing: -.2px; }
+  .ver { font-size: 11px; font-weight: 600; color: var(--sub); background: #f1f5f9; padding: 2px 7px; border-radius: 999px; margin-left: 2px; }
+  .ver.stale { color: #b91c1c; background: #fef2f2; }
+  .iconbtn.stale { border-color: #fecaca; background: #fef2f2; color: #dc2626; }
+  .head-actions { margin-left: auto; display: flex; gap: 6px; }
+  .iconbtn { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--sub); cursor: pointer; padding: 0; }
+  .iconbtn:hover { background: #f8fafc; color: var(--ink); }
+  .iconbtn.spark { border-color: #bbf7d0; background: #f0fdf4; color: var(--green); }
+
+  /* kit selector */
+  #kitbox { margin-bottom: 10px; }
+  .kit-chip { display: flex; align-items: center; gap: 9px; padding: 11px 12px; border: 1.5px solid var(--green); background: #f0fdf4; border-radius: 11px; color: var(--green-d); font-weight: 600; font-size: 12.5px; }
+  .kit-chip .icon { color: var(--green); flex: 0 0 auto; }
+  .kit-chip .kit-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .kit-chip .chev { color: #86efac; }
+  select#kit { width: 100%; padding: 10px 11px; border: 1.5px solid var(--line); border-radius: 11px; font-size: 12.5px; background: #fff; }
+  .kit-warn { color: #b91c1c; font-size: 11px; margin-top: 4px; }
+
+  /* auto fill */
+  .btn-fill { width: 100%; display: flex; align-items: center; justify-content: center; gap: 9px; padding: 13px; margin-bottom: 12px;
+              background: linear-gradient(180deg,#22c55e,#16a34a); color: #fff; border: 0; border-radius: 12px; cursor: pointer;
+              font-size: 15px; font-weight: 800; letter-spacing: .2px; box-shadow: 0 2px 8px rgba(22,163,74,.28); }
+  .btn-fill:hover { filter: brightness(1.03); }
+  .btn-fill .icon { width: 20px; height: 20px; stroke: #fff; }
+
+  /* action cards */
+  .card { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 12px; margin-bottom: 9px;
+          border: 1px solid var(--line); border-radius: 12px; background: #fbfcfe; cursor: pointer; }
+  .card:hover { background: #f6f8fc; }
+  .card-ic { width: 38px; height: 38px; flex: 0 0 auto; border-radius: 10px; display: grid; place-items: center; }
+  .card-ic .icon { width: 20px; height: 20px; }
+  .ic-purple { background: #ede9fe; color: #7c3aed; }
+  .ic-blue { background: #dbeafe; color: #2563eb; }
+  .card-txt { flex: 1; min-width: 0; }
+  .card-t { display: block; font-weight: 700; font-size: 13.5px; }
+  .card-s { display: block; font-size: 11.5px; color: var(--sub); margin-top: 2px; line-height: 1.35; }
+  .card .chev { color: #cbd5e1; flex: 0 0 auto; }
+
+  /* stats */
+  #stats { display: flex; flex-wrap: wrap; gap: 7px; margin: 12px 0 6px; }
+  .stat { flex: 1 1 auto; min-width: 74px; border: 1px solid var(--line); border-radius: 11px; padding: 8px 10px; display: flex; align-items: center; gap: 8px; }
+  .stat .icon { width: 17px; height: 17px; flex: 0 0 auto; }
+  .stat b { font-size: 16px; font-weight: 800; line-height: 1; }
+  .stat span { font-size: 10.5px; color: var(--sub); display: block; }
+  .stat.green { background: #f0fdf4; border-color: #bbf7d0; } .stat.green .icon, .stat.green b { color: var(--green); }
+  .stat.red { background: #fef2f2; border-color: #fecaca; } .stat.red .icon, .stat.red b { color: #dc2626; }
+  .stat.blue { background: #eff6ff; border-color: #bfdbfe; } .stat.blue .icon, .stat.blue b { color: #2563eb; }
+  .stat.mini { min-width: 62px; } .stat.mini b { font-size: 14px; }
+
+  .review { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--sub); margin: 8px 0 4px; }
+  .review .icon { width: 15px; height: 15px; color: var(--green); }
+
+  #status { font-size: 12px; color: var(--sub); margin: 4px 0; }
+
+  /* report list - no inner scroll; the whole popup scrolls once (single scrollbar).
+     No border-top here so it never doubles up with the footer divider. */
+  #report { margin-top: 6px; }
+  .row { display: flex; align-items: center; gap: 9px; padding: 8px 2px; border-bottom: 1px solid #f1f5f9; }
+  .tbadge { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 4px; min-width: 62px; padding: 3px 7px; border-radius: 7px; background: #f0fdf4; color: #166534; font-size: 10.5px; font-weight: 700; }
+  .tbadge .icon { width: 12px; height: 12px; }
+  .tbadge .glyph { font-weight: 800; font-size: 11px; width: 12px; text-align: center; }
+  .row-txt { flex: 1; min-width: 0; font-size: 12px; }
+  .row-txt .val { font-weight: 600; }
+  .row-txt .val.ok { color: #059669; } .row-txt .val.manual { color: #dc2626; }
+  .row-txt .lbl { color: var(--sub); }
+  .row-txt .opts { color: #94a3b8; font-size: 11px; margin-top: 2px; }
+  .row-st { flex: 0 0 auto; }
+  .row-st .icon { width: 17px; height: 17px; }
+  .st-ok { color: var(--green); } .st-skip { color: #cbd5e1; } .st-manual { color: #dc2626; }
+
+  /* footer */
+  .foot { display: flex; align-items: center; gap: 6px; margin-top: 12px; padding-top: 9px; border-top: 1px solid var(--line); font-size: 9.5px; color: var(--sub); white-space: nowrap; }
+  .foot .privacy { overflow: hidden; text-overflow: ellipsis; }
+  .foot .icon { width: 13px; height: 13px; color: var(--green); flex: 0 0 auto; }
+  .foot a { margin-left: auto; color: var(--sub); text-decoration: none; display: inline-flex; align-items: center; gap: 3px; flex: 0 0 auto; white-space: nowrap; }
+  .foot a:hover { color: var(--ink); }
 </style></head>
 <body>
-  <h1><img src="icon32.png" width="20" height="20" style="vertical-align:-4px;margin-right:6px">JobFill <span id="ver" style="color:#9ca3af;font-weight:400;font-size:12px"></span></h1>
+  <div class="head">
+    <img class="logo" src="icon48.png" alt="">
+    <div class="title">JobFill</div><span class="ver" id="ver"></span>
+    <div class="head-actions">
+      <button class="iconbtn" id="btn-help" title="Open the jobs board">
+        <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.5-3 4"/><path d="M12 17h.01"/></svg>
+      </button>
+      <button class="iconbtn" id="btn-settings" title="Open the jobs board">
+        <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M10.6 3.3a1 1 0 0 1 1-.8h.8a1 1 0 0 1 1 .8l.25 1.4a6.5 6.5 0 0 1 1.5.86l1.33-.5a1 1 0 0 1 1.2.44l.4.7a1 1 0 0 1-.2 1.24l-1.08.95a6.5 6.5 0 0 1 0 1.72l1.08.95a1 1 0 0 1 .2 1.24l-.4.7a1 1 0 0 1-1.2.44l-1.33-.5a6.5 6.5 0 0 1-1.5.86l-.25 1.4a1 1 0 0 1-1 .8h-.8a1 1 0 0 1-1-.8l-.25-1.4a6.5 6.5 0 0 1-1.5-.86l-1.33.5a1 1 0 0 1-1.2-.44l-.4-.7a1 1 0 0 1 .2-1.24l1.08-.95a6.5 6.5 0 0 1 0-1.72l-1.08-.95a1 1 0 0 1-.2-1.24l.4-.7a1 1 0 0 1 1.2-.44l1.33.5a6.5 6.5 0 0 1 1.5-.86z"/><circle cx="12" cy="12" r="2.4"/></svg>
+      </button>
+      <button class="iconbtn" id="btn-reload" title="Reload the extension (apply the latest version)">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14-4.9M4 4v3.5h3.5"/><path d="M4 13a8 8 0 0 0 14 4.9M20 20v-3.5h-3.5"/></svg>
+      </button>
+    </div>
+  </div>
+
   <div id="kitbox"></div>
-  <button id="fill">Auto Fill</button>
-  <button id="capture" class="secondary">Capture Q&amp;A for Claude</button>
-  <button id="copy" class="secondary" style="display:none">for Claude</button>
+
+  <button class="btn-fill" id="fill">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M15 4V2M15 10V8M12 7h2M18 7h2"/><path d="M5.5 20.5 17 9l-2-2L3.5 18.5z"/><path d="M14 6l4 4"/></svg>
+    Auto Fill
+  </button>
+
+  <button class="card" id="capture" title="Copy the question&rarr;answer pairs you filled, for Claude to learn from">
+    <span class="card-ic ic-purple"><svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+    <span class="card-txt"><span class="card-t">Capture Q&amp;A for Claude</span><span class="card-s">Extract questions &amp; answers from this page</span></span>
+    <svg class="icon chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>
+  </button>
+
+  <button class="card" id="copy" style="display:none" title="Copy a diagnostic report of this fill run, for Claude to debug">
+    <span class="card-ic ic-blue"><svg class="icon" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 8V4M8 3h8"/><circle cx="9" cy="14" r="1"/><circle cx="15" cy="14" r="1"/></svg></span>
+    <span class="card-txt"><span class="card-t">Fill report for Claude</span><span class="card-s">Format this run's data for Claude</span></span>
+    <svg class="icon chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>
+  </button>
+
+  <div id="stats"></div>
   <div id="status">-</div>
   <div id="report"></div>
+
+  <div class="foot">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6z"/><path d="m9 12 2 2 4-4"/></svg>
+    <span class="privacy">Your data stays local - never stored or sent.</span>
+    <a id="foot-link" href="#">Learn more <svg class="icon" viewBox="0 0 24 24" style="width:11px;height:11px"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+  </div>
+
   <script src="popup.js"></script>
 </body>
 </html>

@@ -6,9 +6,14 @@ import AutoRefresh from "./AutoRefresh";
 import JobsMenu from "./JobsMenu";
 import ScoreMenu from "./ScoreMenu";
 import CommandK from "./CommandK";
+import PrescanIcon from "./PrescanIcon";
+import ReadyScanIcon from "./ReadyScanIcon";
 import CollapsiblePanel from "./CollapsiblePanel";
 import PanelNav from "./PanelNav";
+import ScanSpinner from "./ScanSpinner";
 import { techMeta } from "@/lib/tech";
+import { nearHome } from "@/lib/near-home";
+import { altitude, ALT_META } from "@/lib/altitude";
 
 export const dynamic = "force-dynamic"; // always read live SQLite
 
@@ -210,10 +215,14 @@ function techCell(r: AppRow) {
   if (!s) return <span className="text-gray-300">-</span>;
   const label = techMeta(s)?.label || s;
   const uri = getLogo(`tech:${s}`);
-  return uri
+  // Click the tech chip -> Google it (preset search) to learn more; data-external so the
+  // whole-row link ignores this click. Hover still shows the tech name. (owner 2026-08-06)
+  const search = `https://www.google.com/search?q=${encodeURIComponent(label)}`;
+  const inner = uri
     // eslint-disable-next-line @next/next/no-img-element
-    ? <img src={uri} alt={label} title={label} width={18} height={18} className="w-[18px] h-[18px] rounded-[4px] object-contain bg-white shrink-0 inline-block align-middle" />
-    : <span title={label} className="text-[9px] font-bold uppercase tracking-tight text-gray-500 bg-gray-100 rounded px-1 py-0.5 leading-none">{label.slice(0, 3)}</span>;
+    ? <img src={uri} alt={label} width={18} height={18} className="w-[18px] h-[18px] rounded-[4px] object-contain bg-white shrink-0 inline-block align-middle" />
+    : <span className="text-[9px] font-bold uppercase tracking-tight text-gray-500 bg-gray-100 rounded px-1 py-0.5 leading-none">{label.slice(0, 3)}</span>;
+  return <a data-external href={search} target="_blank" rel="noopener noreferrer" title={`${label} - click to search`} className="inline-flex no-underline align-middle">{inner}</a>;
 }
 
 // Tiny 7-day area sparkline for the hero tiles - white on the gradient, last point (today)
@@ -253,6 +262,7 @@ function statusIcon(gstatus: string, r: AppRow) {
   if (gstatus === "archived") {
     if (r.status === "rejected") { color = "#9ca3af"; glyph = "x"; title = "Rejected"; }
     else if (r.status === "expired") { color = "#d97706"; glyph = "clock"; title = "Expired"; }
+    else if (r.status === "hold") { color = "#6366f1"; glyph = "clock"; title = "On hold"; }
     else { color = "#f43f5e"; glyph = "down"; title = "Not interested"; }
   } else if (gstatus === "kit_only") { color = "#38bdf8"; glyph = "clock"; title = "Needs pre-scan"; }
   else if (gstatus === "kit_ready") {
@@ -278,10 +288,16 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
   const searchJobs = getBoard(0).groups.flatMap((g) => g.rows.map((r) => ({
     id: r.id, title: r.title || "", company: r.company || "", score: r.score ?? 0, status: r.status || "",
   })));
+  // Deduped company -> real logo data-URI for the Cmd+K palette (avg ~1.4KB each, one per
+  // distinct company). Real brand icons, not colored initials. (owner request 2026-08-05)
+  const cmdkLogos: Record<string, string> = {};
+  for (const j of searchJobs) {
+    if (j.company && !(j.company in cmdkLogos)) { const l = getLogo(j.company); if (l) cmdkLogos[j.company] = l; }
+  }
   // Total excludes skipped so the tiles reconcile: New + Ready + Manual + Applied = Total.
   // Applied folds in rejected (they were applied to), and there is no separate Rejected tile.
   const total = Object.entries(counts).reduce((a, [k, v]) => a + (k === "skipped" || k === "archived" ? 0 : v), 0);
-  const tiles = ["planned", "kit_only", "kit_ready", "manual_only", "applied"].filter((s) => counts[s]);
+  const tiles = ["kit_only", "kit_ready", "manual_only", "applied"].filter((s) => counts[s]);
   // 7-day activity for the hero sparklines. Each tile shows the series most relevant to it:
   // detection for New/Not-ready/Total, pre-scan for Ready, applications for Applied.
   const trends = getTrends(7);
@@ -305,7 +321,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <CommandK jobs={searchJobs} />
+            <CommandK jobs={searchJobs} logos={cmdkLogos} />
             <ScoreMenu min={min} buckets={buckets} tiers={[...SCORE_TIERS]} />
             <JobsMenu />
           </div>
@@ -357,7 +373,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
             );
           });
           return (
-          <CollapsiblePanel key={g.status} status={g.status} label={g.label} count={g.rows.length} gradient={HGRAD[g.status] || "from-gray-500 to-gray-600"} archived={g.status === "archived"} defaultCollapsed={g.status === "kit_only"} breakdown={breakdownPills}>
+          <CollapsiblePanel key={g.status} status={g.status} label={g.label} count={g.rows.length} gradient={HGRAD[g.status] || "from-gray-500 to-gray-600"} archived={g.status === "archived"} breakdown={breakdownPills} action={g.status === "kit_only" ? <PrescanIcon /> : g.status === "kit_ready" ? <ReadyScanIcon /> : undefined}>
             <table className="w-full table-fixed border-collapse text-[11px] sm:text-[13px]">
               {/* Identical column widths on EVERY panel (thead governs table-fixed) so
                   columns align top-down across panels. Company + Score hide on phones;
@@ -377,7 +393,9 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
                       {(() => {
                         const src = jobSource(r.url);
                         const uri = markUri(src, r.company);
-                        return (
+                        // Click the source mark -> open the posting (same as the ↗ arrow);
+                        // data-external so the row-click doesn't hijack it. (owner 2026-08-06)
+                        const mark = (
                           <span className="relative inline-block align-middle shrink-0" style={{ width: 20, height: 20 }}>
                             {uri
                               /* eslint-disable-next-line @next/next/no-img-element */
@@ -386,6 +404,9 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
                             {r.easy_apply ? <span className="absolute -bottom-1 -right-1 leading-none pointer-events-none font-bold text-blue-600 bg-white rounded px-0.5" style={{ fontSize: 7 }} title="Easy/Quick Apply">easy</span> : null}
                           </span>
                         );
+                        return r.url
+                          ? <a data-external href={r.url} target="_blank" rel="noopener noreferrer" title={`Open on ${src}`} className="inline-flex no-underline">{mark}</a>
+                          : mark;
                       })()}
                     </td>
                     <td className="pl-1 pr-1 py-2 truncate hidden sm:table-cell">
@@ -397,6 +418,8 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
                     </td>
                     <td className="px-2.5 py-2">
                       <div className="flex items-center gap-1.5 min-w-0">
+                        <ScanSpinner id={r.id} />
+                        {(() => { const a = altitude(r.company, r.title, !!nearHome(r.location)); const m = ALT_META[a]; return <span title={`${m.label} - ${m.hint}`} className={`shrink-0 w-1.5 h-1.5 rounded-full ${a === "reach" ? "bg-amber-400" : a === "near-home" ? "bg-emerald-500" : "bg-blue-500"}`} />; })()}
                         <span className="flex-1 min-w-0 truncate text-[#1f2328]">{r.title}</span>
                         {r.url ? <a data-external href={r.url} target="_blank" rel="noopener noreferrer" title="Open posting" className="shrink-0 no-underline align-middle font-bold" style={{ color: LINKC[g.status] || "#2563eb" }}>&#8599;</a> : null}
                       </div>
@@ -404,7 +427,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
                     <td className="px-1 py-2 text-center">{techCell(r)}</td>
                     <td className="px-1.5 py-2 text-left">
                       <span className="sm:hidden">{statusIcon(g.status, r)}</span>
-                      <span className="hidden sm:inline">{g.status === "archived" ? (r.status === "rejected" ? statusPill("rejected", "bg-gray-100 text-gray-500", agoLabel(r.rejected_at) || agoLabel(r.updated_at)) : r.status === "expired" ? statusPill("expired", "bg-amber-100 text-amber-700", agoLabel(r.updated_at)) : statusPill("disliked", "bg-rose-100 text-rose-600", agoLabel(r.updated_at))) : g.status === "kit_only" ? <span className="inline-block text-[9px] font-bold uppercase tracking-wide rounded px-1.5 py-0.5 bg-sky-50 text-sky-400 whitespace-nowrap">needs prescan</span> : g.status === "kit_ready" ? readyProgress(r) : pfBadge(r)}</span>
+                      <span className="hidden sm:inline">{g.status === "archived" ? (r.status === "rejected" ? statusPill("rejected", "bg-gray-100 text-gray-500", agoLabel(r.rejected_at) || agoLabel(r.updated_at)) : r.status === "expired" ? statusPill("expired", "bg-amber-100 text-amber-700", agoLabel(r.updated_at)) : r.status === "hold" ? statusPill("on hold", "bg-indigo-50 text-indigo-600", agoLabel(r.updated_at)) : statusPill("disliked", "bg-rose-100 text-rose-600", agoLabel(r.updated_at))) : g.status === "kit_only" ? (/wall|noform/.test(r.pf_status || "") ? <span title={r.pf_status === "wall" ? "Blocked (Cloudflare) - fill in your Chrome" : "This URL has no application form (redirects to a listing) - not auto-fillable"} className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wide rounded px-1.5 py-0.5 bg-rose-50 text-rose-500 whitespace-nowrap"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></svg>not fillable</span> : <span className="inline-block text-[9px] font-bold uppercase tracking-wide rounded px-1.5 py-0.5 bg-sky-50 text-sky-400 whitespace-nowrap">needs prescan</span>) : g.status === "kit_ready" ? readyProgress(r) : pfBadge(r)}</span>
                     </td>
                     <td className="pl-1 pr-3 py-2 text-right text-gray-400 hidden sm:table-cell">{r.score ?? "-"}</td>
                   </RowLink>

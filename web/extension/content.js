@@ -85,15 +85,37 @@
     return own;
   }
 
-  // Green 5px border on everything JobFill filled/selected, so the user can SEE
-  // at a glance what the plugin touched (owner request 2026-07-22).
+  // Resolve the box to highlight - STRICTLY a real form CONTROL, never a paragraph, label,
+  // or the big application container (that painted the whole form green with an ugly left
+  // bar). react-select renders the real input as a 2px sliver, so highlight its
+  // .select__control box; otherwise highlight the control element itself. (owner 2026-08-06)
+  function hlTarget(el) {
+    return el.closest("[class*='select__control']") || el;
+  }
+  // Inject the highlight animation once: a modern focus GLOW that pulses twice, then settles
+  // to a crisp 2px inset border + faint tint. Inset box-shadow paints all 4 sides and never
+  // clips. Only ever applied to form controls. (owner request 2026-08-06 - looks professional)
+  function ensureHlStyle() {
+    if (document.getElementById("__jobfill_hl")) return;
+    const s = document.createElement("style");
+    s.id = "__jobfill_hl";
+    s.textContent =
+      "@keyframes jfGlowOk{0%{box-shadow:inset 0 0 0 2px #16a34a,0 0 0 0 rgba(22,163,74,.55)}70%{box-shadow:inset 0 0 0 2px #16a34a,0 0 0 9px rgba(22,163,74,0)}100%{box-shadow:inset 0 0 0 2px #16a34a,0 0 0 0 rgba(22,163,74,0)}}" +
+      "@keyframes jfGlowNo{0%{box-shadow:inset 0 0 0 2px #dc2626,0 0 0 0 rgba(220,38,38,.55)}70%{box-shadow:inset 0 0 0 2px #dc2626,0 0 0 9px rgba(220,38,38,0)}100%{box-shadow:inset 0 0 0 2px #dc2626,0 0 0 0 rgba(220,38,38,0)}}" +
+      ".jf-ok{border-radius:7px!important;background-color:rgba(22,163,74,.05)!important;box-shadow:inset 0 0 0 2px #16a34a!important;animation:jfGlowOk 1s ease-out 2}" +
+      ".jf-no{border-radius:7px!important;background-color:rgba(220,38,38,.05)!important;box-shadow:inset 0 0 0 2px #dc2626!important;animation:jfGlowNo 1s ease-out 2}";
+    (document.head || document.documentElement).appendChild(s);
+  }
+  function paintFill(el, ok) {
+    ensureHlStyle();
+    const t = hlTarget(el);
+    t.classList.remove("jf-ok", "jf-no");
+    void t.offsetWidth; // restart the animation if the field is re-filled
+    t.classList.add(ok ? "jf-ok" : "jf-no");
+    return t;
+  }
   function markFilled(el) {
-    try {
-      const t = el.closest("[class*='select__control'], [class*='container']") || el;
-      t.style.setProperty("outline", "5px solid #16a34a", "important");
-      t.style.setProperty("outline-offset", "-1px", "important");
-      spotlight(t);
-    } catch (_) {}
+    try { spotlight(paintFill(el, true)); } catch (_) {}
   }
 
   function setNative(el, val) {
@@ -147,12 +169,11 @@
   }
 
   function flash(el, ok) {
-    // PERSISTENT 5px border: green = JobFill filled it, red = needs you.
-    // Stays until submit so the user can eyeball exactly what was touched.
+    // PERSISTENT full-box highlight: green = JobFill filled it, red = needs you. Inset
+    // box-shadow shows all 4 sides and never clips (unlike the old outline). Stays until
+    // submit so the user can eyeball exactly what was touched. (owner 2026-08-06)
     try {
-      const t = el.closest("div,fieldset,label") || el;
-      t.style.setProperty("outline", ok ? "5px solid #16a34a" : "5px solid #dc2626", "important");
-      t.style.setProperty("outline-offset", "-1px", "important");
+      const t = paintFill(el, ok);
       t.scrollIntoView({ block: "center", behavior: "smooth" });
       spotlight(t);
     } catch (e) {}
@@ -413,8 +434,12 @@
     seen = new WeakSet();
     banner("JobFill: filling this form...");
     const { profile, resumeB64, cover, kitId, overwrite = [] } = data;
+    // cover is now { file:{b64,name}, text } (older shape: a plain string). The PDF file
+    // goes to the upload slot; text is only for paste-into-textarea cover fields.
+    const coverText = cover && typeof cover === "object" ? (cover.text || "") : (cover || "");
+    const coverFile = cover && typeof cover === "object" ? cover.file : null;
     const wantsOverwrite = (label) => overwrite.some((o) => norm(label).includes(norm(o)));
-    const rules = [...compileServerRules(data.rules), ...buildRules(profile, cover)];
+    const rules = [...compileServerRules(data.rules), ...buildRules(profile, coverText)];
     const report = [];
     const debug = [];
 
@@ -454,8 +479,10 @@
           report.push(["cover letter", "MANUAL - WRONG FILE attached: " + chip.trim() + " (remove it, then Fill again)", "file"]);
         else if (chip)
           report.push(["cover letter", "already attached: " + chip.trim(), "file"]);
-        else if (cover)
-          attach(fi, new File([cover], pname + " - Cover Letter.txt", { type: "text/plain" }), "cover letter");
+        else if (coverFile && coverFile.b64)
+          attach(fi, b64ToFile(coverFile.b64, pname + " - Cover Letter.pdf"), "cover letter");
+        else if (coverText)
+          attach(fi, new File([coverText], pname + " - Cover Letter.txt", { type: "text/plain" }), "cover letter");
         else
           report.push(["cover letter", "MANUAL - attach a cover letter yourself (no cover doc in this kit)", "file"]);
         continue;

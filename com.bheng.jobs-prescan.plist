@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.bheng.jobs-prescan</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/bheng/Sites/jobs/run_prescan.sh</string>
+  </array>
+  <!-- PRE-SCAN (form fill): every 1h. The script self-skips when no fillable form is non-green,
+       so this only does real work when a form actually needs filling. (owner 2026-08-07) -->
+  <key>StartInterval</key><integer>3600</integer>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key><string>/Users/bheng/.nvm/versions/node/v22.23.1/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+  <key>WorkingDirectory</key><string>/Users/bheng/Sites/jobs</string>
+  <key>StandardOutPath</key><string>/tmp/jobs-prescan.log</string>
+  <key>StandardErrorPath</key><string>/tmp/jobs-prescan.log</string>
+</dict>
+</plist>

@@ -24,7 +24,7 @@ const jobs = ids.length
   ? ids.map((id) => db.prepare("SELECT id, url, company FROM applications WHERE id=?").get(id)).filter(Boolean)
   : db.prepare("SELECT id, url, company FROM applications WHERE status='kit_ready' ORDER BY score DESC").all();
 
-const profileDir = path.join(os.homedir(), ".cache/jobfill-prerun-profile");
+const profileDir = process.env.PRERUN_PROFILE || path.join(os.homedir(), ".cache/jobfill-prerun-profile");
 const ctx = await chromium.launchPersistentContext(profileDir, {
   channel: "chromium",
   headless: true,
@@ -44,11 +44,15 @@ for (const j of jobs) {
     const body = (await page.locator("body").innerText().catch(() => "")).slice(0, 300);
     if (/security verification|verify you are human|cloudflare/i.test(body)) {
       console.log(`WALL   ${j.company} - ${j.id} (Cloudflare - needs your real Chrome)`);
+      db.prepare("UPDATE applications SET pf_status='wall', pf_date=datetime('now') WHERE id=?").run(j.id);
       await page.close(); continue;
     }
     await sw.evaluate((kitId) => doFill(kitId), j.id);
     let ev = null;
     for (let i = 0; i < 12 && !ev; i++) { await sleep(4000); ev = db.prepare("SELECT id FROM events WHERE app_id=? AND outcome='filled' AND id>?").get(j.id, before); }
+    // No fill event = the URL had no application form (e.g. a listing/board page that never
+    // reaches a form). Mark it NOT FILLABLE so the board can flag it red. (owner 2026-08-06)
+    if (!ev) db.prepare("UPDATE applications SET pf_status='noform', pf_date=datetime('now') WHERE id=?").run(j.id);
     const pf = db.prepare("SELECT pf_status, pf_covered, pf_total FROM applications WHERE id=?").get(j.id);
     const red = (pf.pf_total ?? 0) - (pf.pf_covered ?? 0);
     console.log(`${!ev ? "NOEVENT" : pf.pf_status === "ready" ? "GREEN" : `RED x${red}`}  ${j.company} - ${j.id} (${pf.pf_covered ?? "?"}/${pf.pf_total ?? "?"})`);
