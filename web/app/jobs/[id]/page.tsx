@@ -135,6 +135,14 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
     const obf = t.match(/([\w.+-]+)\s*[[(]\s*at\s*[\])]\s*([\w-]+)\s*[[(]?\s*(?:dot|\.)\s*[\])]?\s*([a-z]{2,24})/i)
       || t.match(/([\w.+-]+)\s+at\s+([\w-]+)\s+dot\s+([a-z]{2,24})/i);
     if (obf) { const v = valid(`${obf[1]}@${obf[2]}.${obf[3]}`); if (v) return v; }
+    // "name at domain.tld" - spelled "at" with a REAL domain (literal dot), e.g. HN's
+    // "email ben at bucket.bot". Guarded against prose verbs and job-board domains so it
+    // doesn't grab "apply at workatastartup.com". (owner 2026-08-08)
+    const at2 = t.match(/\b([a-z][\w.+-]{1,30})\s+at\s+([a-z0-9-]+(?:\.[a-z0-9-]+)+)\b/i);
+    if (at2 && !/^(apply|send|us|me|you|contact|email|reach|write|join|work|now|here|role|jobs?|hiring|team)$/i.test(at2[1])
+      && !/ycombinator|workatastartup|linkedin|indeed|greenhouse|lever|ashby|workday|gmail|google/i.test(at2[2])) {
+      const v = valid(`${at2[1]}@${at2[2]}`); if (v) return v;
+    }
     return "";
   })();
   // Prefer the address in the post; else fall back to a Hunter-found contact cached on the row
@@ -142,6 +150,14 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
   const recruiterEmail = extractedEmail || (app.found_email || "");
   let foundMeta: { name?: string; position?: string; confidence?: number } = {};
   try { foundMeta = app.found_email && !extractedEmail ? JSON.parse(app.found_email_meta || "{}") : {}; } catch { /* ignore */ }
+  // A direct "apply here" link in the post (workatastartup / a careers page) - Step 1, done
+  // before the warm email. Skip the HN item itself and any asset URL. (owner 2026-08-08)
+  const applyLink = (() => {
+    const t = `${app.jd || ""} ${app.notes || ""}`;
+    const urls = t.match(/https?:\/\/[^\s)>\]]+/gi) || [];
+    const link = urls.find((u) => !/news\.ycombinator\.com/i.test(u) && !/\.(png|jpe?g|gif|svg|pdf|webp)$/i.test(u));
+    return link ? link.replace(/[.,);\]]+$/, "") : "";
+  })();
   // "Apply now" opens Gmail web compose (primary account) with to/subject/body pre-injected.
   const gmailComposeUrl = `https://mail.google.com/mail/u/0/?view=cm&fs=1&tf=1${recruiterEmail ? `&to=${encodeURIComponent(recruiterEmail)}` : ""}&su=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
 
@@ -292,13 +308,30 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
         {isEmailApply && kit.coverText ? (
           <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden mb-3.5">
             <div className="bg-gradient-to-r from-slate-600 to-slate-800 px-4 py-2.5 flex items-center justify-between gap-2">
-              <h2 className="text-sm text-white tracking-wide flex items-center gap-2"><HIcon d={HD.email} />Email to recruiter<span className="text-xs text-white/80 ml-2">Hacker News - ready to send</span></h2>
+              <h2 className="text-sm text-white tracking-wide flex items-center gap-2"><HIcon d={HD.email} />How to apply<span className="text-xs text-white/80 ml-2">Hacker News &middot; {applyLink ? "2 steps" : "1 step"}</span></h2>
               <span className="flex items-center gap-1.5 shrink-0">
                 <a href={gmailComposeUrl} target="_blank" rel="noopener noreferrer" className="text-[11px] font-bold text-white bg-green-600 hover:bg-green-700 rounded px-2.5 py-0.5 no-underline">Apply now (Gmail)</a>
                 <CopyButton text={emailBody} label="Copy" />
               </span>
             </div>
             <div className="px-6 py-5">
+              {/* Numbered so it is obvious what to do first: apply on their site (if the post
+                  gives a link), THEN send the warm email to stand out. Email-only posts show
+                  just one step. (owner request 2026-08-08) */}
+              {applyLink ? (
+                <div className="flex items-center gap-2.5 mb-4 pb-4 border-b border-gray-100">
+                  <span className="shrink-0 w-5 h-5 rounded-full bg-slate-700 text-white text-[11px] font-bold flex items-center justify-center">1</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[13px] font-bold text-[#1f2328]">Apply on their site first</div>
+                    <div className="text-[11px] text-gray-500 truncate">{applyLink.replace(/^https?:\/\/(www\.)?/, "")}</div>
+                  </div>
+                  <a href={applyLink} target="_blank" rel="noopener noreferrer" className="shrink-0 text-[11px] font-bold text-white bg-blue-600 hover:bg-blue-700 rounded px-2.5 py-1 no-underline inline-flex items-center gap-1">Open &#8599;</a>
+                </div>
+              ) : null}
+              <div className="flex items-center gap-2.5 mb-3">
+                <span className="shrink-0 w-5 h-5 rounded-full bg-slate-700 text-white text-[11px] font-bold flex items-center justify-center">{applyLink ? "2" : "1"}</span>
+                <div className="text-[13px] font-bold text-[#1f2328]">{applyLink ? "Then email" : "Email"} {foundMeta.name || (recruiterEmail ? "them" : "the team")} directly{applyLink ? " to stand out" : ""}</div>
+              </div>
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wide shrink-0 w-12">To</span>
                 {recruiterEmail
