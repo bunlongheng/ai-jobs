@@ -257,7 +257,10 @@
       sel(/gender identity|^gender$|what gender/, a.eeo?.gender ? [a.eeo.gender] : ["I don't wish to answer", "Decline to self-identify", "Prefer not to say"]),
       sel(/transgender/, ["No"]),
       sel(/sexual orientation/, a.eeo?.orientation ? [a.eeo.orientation, "I don't wish to answer"] : ["I don't wish to answer", "Decline to self-identify", "Prefer not to say"]),
-      sel(/disability/, ["I do not want to answer", "I don't want to answer", "I don't wish to answer", "I do not wish to answer", "Decline to self-identify"]),
+      // Answer disability with the standardized federal "No" (not a decline) - owner does not
+      // have a disability, so state it. Exact-match on the OFCCP wording wins; decline stays a
+      // fallback for forms that only offer decline. (owner request 2026-08-08)
+      sel(/disability/, ["No, I do not have a disability and have not had one in the past", "No, I do not have a disability, and have not had one in the past", "I do not want to answer", "I don't want to answer", "I don't wish to answer", "I do not wish to answer", "Decline to self-identify"]),
       sel(/veteran|military/, ["I am not a protected veteran", "No military service", "I decline to self-identify", "I do not want to answer"]),
       sel(/race|ethnicit/, a.eeo?.race ? [a.eeo.race, "I don't wish to answer", "I do not want to answer", "Decline to self-identify"] : ["I don't wish to answer", "I do not want to answer", "Decline to self-identify"]),
       sel(/agree|consent|acknowledge|privacy (policy|notice)|terms/, ["I agree", "I Agree", "Yes"]),
@@ -358,37 +361,46 @@
   // open -> read -> (type + POLL for async APIs) -> click match -> VERIFY
   // Returns {picked, options}: options = what the menu actually offered, so
   // failures report EVIDENCE (the real option texts) instead of a blind MANUAL.
-  async function fillCombobox(el, wants, { contains = false, seed = null, isAsync = false } = {}) {
-    await settleMenus();
-    const ctl = comboControl(el);
-    el.focus();
-    await openMenu(el, ctl);
-    let opt = findOption(wants, { contains }, ctl);
-    if (!opt) {
-      const typed = String(seed || wants[0]).slice(0, 40);
-      await typeInto(el, typed); // realistic per-char typing for picky filters
-      const rounds = isAsync ? 12 : 4;
-      for (let i = 0; i < rounds && !opt; i++) { await sleep(500); opt = findOption(wants, { contains }, ctl); }
+  // `repeat` > 1 re-picks the SAME option that many times. Greenhouse's country/dial-code
+  // react-select shows "+1" after one click but does NOT commit it (the field stays
+  // "Select a country" / "Phone is required") until it's picked again - owner had to select
+  // it 2-3 times by hand. Re-picking forces the commit. (owner 2026-08-08)
+  async function fillCombobox(el, wants, { contains = false, seed = null, isAsync = false, repeat = 1 } = {}) {
+    let success = null;
+    for (let pass = 0; pass < Math.max(1, repeat); pass++) {
+      await settleMenus();
+      const ctl = comboControl(el);
+      el.focus();
+      await openMenu(el, ctl);
+      let opt = findOption(wants, { contains }, ctl);
+      if (!opt) {
+        const typed = String(seed || wants[0]).slice(0, 40);
+        await typeInto(el, typed); // realistic per-char typing for picky filters
+        const rounds = isAsync ? 12 : 4;
+        for (let i = 0; i < rounds && !opt; i++) { await sleep(500); opt = findOption(wants, { contains }, ctl); }
+      }
+      const options = listOptions(ctl).map((o) => o.textContent.trim()).slice(0, 30);
+      if (opt) {
+        const picked = opt.textContent.trim();
+        mouse(opt);
+        await sleep(250);
+        if (displayedValue(el) || el.value) { success = { picked, options }; if (pass < repeat - 1) { await sleep(200); continue; } return success; }
+      }
+      // portal-rendered lists we cannot see: accept the top suggestion via keyboard,
+      // but ONLY keep it if the committed value verifiably matches a wanted token.
+      if (!opt) {
+        key(el, "ArrowDown"); await sleep(250); key(el, "Enter"); await sleep(400);
+        const got = displayedValue(el) || el.value || "";
+        const okTok = wants.some((w) => got.toLowerCase().includes(String(w).toLowerCase().split(",")[0]));
+        if (got && okTok) { success = { picked: got, options }; if (pass < repeat - 1) { await sleep(200); continue; } return success; }
+      }
+      if (success) return success; // committed on an earlier pass
+      setNative(el, "");
+      el.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+      el.blur();
+      return { picked: null, options };
     }
-    const options = listOptions(ctl).map((o) => o.textContent.trim()).slice(0, 30);
-    if (opt) {
-      const picked = opt.textContent.trim();
-      mouse(opt);
-      await sleep(250);
-      if (displayedValue(el) || el.value) return { picked, options }; // verified
-    }
-    // portal-rendered lists we cannot see: accept the top suggestion via keyboard,
-    // but ONLY keep it if the committed value verifiably matches a wanted token.
-    if (!opt) {
-      key(el, "ArrowDown"); await sleep(250); key(el, "Enter"); await sleep(400);
-      const got = displayedValue(el) || el.value || "";
-      const okTok = wants.some((w) => got.toLowerCase().includes(String(w).toLowerCase().split(",")[0]));
-      if (got && okTok) return { picked: got, options };
-    }
-    setNative(el, "");
-    el.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
-    el.blur();
-    return { picked: null, options };
+    return success || { picked: null, options: [] };
   }
 
   function b64ToFile(b64, name) {
@@ -525,7 +537,8 @@
             closeAllMenus();
             const inferred = inferByOptions(opts);
             if (inferred) {
-              const res = await fillCombobox(el, [inferred], { contains: false });
+              const isCountry = /\+\d|united states|country|dial/i.test(String(inferred));
+              const res = await fillCombobox(el, [inferred], { contains: false, repeat: isCountry ? 3 : 1 });
               flash(el, !!res.picked);
               if (res.picked) { report.push([short, res.picked, "dropdown", opts]); continue; }
             }
@@ -537,7 +550,8 @@
         const wants = r.kind === "choice" ? r.opts : [r.v];
         const contains = r.contains || r.kind === "location";
         if (!wants[0]) { report.push([short, "MANUAL", "dropdown"]); continue; }
-        const res = await fillCombobox(el, wants, { contains, seed: r.seed, isAsync: r.async });
+        const isCountry = /country|dial/i.test(short) || /\+1|united states/i.test(wants.join(" "));
+        const res = await fillCombobox(el, wants, { contains, seed: r.seed, isAsync: r.async, repeat: isCountry ? 3 : 1 });
         flash(el, !!res.picked);
         if (res.picked) report.push([short, res.picked, "dropdown", res.options]);
         else {
