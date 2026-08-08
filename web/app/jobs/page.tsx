@@ -135,6 +135,24 @@ function statusPill(label: string, cls: string, ago?: string | null) {
   );
 }
 
+// "Not ready" pile badge - tells the TRUTH about how each job is applied to, instead of a
+// blanket "needs prescan". Pre-scan (headless form fill) only works on a real ATS form, so a
+// HN comment (apply by email) or a LinkedIn/Indeed listing (apply on their site) can never be
+// pre-scanned - labelling them "needs prescan" is a lie. Only a direct, not-yet-scanned ATS
+// URL genuinely needs a pre-scan. (owner question 2026-08-07)
+function notReadyBadge(r: AppRow) {
+  const chip = (label: string, cls: string, title: string, icon: React.ReactNode) => (
+    <span title={title} className={`inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wide rounded px-1.5 py-0.5 whitespace-nowrap ${cls}`}>{icon}{label}</span>
+  );
+  const u = r.url || "";
+  if (r.pf_status === "wall") return chip("not fillable", "bg-rose-50 text-rose-500", "Blocked (Cloudflare) - fill in your Chrome", <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></svg>);
+  if (r.pf_status === "noform") return chip("not fillable", "bg-rose-50 text-rose-500", "This URL has no application form (redirects to a listing) - not auto-fillable", <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></svg>);
+  if (u.includes("news.ycombinator.com")) return chip("email apply", "bg-violet-50 text-violet-600", "HN 'who is hiring' post - you apply by EMAIL, there is no web form to pre-scan", <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>);
+  if (u.includes("linkedin.com")) return chip("on linkedin", "bg-blue-50 text-blue-500", "LinkedIn listing - apply on LinkedIn; there is no external form to pre-scan", <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>);
+  if (u.includes("indeed.com")) return chip("on indeed", "bg-indigo-50 text-indigo-500", "Indeed listing - apply on Indeed; there is no external form to pre-scan", <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>);
+  return chip("needs prescan", "bg-sky-50 text-sky-400", "Direct ATS form not yet pre-scanned - the pre-scan will fill it and check readiness", null);
+}
+
 function pfBadge(r: AppRow) {
   if (r.status !== "kit_ready" && r.status !== "manual_only") {
     // Applied: green pill + how long ago (consistent with the rejected pill). (2026-08-05)
@@ -177,7 +195,9 @@ function readyProgress(r: AppRow) {
       <span className="relative inline-block h-1.5 w-14 rounded-full bg-gray-200 overflow-hidden shrink-0">
         <span className="absolute inset-y-0 left-0 rounded-full bg-blue-600" style={{ width: `${pct}%` }} />
       </span>
-      <span className={`text-[10px] tabular-nums ${done ? "text-blue-700 font-bold" : "text-gray-500"}`}>{covered}/{total}</span>
+      {/* Ready jobs are full by definition, so covered==total - show ONE number, not "23/23".
+          Only a rare not-yet-full row keeps the covered/total split. (owner request 2026-08-07) */}
+      <span className={`text-[10px] tabular-nums ${done ? "text-blue-700 font-bold" : "text-gray-500"}`}>{done ? total : `${covered}/${total}`}</span>
     </span>
   );
 }
@@ -264,7 +284,13 @@ function statusIcon(gstatus: string, r: AppRow) {
     else if (r.status === "expired") { color = "#d97706"; glyph = "clock"; title = "Expired"; }
     else if (r.status === "hold") { color = "#6366f1"; glyph = "clock"; title = "On hold"; }
     else { color = "#f43f5e"; glyph = "down"; title = "Not interested"; }
-  } else if (gstatus === "kit_only") { color = "#38bdf8"; glyph = "clock"; title = "Needs pre-scan"; }
+  } else if (gstatus === "kit_only") {
+    const u = r.url || "";
+    if (r.pf_status === "wall" || r.pf_status === "noform") { color = "#f43f5e"; glyph = "x"; title = "Not fillable"; }
+    else if (u.includes("news.ycombinator.com")) { color = "#7c3aed"; glyph = "clock"; title = "Apply by email"; }
+    else if (u.includes("linkedin.com") || u.includes("indeed.com")) { color = "#3b82f6"; glyph = "clock"; title = "Apply on site"; }
+    else { color = "#38bdf8"; glyph = "clock"; title = "Needs pre-scan"; }
+  }
   else if (gstatus === "kit_ready") {
     const done = (r.pf_total ?? 0) > 0 && (r.pf_covered ?? 0) >= (r.pf_total ?? 0);
     color = "#2563eb"; glyph = done ? "check" : "half"; title = done ? "Ready - all fields covered" : `Ready - ${r.pf_covered ?? 0}/${r.pf_total ?? 0} fields`;
@@ -309,15 +335,15 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
 
   return (
     <main className="min-h-screen bg-[#f6f8fa] text-[#1f2328]" style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" }}>
-      <div className="max-w-[900px] mx-auto px-5 py-7 pb-16">
+      <div className="max-w-[900px] mx-auto px-4 sm:px-5 py-4 sm:py-7 pb-16">
         <AutoRefresh />
-        <div className="mb-4 flex items-start justify-between gap-4">
+        <div className="mb-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
           <div className="flex items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/icon.png" alt="AI-Jobs" width={52} height={52} className="hidden sm:block rounded-[12px] shadow-sm shrink-0" />
-            <div>
-              <h1 className="text-3xl font-bold text-[#1f2328] mb-1">AI-Jobs</h1>
-              <div className="text-[13px] text-gray-500">{total} tracked &middot; live from SQLite &middot; zero-token</div>
+            <img src="/icon.png" alt="AI-Jobs" width={52} height={52} className="block w-11 h-11 sm:w-[52px] sm:h-[52px] rounded-[12px] shadow-sm shrink-0" />
+            <div className="min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#1f2328] mb-0.5 whitespace-nowrap">AI-Jobs</h1>
+              <div className="text-[12px] sm:text-[13px] text-gray-500">{total} tracked &middot; live &middot; zero-token</div>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
@@ -327,11 +353,13 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2 mb-2">
-          <div className="flex-1 min-w-[88px] rounded-[10px] px-2.5 py-2.5 sm:px-4 sm:py-3 text-white shadow-sm bg-gradient-to-r from-gray-700 to-gray-900 flex items-center justify-between gap-2">
+        {/* All hero tiles stay on ONE row on a phone (flex-nowrap + shrinkable) so they never
+            wrap and shove the job list down. Compact font/padding on mobile. (owner 2026-08-08) */}
+        <div className="flex flex-nowrap sm:flex-wrap gap-1.5 sm:gap-2 mb-2">
+          <div className="flex-1 min-w-0 sm:min-w-[88px] rounded-[10px] px-2 py-1.5 sm:px-4 sm:py-3 text-white shadow-sm bg-gradient-to-r from-gray-700 to-gray-900 flex items-center justify-between gap-2">
             <div className="min-w-0">
-              <div className="text-[20px] sm:text-[26px] font-bold leading-none">{total}</div>
-              <div className="text-[10px] sm:text-xs text-white/85 mt-0.5 truncate">Total</div>
+              <div className="text-[17px] sm:text-[26px] font-bold leading-none">{total}</div>
+              <div className="text-[9px] sm:text-xs text-white/85 mt-0.5 truncate">Total</div>
             </div>
             <div className="hidden sm:flex flex-col items-end shrink-0">
               <Sparkline data={TREND.total} />
@@ -339,10 +367,10 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
             </div>
           </div>
           {tiles.map((s) => (
-            <div key={s} className={`flex-1 min-w-[88px] rounded-[10px] px-2.5 py-2.5 sm:px-4 sm:py-3 text-white shadow-sm bg-gradient-to-r ${HGRAD[s]} flex items-center justify-between gap-2`}>
+            <div key={s} className={`flex-1 min-w-0 sm:min-w-[88px] rounded-[10px] px-2 py-1.5 sm:px-4 sm:py-3 text-white shadow-sm bg-gradient-to-r ${HGRAD[s]} flex items-center justify-between gap-2`}>
               <div className="min-w-0">
-                <div className="text-[20px] sm:text-[26px] font-bold leading-none">{s === "applied" ? (counts.applied || 0) + (counts.rejected || 0) : counts[s]}</div>
-                <div className="text-[10px] sm:text-xs text-white/85 mt-0.5 truncate">{s === "planned" ? "New" : s === "kit_ready" ? "Ready" : s === "kit_only" ? "Not ready" : s === "manual_only" ? "Manual" : s[0].toUpperCase() + s.slice(1)}</div>
+                <div className="text-[17px] sm:text-[26px] font-bold leading-none">{s === "applied" ? (counts.applied || 0) + (counts.rejected || 0) : counts[s]}</div>
+                <div className="text-[9px] sm:text-xs text-white/85 mt-0.5 truncate">{s === "planned" ? "New" : s === "kit_ready" ? "Ready" : s === "kit_only" ? "Not ready" : s === "manual_only" ? "Manual" : s[0].toUpperCase() + s.slice(1)}</div>
               </div>
               <div className="hidden sm:flex flex-col items-end shrink-0">
                 <Sparkline data={TREND[s] || trends.detected} />
@@ -379,11 +407,11 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
                   columns align top-down across panels. Company + Score hide on phones;
                   Role widens and Status collapses to one icon there. (owner request 2026-08-05) */}
               <thead><tr className="bg-[#f6f8fa] text-gray-400 text-[11px] text-left">
-                <th className="pl-3 pr-1 py-2 font-medium w-[30px]">Src</th>
-                <th className="pl-1 pr-1 py-2 font-medium hidden sm:table-cell sm:w-[16%]">Company</th>
-                <th className="px-2.5 py-2 font-medium w-[56%] sm:w-[50%]">Role</th>
-                <th className="px-1 py-2 font-medium text-center w-[13%] sm:w-[8%]">Tech</th>
-                <th className="px-1.5 py-2 font-medium text-left w-[22%] sm:w-[14%]">Status</th>
+                <th className="pl-3 pr-1 py-2 font-medium w-[24px]">Src</th>
+                <th className="pl-1 pr-1 py-2 font-medium w-[36px] sm:w-[16%]"><span className="hidden sm:inline">Company</span></th>
+                <th className="px-2 sm:px-2.5 py-2 font-medium w-[52%] sm:w-[50%]">Role</th>
+                <th className="px-1 py-2 font-medium text-center w-[14%] sm:w-[8%]">Tech</th>
+                <th className="px-1.5 py-2 font-medium text-right sm:text-left w-[24%] sm:w-[14%]">Status</th>
                 <th className="pl-1 pr-3 py-2 font-medium text-right hidden sm:table-cell sm:w-[8%]">Score</th>
               </tr></thead>
               <tbody>
@@ -409,11 +437,11 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
                           : mark;
                       })()}
                     </td>
-                    <td className="pl-1 pr-1 py-2 truncate hidden sm:table-cell">
+                    <td className="pl-2 pr-1 py-2.5 sm:pl-1 truncate">
                       <span className="flex items-center gap-2 text-[#1f2328]">
-                        <span className="text-gray-300 font-normal select-none leading-none">|</span>
+                        <span className="hidden sm:inline text-gray-300 font-normal select-none leading-none">|</span>
                         <Logo company={r.company} />
-                        <span className="truncate">{r.company || "?"}</span>
+                        <span className="hidden sm:inline truncate">{r.company || "?"}</span>
                       </span>
                     </td>
                     <td className="px-2.5 py-2">
@@ -425,9 +453,9 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
                       </div>
                     </td>
                     <td className="px-1 py-2 text-center">{techCell(r)}</td>
-                    <td className="px-1.5 py-2 text-left">
+                    <td className="px-1.5 py-2.5 text-right sm:text-left pr-3 sm:pr-1.5">
                       <span className="sm:hidden">{statusIcon(g.status, r)}</span>
-                      <span className="hidden sm:inline">{g.status === "archived" ? (r.status === "rejected" ? statusPill("rejected", "bg-gray-100 text-gray-500", agoLabel(r.rejected_at) || agoLabel(r.updated_at)) : r.status === "expired" ? statusPill("expired", "bg-amber-100 text-amber-700", agoLabel(r.updated_at)) : r.status === "hold" ? statusPill("on hold", "bg-indigo-50 text-indigo-600", agoLabel(r.updated_at)) : statusPill("disliked", "bg-rose-100 text-rose-600", agoLabel(r.updated_at))) : g.status === "kit_only" ? (/wall|noform/.test(r.pf_status || "") ? <span title={r.pf_status === "wall" ? "Blocked (Cloudflare) - fill in your Chrome" : "This URL has no application form (redirects to a listing) - not auto-fillable"} className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wide rounded px-1.5 py-0.5 bg-rose-50 text-rose-500 whitespace-nowrap"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></svg>not fillable</span> : <span className="inline-block text-[9px] font-bold uppercase tracking-wide rounded px-1.5 py-0.5 bg-sky-50 text-sky-400 whitespace-nowrap">needs prescan</span>) : g.status === "kit_ready" ? readyProgress(r) : pfBadge(r)}</span>
+                      <span className="hidden sm:inline">{g.status === "archived" ? (r.status === "rejected" ? statusPill("rejected", "bg-gray-100 text-gray-500", agoLabel(r.rejected_at) || agoLabel(r.updated_at)) : r.status === "expired" ? statusPill("expired", "bg-amber-100 text-amber-700", agoLabel(r.updated_at)) : r.status === "hold" ? statusPill("on hold", "bg-indigo-50 text-indigo-600", agoLabel(r.updated_at)) : statusPill("disliked", "bg-rose-100 text-rose-600", agoLabel(r.updated_at))) : g.status === "kit_only" ? notReadyBadge(r) : g.status === "kit_ready" ? readyProgress(r) : pfBadge(r)}</span>
                     </td>
                     <td className="pl-1 pr-3 py-2 text-right text-gray-400 hidden sm:table-cell">{r.score ?? "-"}</td>
                   </RowLink>

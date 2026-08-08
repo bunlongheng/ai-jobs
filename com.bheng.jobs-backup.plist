@@ -1,14 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0"><dict>
+<plist version="1.0">
+<dict>
   <key>Label</key><string>com.bheng.jobs-backup</string>
-  <key>ProgramArguments</key><array><string>/bin/zsh</string><string>/Users/bheng/Sites/jobs/backup_db.sh</string></array>
-  <key>WorkingDirectory</key><string>/Users/bheng/Sites/jobs</string>
-  <key>EnvironmentVariables</key><dict><key>PATH</key><string>/Users/bheng/.nvm/versions/node/v22.23.1/bin:/usr/bin:/bin</string></dict>
-  <key>StartCalendarInterval</key><array>
-    <dict><key>Hour</key><integer>3</integer><key>Minute</key><integer>0</integer></dict>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>/Users/bheng/Sites/jobs/backup_db.sh</string>
   </array>
-  <key>RunAtLoad</key><false/>
+  <!-- WAL-safe online snapshot of jobs.db (the single source of truth) to iCloud/JobsBackups,
+       keeping the last 14. Runs at load and every 6h so a crash never loses more than a few
+       hours - ~3.5 days of rolling off-machine history at 14 snapshots. (owner request 2026-08-07) -->
+  <key>RunAtLoad</key><true/>
+  <key>StartInterval</key><integer>21600</integer>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key><string>/Users/bheng/.nvm/versions/node/v22.23.1/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+  <key>WorkingDirectory</key><string>/Users/bheng/Sites/jobs/web</string>
   <key>StandardOutPath</key><string>/tmp/jobs-backup.log</string>
   <key>StandardErrorPath</key><string>/tmp/jobs-backup.log</string>
-</dict></plist>
+</dict>
+</plist>

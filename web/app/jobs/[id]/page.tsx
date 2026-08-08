@@ -4,6 +4,7 @@ import { getLogo } from "@/lib/logos";
 import { nearHome } from "@/lib/near-home";
 import { altitude, ALT_META } from "@/lib/altitude";
 import ReachOut from "../ReachOut";
+import FindEmailButton from "../FindEmailButton";
 import Reactions from "../Reactions";
 import CopyButton from "../CopyButton";
 import Link from "next/link";
@@ -109,15 +110,38 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
     "bheng.code@gmail.com",
     "978-677-0861",
   ].join("\n");
-  // Find the apply-to email in the posting. Handles plain addresses AND the HN-style
-  // obfuscation "name [at] company [dot] com" / "name (at) company dot com". (owner 2026-08-05)
-  const recruiterEmail = (() => {
+  // Find the apply-to email in the posting. Handles plain addresses AND the HN-style obfuscation
+  // "name [at] company [dot] com". VALIDATES the result so we never inject garbage into the To:
+  // field - the old naive version matched prose like "data at scale. This" -> "data@scale.This"
+  // and placeholders like "first.last@". A wrong recipient is worse than none. (owner 2026-08-07)
+  const extractedEmail = (() => {
     const t = `${app.jd || ""} ${app.notes || ""}`;
+    const PLACE_LOCAL = /^(first\.?last|firstname\.?lastname|f\.?last|your\.?name|yourname|your\.?email|name|firstname|lastname|first|last|someone|somebody|user|username|email|e-?mail|me|you|hello|hi|test|example|foo|bar)$/i;
+    const PLACE_DOM = /^(example|domain|company|yourcompany|mycompany|email|test|sample|acme|foo|bar|placeholder)\.(com|org|io|net|co|dev)$/i;
+    const valid = (e: string) => {
+      const clean = e.trim().toLowerCase().replace(/[.,;:>)\]]+$/, "");
+      const [local, domain] = clean.split("@");
+      if (!local || !domain) return "";
+      if (PLACE_LOCAL.test(local) || PLACE_DOM.test(domain)) return "";
+      const tld = domain.split(".").pop() || "";
+      if (!/^[a-z]{2,24}$/.test(tld)) return ""; // kills prose TLDs like "This"/"We"/"Compensation"
+      if (!/^[a-z0-9][a-z0-9.-]*\.[a-z]{2,24}$/.test(domain)) return "";
+      return clean;
+    };
     const plain = t.match(/[\w.+-]+@[\w-]+\.[\w.-]{2,}/);
-    if (plain) return plain[0];
-    const obf = t.match(/([\w.+-]+)\s*[[(]?\s*at\s*[\])]?\s*([\w-]+)\s*[[(]?\s*(?:dot|\.)\s*[\])]?\s*([\w.]{2,})/i);
-    return obf ? `${obf[1]}@${obf[2]}.${obf[3]}` : "";
+    if (plain) { const v = valid(plain[0]); if (v) return v; }
+    // Obfuscation must use EXPLICIT markers (brackets, or the word "dot") - never a literal ".",
+    // which is what made prose match. Bracketed [at]..[dot] first, else spelled " at .. dot ".
+    const obf = t.match(/([\w.+-]+)\s*[[(]\s*at\s*[\])]\s*([\w-]+)\s*[[(]?\s*(?:dot|\.)\s*[\])]?\s*([a-z]{2,24})/i)
+      || t.match(/([\w.+-]+)\s+at\s+([\w-]+)\s+dot\s+([a-z]{2,24})/i);
+    if (obf) { const v = valid(`${obf[1]}@${obf[2]}.${obf[3]}`); if (v) return v; }
+    return "";
   })();
+  // Prefer the address in the post; else fall back to a Hunter-found contact cached on the row
+  // (the "Find email" button below writes app.found_email). (owner request 2026-08-08)
+  const recruiterEmail = extractedEmail || (app.found_email || "");
+  let foundMeta: { name?: string; position?: string; confidence?: number } = {};
+  try { foundMeta = app.found_email && !extractedEmail ? JSON.parse(app.found_email_meta || "{}") : {}; } catch { /* ignore */ }
   // "Apply now" opens Gmail web compose (primary account) with to/subject/body pre-injected.
   const gmailComposeUrl = `https://mail.google.com/mail/u/0/?view=cm&fs=1&tf=1${recruiterEmail ? `&to=${encodeURIComponent(recruiterEmail)}` : ""}&su=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
 
@@ -278,8 +302,19 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wide shrink-0 w-12">To</span>
                 {recruiterEmail
-                  ? <><span className="flex-1 min-w-0 text-[14px] text-[#1f2328] truncate">{recruiterEmail}</span><CopyButton text={recruiterEmail} tone="onLight" /></>
-                  : <span className="flex-1 min-w-0 text-[13px] text-amber-600">No apply-email in the post - add it in Gmail (the posting uses a link or hid the address)</span>}
+                  ? <>
+                      <span className="flex-1 min-w-0 text-[14px] text-[#1f2328] truncate">{recruiterEmail}</span>
+                      {(foundMeta.name || foundMeta.position) ? <span className="shrink-0 text-[11px] text-indigo-500 truncate max-w-[46%]" title={`Found via Hunter${foundMeta.confidence ? ` - ${foundMeta.confidence}% match` : ""}`}>via Hunter{foundMeta.name ? `: ${foundMeta.name}` : ""}{foundMeta.position ? ` (${foundMeta.position})` : ""}</span> : null}
+                      <CopyButton text={recruiterEmail} tone="onLight" />
+                    </>
+                  : <>
+                      <span className="flex-1 min-w-0 text-[13px] text-amber-600">No email in the post - try LinkedIn first (free), Hunter only if needed</span>
+                      <a href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(`${app.company || ""} recruiter`)}`} target="_blank" rel="noopener noreferrer" className="shrink-0 text-[11px] font-bold text-white bg-[#0a66c2] hover:bg-[#004182] rounded px-2.5 py-1 no-underline inline-flex items-center gap-1" title="Find the recruiter / poster on LinkedIn - costs nothing">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M4.98 3.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.78 2.65 4.78 6.1V21H20v-5.5c0-1.3-.02-3-1.83-3-1.83 0-2.11 1.43-2.11 2.9V21H12z"/></svg>
+                        LinkedIn
+                      </a>
+                      <FindEmailButton id={app.id} />
+                    </>}
               </div>
               <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-100">
                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wide shrink-0 w-12">Subject</span>
@@ -307,6 +342,20 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
           const answered = manualNonFile.map((f) => ({ q: String(f[0] ?? ""), a: resolveAnswer(String(f[0] ?? "")) })).filter((x) => x.a);
           const reds = manualNonFile.filter((f) => !resolveAnswer(String(f[0] ?? "")));
           const files = fields.filter((f) => isRed(f) && isFile(f));
+          // Turn each raw file field into a plain-English row. The scanner shows a bare "attach"
+          // when a form's file input has no readable label (common on Greenhouse/Ashby) - say so
+          // instead of a cryptic "attach", and tell the truth about whether it auto-attaches or
+          // needs a hand. (owner question 2026-08-07)
+          const fileMeta = (f: Field): { label: string; note: string; auto: boolean } => {
+            const l = String(f[0] ?? "").toLowerCase();
+            const unlabeled = /unlabeled upload/i.test(String(f[1] ?? ""));
+            if (/resume|\bcv\b|curriculum/.test(l)) return { label: "Resume / CV", note: "attaches automatically", auto: true };
+            if (/cover letter/.test(l)) return { label: "Cover letter", note: "attaches automatically", auto: true };
+            if (/portfolio/.test(l)) return { label: "Portfolio", note: "optional - your site link", auto: false };
+            if (unlabeled || l === "attach") return { label: "Unlabeled upload box", note: "the form's file button has no label - drag a file by hand only if it asks", auto: false };
+            if (/upload/.test(l)) return { label: "Extra upload", note: "optional - nothing required", auto: false };
+            return { label: String(f[0] ?? "file"), note: "optional extra upload", auto: false };
+          };
           const greens = fields.filter((f) => !isRed(f));
           return (
             <>
@@ -344,15 +393,18 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
               {files.length ? (
                 <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden mb-3.5">
                   <h2 className="bg-gradient-to-r from-slate-500 to-slate-600 text-white text-sm tracking-wide px-4 py-2.5 flex items-center gap-2"><HIcon d={HD.files} />Files - handled when you apply <span className="text-xs font-bold text-white bg-slate-700 rounded-full px-2 py-0.5 ml-1">{files.length}</span></h2>
-                  <div className="px-4 py-2.5 text-[12px] text-gray-500 border-b border-gray-100">Your resume and cover letter attach automatically when the extension fills the form. The rest are optional extra uploads - nothing to fix here.</div>
+                  <div className="px-4 py-2.5 text-[12px] text-gray-500 border-b border-gray-100">Your resume and cover letter attach automatically when the extension fills the form. Anything marked <span className="text-amber-600 font-semibold">by hand</span> is just an unlabeled or optional upload box - only touch it if the form actually asks.</div>
                   <table className="w-full border-collapse">
                     <tbody>
-                      {files.map((f: Field, i: number) => (
-                        <tr key={i}>
-                          <td className="px-2.5 py-1.5 border-b border-gray-100 text-gray-700 text-[13px] font-semibold w-[42%]">{f[0]}</td>
-                          <td className="px-2.5 py-1.5 border-b border-gray-100 text-xs text-gray-400">attaches at apply time</td>
-                        </tr>
-                      ))}
+                      {files.map((f: Field, i: number) => {
+                        const m = fileMeta(f);
+                        return (
+                          <tr key={i}>
+                            <td className="px-2.5 py-1.5 border-b border-gray-100 text-gray-700 text-[13px] font-semibold w-[42%]">{m.label}</td>
+                            <td className={`px-2.5 py-1.5 border-b border-gray-100 text-xs ${m.auto ? "text-green-600" : "text-gray-400"}`}>{m.auto ? "attaches automatically" : m.note}</td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>

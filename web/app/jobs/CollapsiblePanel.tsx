@@ -50,23 +50,28 @@ export default function CollapsiblePanel({
   }
 
   return (
-    <div id={`panel-${status}`} className={`mt-6 scroll-mt-4 rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden ${archived ? "opacity-75 [&_img]:grayscale" : ""}`}>
+    <div id={`panel-${status}`} className={`mt-3.5 sm:mt-6 scroll-mt-4 rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden ${archived ? "opacity-75 [&_img]:grayscale" : ""}`}>
       <button
         onClick={toggle}
         aria-expanded={open}
         title={open ? "Click to collapse" : "Click to expand"}
         className={`w-full bg-gradient-to-r ${gradient} px-4 py-2.5 flex items-center justify-between gap-2 text-left`}
       >
-        <div className="flex items-center gap-2 shrink-0">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-200 text-white/90" style={{ transform: open ? "rotate(90deg)" : "none" }}>
+        <div className="flex items-center gap-2 min-w-0">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 transition-transform duration-200 text-white/90" style={{ transform: open ? "rotate(90deg)" : "none" }}>
             <polyline points="9 18 15 12 9 6" />
           </svg>
           <PanelIcon status={status} />
-          <h3 className="text-sm font-bold tracking-wide text-white">{label}</h3>
-          <span className="text-xs font-bold rounded-full px-2.5 py-0.5 bg-white/30 text-white">{count}</span>
+          <h3 className="text-sm font-bold tracking-wide text-white truncate">{label}</h3>
+          <span className="text-xs font-bold rounded-full px-2.5 py-0.5 bg-white/30 text-white shrink-0">{count}</span>
+        </div>
+        {/* Source-count pills (desktop only - they wrap into a mess on a phone) plus the scan /
+            security action, floated to the far right so the header line reads consistently
+            whether or not the pills are shown. (owner 2026-08-08) */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          <div className="hidden sm:flex items-center gap-1.5 flex-wrap justify-end">{breakdown}</div>
           {action}
         </div>
-        <div className="flex items-center gap-1.5 flex-wrap justify-end">{breakdown}</div>
       </button>
       {open ? children : null}
     </div>

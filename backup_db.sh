@@ -1,26 +1,22 @@
 #!/bin/zsh
-# Nightly consistent snapshot of jobs.db (the single source of truth).
-# Uses better-sqlite3's online .backup() so it is safe to run while the app
-# is writing (WAL mode) - the snapshot is transactionally consistent.
-# Keeps the last 14 snapshots, off-machine via iCloud/Dropbox when available.
+# Consistent snapshot of jobs.db (the single source of truth), safe to run while the app writes
+# (better-sqlite3 online .backup() over WAL = transactionally consistent).
+#
+# Two destinations, because macOS TCC blocks a launchd-spawned process from ENUMERATING the
+# iCloud folder (~/Library/Mobile Documents), even though writing a known path there works:
+#   1. LOCAL  ~/.jobs-db-backups  - launchd has full access, so this set is reliably PRUNED to 14.
+#      Covers the common losses: corruption, a bad migration, an accidental delete.
+#   2. iCLOUD JobsBackups         - best-effort OFF-machine copy so a dead Mac never loses the DB.
+#      Writes work under launchd; pruning does not, so it is left unpruned (tiny files, secondary).
 set -e
 
 WEB="/Users/bheng/Sites/jobs/web"
 SRC="$WEB/jobs.db"
 
-# Pick an off-machine destination when one exists, else fall back to $HOME.
-if [ -d "$HOME/Library/Mobile Documents/com~apple~CloudDocs" ]; then
-  BASE="$HOME/Library/Mobile Documents/com~apple~CloudDocs"
-elif [ -d "$HOME/Dropbox" ]; then
-  BASE="$HOME/Dropbox"
-else
-  BASE="$HOME"
-fi
-DEST_DIR="$BASE/JobsBackups"
-mkdir -p "$DEST_DIR"
-
+LOCAL_DIR="$HOME/.jobs-db-backups"
+mkdir -p "$LOCAL_DIR"
 STAMP=$(date +%Y%m%d-%H%M%S)
-DEST="$DEST_DIR/jobs-$STAMP.db"
+DEST="$LOCAL_DIR/jobs-$STAMP.db"
 
 cd "$WEB"
 node -e '
@@ -32,6 +28,20 @@ db.backup(dest)
   .catch((e) => { console.error(e); process.exit(1); });
 ' "$SRC" "$DEST"
 
-# Retention: keep the 14 most recent snapshots.
-ls -1t "$DEST_DIR"/jobs-*.db 2>/dev/null | tail -n +15 | xargs -r rm -f
-echo "retained: $(ls -1 "$DEST_DIR"/jobs-*.db 2>/dev/null | wc -l | tr -d ' ') snapshots in $DEST_DIR"
+# Retention on the LOCAL set (launchd can enumerate this dir). Timestamped names sort
+# chronologically, so sort -r | tail -n +15 = everything past the newest 14.
+find "$LOCAL_DIR" -name 'jobs-*.db' -type f | sort -r | tail -n +15 | tr '\n' '\0' | xargs -0 -r rm -f
+echo "retained: $(find "$LOCAL_DIR" -name 'jobs-*.db' -type f | wc -l | tr -d ' ') local snapshots in $LOCAL_DIR"
+
+# Best-effort off-machine copy to iCloud (survives a dead Mac). Writing a known path works under
+# launchd; never fail the backup if iCloud is unavailable, and do NOT try to prune it there.
+ICLOUD_BASE="$HOME/Library/Mobile Documents/com~apple~CloudDocs"
+if [ -d "$ICLOUD_BASE" ]; then
+  ICLOUD_DIR="$ICLOUD_BASE/JobsBackups"
+  mkdir -p "$ICLOUD_DIR" 2>/dev/null || true
+  if cp "$DEST" "$ICLOUD_DIR/jobs-$STAMP.db" 2>/dev/null; then
+    echo "off-machine copy -> iCloud/JobsBackups"
+  else
+    echo "iCloud copy skipped (grant Full Disk Access to launchd for off-machine backups)"
+  fi
+fi

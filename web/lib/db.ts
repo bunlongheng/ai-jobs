@@ -98,6 +98,7 @@ export type AppRow = {
   easy_apply: number | null; easy_apply_checked: number | null;
   jd: string | null;
   tech: string | null;
+  found_email: string | null; found_email_meta: string | null;
   source_run: string | null; updated_at: string | null;
 };
 
