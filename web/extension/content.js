@@ -330,9 +330,21 @@
     return null;
   }
 
-  // close any stale open menu so its options don't leak into the next field's probe
+  // close any stale open menu so its options don't leak into the next field's probe.
+  // A MODAL apply form (workatastartup/YC, some Ashby/Gem) closes on a bubbling Escape or a
+  // backdrop mousedown/click - that is what made JobFill keep closing the modal. Inside a
+  // dialog, dismiss just the menu (blur + a click on a SAFE non-interactive spot inside the
+  // modal); only use the aggressive whole-document dismiss when there is no modal. (owner 2026-08-09)
   function closeAllMenus() {
     const a = document.activeElement;
+    const modal = document.querySelector("[role=dialog],[aria-modal='true']");
+    if (modal) {
+      if (a && a.blur) a.blur();
+      const safe = modal.querySelector("h1,h2,h3,legend") || modal.firstElementChild || modal;
+      safe.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+      safe.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      return;
+    }
     if (a) a.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
     document.body.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
     document.body.click();
@@ -396,7 +408,10 @@
       }
       if (success) return success; // committed on an earlier pass
       setNative(el, "");
-      el.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+      // Skip the bubbling Escape inside a modal - it would close the whole apply dialog. (2026-08-09)
+      if (!document.querySelector("[role=dialog],[aria-modal='true']")) {
+        el.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+      }
       el.blur();
       return { picked: null, options };
     }
