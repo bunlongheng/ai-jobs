@@ -196,15 +196,16 @@ export default function RecruitersPage() {
   return (
     <div className="min-h-screen bg-[#f6f8fa]">
       <div className="max-w-[900px] mx-auto px-4 sm:px-5 py-4 sm:py-7 pb-16">
-        {/* Fixed top-right view switch - identical position on both views so it never jumps. */}
-        <div className="flex justify-end mb-3"><ViewTabs /></div>
-        <div className="mb-4 flex items-center gap-3">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/icon.png" alt="AI-Jobs" width={52} height={52} className="block w-11 h-11 sm:w-[52px] sm:h-[52px] rounded-[12px] shadow-sm shrink-0" />
-          <div className="min-w-0">
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#1f2328] mb-0.5 whitespace-nowrap">AI-Jobs</h1>
-            <div className="text-[12px] sm:text-[13px] text-gray-500">{all.length} recruiters &middot; NH &middot; Boston &middot; US &middot; global</div>
+        <div className="mb-4 flex items-start justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/icon.png" alt="AI-Jobs" width={52} height={52} className="block w-11 h-11 sm:w-[52px] sm:h-[52px] rounded-[12px] shadow-sm shrink-0" />
+            <div className="min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#1f2328] mb-0.5 whitespace-nowrap">AI-Jobs</h1>
+              <div className="text-[12px] sm:text-[13px] text-gray-500">{all.length} recruiters &middot; NH &middot; Boston &middot; US &middot; global</div>
+            </div>
           </div>
+          <ViewTabs />
         </div>
 
         <div className="flex flex-nowrap sm:flex-wrap gap-1.5 sm:gap-2 mb-2">

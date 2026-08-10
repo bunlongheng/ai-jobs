@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
-const FLAGS = new Set(["called", "emailed", "replied"]);
+const FLAGS = new Set(["called", "emailed", "voicemail", "replied"]);
 
 // Toggle a per-firm outreach flag (called / emailed / replied) for the recruiter call sheet.
 // Flags are independent checkboxes stored as a CSV in recruiter_status.status. (owner 2026-08-09)
