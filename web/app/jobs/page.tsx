@@ -342,6 +342,8 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
     <main className="min-h-screen bg-[#f6f8fa] text-[#1f2328]" style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" }}>
       <div className="max-w-[900px] mx-auto px-4 sm:px-5 py-4 sm:py-7 pb-16">
         <AutoRefresh />
+        {/* Fixed top-right view switch - identical position on both views so it never jumps. */}
+        <div className="flex justify-end mb-3"><ViewTabs /></div>
         <div className="mb-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
           <div className="flex items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -352,7 +354,6 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <ViewTabs />
             <CommandK jobs={searchJobs} logos={cmdkLogos} />
             <ScoreMenu min={min} buckets={buckets} tiers={[...SCORE_TIERS]} />
             <JobsMenu />
