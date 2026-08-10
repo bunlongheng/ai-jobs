@@ -108,20 +108,24 @@ function distBadge(m: number) {
   return <span className={`text-[11px] font-bold rounded-full px-2 py-0.5 ${cls}`} title={`${tag} - approx driving miles from Pelham NH`}>~{m} mi</span>;
 }
 
-function PersonRow({ p, domain }: { p: Person; domain: string }) {
-  // Grid: [icon] [name+LinkedIn / email stacked] so names and emails line up cleanly down the list.
+// Contacts as a compact aligned mini-table (Name | LinkedIn | Email) - clean to scan when calling.
+function PeopleTable({ people, domain }: { people: Person[]; domain: string }) {
+  const liLink = (p: Person) => p.li
+    ? <a href={`https://www.linkedin.com/in/${p.li}`} target="_blank" rel="noopener noreferrer" className="inline-flex no-underline" title="LinkedIn">{LI}</a>
+    : <a href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(`${p.n.split("(")[0].trim()} ${domain.split(".")[0]}`)}`} target="_blank" rel="noopener noreferrer" className="inline-flex opacity-70 no-underline" title="Find on LinkedIn">{LI}</a>;
   return (
-    <div className="grid grid-cols-[16px_1fr] gap-x-2 items-start py-1">
-      <span className="pt-[3px] text-gray-400"><Ic k="user" s={13} /></span>
-      <div className="min-w-0">
-        <div className="text-[12.5px] text-gray-700 flex items-center gap-1.5">
-          <span>{p.n}</span>
-          {p.li ? <a href={`https://www.linkedin.com/in/${p.li}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center shrink-0 no-underline" title="LinkedIn">{LI}</a> : (
-            <a href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(`${p.n.split("(")[0].trim()} ${domain.split(".")[0]}`)}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center shrink-0 opacity-70 no-underline" title="Find on LinkedIn">{LI}</a>
-          )}
-        </div>
-        {p.em ? <a href={`mailto:${p.em}`} className="text-[12px] text-indigo-600 no-underline break-all">{p.em}</a> : null}
-      </div>
+    <div className="mt-2 bg-slate-50 rounded-lg px-2 py-1 overflow-x-auto">
+      <table className="w-full text-[12.5px] border-collapse">
+        <tbody>
+          {people.map((p, i) => (
+            <tr key={i} className="border-t border-slate-200/70 first:border-0">
+              <td className="py-1.5 pr-3 text-gray-700 align-middle">{p.n}</td>
+              <td className="py-1.5 pr-3 align-middle w-5">{liLink(p)}</td>
+              <td className="py-1.5 align-middle text-indigo-600 whitespace-nowrap">{p.em ? <a href={`mailto:${p.em}`} className="no-underline">{p.em}</a> : null}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
@@ -155,7 +159,7 @@ function Card({ f, accent, flags }: { f: Firm; accent: string; flags: string[] }
           : f.form ? <a href={f.form} target="_blank" rel="noopener noreferrer" className="text-[12.5px] text-gray-500 no-underline inline-flex items-center gap-1"><Ic k="form" s={13} />contact form (no public email)</a> : null}
         {f.apply ? <a href={f.apply} target="_blank" rel="noopener noreferrer" className="text-[13px] font-bold text-violet-600 no-underline inline-flex items-center gap-1"><Ic k="check" s={13} />Apply / sign up</a> : null}
       </div>
-      {f.people?.length ? <div className="mt-2 bg-slate-50 rounded-lg px-2.5 py-1.5">{f.people.map((p, i) => <PersonRow key={i} p={p} domain={f.domain} />)}</div> : null}
+      {f.people?.length ? <PeopleTable people={f.people} domain={f.domain} /> : null}
     </div>
   );
 }
