@@ -109,13 +109,19 @@ function distBadge(m: number) {
 }
 
 function PersonRow({ p, domain }: { p: Person; domain: string }) {
+  // Grid: [icon] [name+LinkedIn / email stacked] so names and emails line up cleanly down the list.
   return (
-    <div className="flex items-center gap-2 flex-wrap py-0.5">
-      <span className="text-[12.5px] text-gray-700 inline-flex items-center gap-1"><Ic k="user" s={12} cls="text-gray-400" />{p.n}</span>
-      {p.li ? <a href={`https://www.linkedin.com/in/${p.li}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-[#0a66c2] no-underline" title="LinkedIn">{LI}</a> : (
-        <a href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(`${p.n.split("(")[0].trim()} ${domain.split(".")[0]}`)}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-[#0a66c2]/70 no-underline" title="Find on LinkedIn">{LI}</a>
-      )}
-      {p.em ? <a href={`mailto:${p.em}`} className="text-[12px] text-indigo-600 no-underline">{p.em}</a> : null}
+    <div className="grid grid-cols-[16px_1fr] gap-x-2 items-start py-1">
+      <span className="pt-[3px] text-gray-400"><Ic k="user" s={13} /></span>
+      <div className="min-w-0">
+        <div className="text-[12.5px] text-gray-700 flex items-center gap-1.5">
+          <span>{p.n}</span>
+          {p.li ? <a href={`https://www.linkedin.com/in/${p.li}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center shrink-0 no-underline" title="LinkedIn">{LI}</a> : (
+            <a href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(`${p.n.split("(")[0].trim()} ${domain.split(".")[0]}`)}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center shrink-0 opacity-70 no-underline" title="Find on LinkedIn">{LI}</a>
+          )}
+        </div>
+        {p.em ? <a href={`mailto:${p.em}`} className="text-[12px] text-indigo-600 no-underline break-all">{p.em}</a> : null}
+      </div>
     </div>
   );
 }
@@ -139,7 +145,7 @@ function Card({ f, accent, flags }: { f: Firm; accent: string; flags: string[] }
           </div>
         </div>
         <div className="flex flex-col items-end gap-2 shrink-0">
-          {f.tel ? <a href={`tel:${f.tel}`} className={`font-bold text-[15px] no-underline inline-flex items-center gap-1 ${f.verifiedPhone ? "text-green-700" : "text-amber-600"}`}><Ic k="phone" s={13} />{f.phone}</a> : null}
+          {f.tel ? <a href={`tel:${f.tel}`} className="font-bold text-[15px] no-underline inline-flex items-center gap-1 text-[#1f2328]"><Ic k="phone" s={13} cls="text-gray-500" />{f.phone}</a> : null}
           <RecruiterStatus firm={firmKey(f)} initial={flags} />
         </div>
       </div>
@@ -209,9 +215,6 @@ export default function RecruitersPage() {
           <Tile n={has("replied")} label="Replied" grad="from-fuchsia-500 to-pink-600" icon="check" />
         </div>
 
-        <div className="text-[12px] text-gray-500 leading-relaxed mb-1 px-1">
-          Tap a number to call, an address to email, the <span className="inline-block align-middle text-[#0a66c2]">{LI}</span> icon for LinkedIn, then check off <b>Called</b>/<b>Emailed</b>. <b className="text-green-700">Green phone</b> = verified · <b className="text-amber-600">amber</b> = toll-free · <b className="text-emerald-700">~mi</b> = driving distance from Pelham. Nothing was guessed - form-only firms show a form link.
-        </div>
 
         <Section icon="home" title="Southern NH - closest to home" grad="from-teal-500 to-emerald-600" firms={NH} accent="text-teal-700 bg-teal-100" fmap={fmap} />
         <Section icon="city" title="Greater Boston - tech boutiques" grad="from-blue-600 to-indigo-700" firms={BOUTIQUE} accent="text-blue-700 bg-blue-100" fmap={fmap} />

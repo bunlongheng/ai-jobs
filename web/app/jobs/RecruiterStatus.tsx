@@ -25,10 +25,9 @@ export default function RecruiterStatus({ firm, initial }: { firm: string; initi
       {FLAGS.map((f) => {
         const on = set.has(f.k);
         return (
-          <button key={f.k} onClick={() => toggle(f.k)} aria-pressed={on} type="button"
-            className={`text-[11px] font-bold rounded-full border px-2.5 py-1 inline-flex items-center gap-1 transition-colors ${on ? f.on : "border-gray-300 text-gray-400 bg-white hover:bg-gray-50"}`}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d={f.d} /></svg>
-            {f.label}
+          <button key={f.k} onClick={() => toggle(f.k)} aria-pressed={on} type="button" title={f.label} aria-label={f.label}
+            className={`rounded-full border w-8 h-8 inline-flex items-center justify-center transition-colors ${on ? f.on : "border-gray-300 text-gray-400 bg-white hover:bg-gray-50"}`}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d={f.d} /></svg>
           </button>
         );
       })}

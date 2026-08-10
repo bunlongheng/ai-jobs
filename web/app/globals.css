@@ -55,14 +55,23 @@ a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid 
   content: ""; position: absolute; inset: -25%; filter: blur(26px);
   animation: bdrift 26s ease-in-out infinite alternate;
 }
-.backdrop::after {
+/* AI view texture: dot grid (data / tech feel). */
+.backdrop-ai::after {
   content: ""; position: absolute; inset: 0; opacity: 1;
   background-image:
-    radial-gradient(rgba(30,41,59,.13) 1.3px, transparent 1.7px),
+    radial-gradient(rgba(30,41,59,.15) 1.3px, transparent 1.7px),
     linear-gradient(rgba(30,41,59,.05) 1px, transparent 1px),
     linear-gradient(90deg, rgba(30,41,59,.05) 1px, transparent 1px);
   background-size: 26px 26px, 26px 26px, 26px 26px;
   animation: bdrift 50s ease-in-out infinite alternate-reverse;
+}
+/* Recruiter view texture: diagonal crosshatch weave - clearly different from the AI dots. */
+.backdrop-rec::after {
+  content: ""; position: absolute; inset: 0; opacity: 1;
+  background-image:
+    repeating-linear-gradient(45deg, rgba(30,41,59,.06) 0 1.5px, transparent 1.5px 15px),
+    repeating-linear-gradient(-45deg, rgba(30,41,59,.045) 0 1.5px, transparent 1.5px 15px);
+  animation: bdrift 55s ease-in-out infinite alternate;
 }
 .backdrop-ai::before {
   background:
