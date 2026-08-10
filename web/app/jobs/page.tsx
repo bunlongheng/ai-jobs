@@ -10,6 +10,7 @@ import PrescanIcon from "./PrescanIcon";
 import ReadyScanIcon from "./ReadyScanIcon";
 import CollapsiblePanel from "./CollapsiblePanel";
 import PanelNav from "./PanelNav";
+import ViewTabs from "./ViewTabs";
 import ScanSpinner from "./ScanSpinner";
 import { techMeta } from "@/lib/tech";
 import { nearHome } from "@/lib/near-home";
@@ -356,6 +357,8 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
             <JobsMenu />
           </div>
         </div>
+
+        <ViewTabs />
 
         {/* All hero tiles stay on ONE row on a phone (flex-nowrap + shrinkable) so they never
             wrap and shove the job list down. Compact font/padding on mobile. (owner 2026-08-08) */}

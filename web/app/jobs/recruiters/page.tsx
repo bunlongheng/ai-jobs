@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { getLogo } from "@/lib/logos";
 import { db } from "@/lib/db";
 import RecruiterStatus from "../RecruiterStatus";
+import ViewTabs from "../ViewTabs";
 
 export const dynamic = "force-dynamic"; // reads cached firm logos + outreach status live
 
@@ -120,36 +120,67 @@ function Card({ f, accent, flags }: { f: Firm; accent: string; flags: string[] }
   );
 }
 
-function Section({ icon, title, color, firms, accent, fmap }: { icon: string; title: string; color: string; firms: Firm[]; accent: string; fmap: Record<string, string[]> }) {
+// A region rendered as a board-style panel: gradient header (icon + title + count) over a card list.
+function Section({ icon, title, grad, firms, accent, fmap }: { icon: string; title: string; grad: string; firms: Firm[]; accent: string; fmap: Record<string, string[]> }) {
   return (
-    <>
-      <div className="flex items-center gap-2 mt-7 mb-3">
-        <span className="text-lg">{icon}</span>
-        <h2 className={`text-[16px] font-extrabold ${color}`}>{title}</h2>
+    <div className="mt-4 rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+      <div className={`bg-gradient-to-r ${grad} px-4 py-2.5 flex items-center gap-2`}>
+        <span className="text-base">{icon}</span>
+        <h3 className="text-sm font-bold tracking-wide text-white">{title}</h3>
+        <span className="text-xs font-bold rounded-full px-2.5 py-0.5 bg-white/30 text-white">{firms.length}</span>
       </div>
-      {firms.map((f) => <Card key={f.name + f.city} f={f} accent={accent} flags={fmap[firmKey(f)] || []} />)}
-    </>
+      <div className="p-3 sm:p-4">
+        {firms.map((f) => <Card key={f.name + f.city} f={f} accent={accent} flags={fmap[firmKey(f)] || []} />)}
+      </div>
+    </div>
+  );
+}
+
+function Tile({ n, label, grad }: { n: number; label: string; grad: string }) {
+  return (
+    <div className={`flex-1 min-w-0 sm:min-w-[88px] rounded-[10px] px-2 py-1.5 sm:px-4 sm:py-3 text-white shadow-sm bg-gradient-to-r ${grad} flex items-center justify-between gap-2`}>
+      <div className="min-w-0">
+        <div className="text-[17px] sm:text-[26px] font-bold leading-none">{n}</div>
+        <div className="text-[9px] sm:text-xs text-white/85 mt-0.5 truncate">{label}</div>
+      </div>
+    </div>
   );
 }
 
 export default function RecruitersPage() {
   const fmap = flagsMap();
+  const all = [...NH, ...BOUTIQUE, ...NATIONAL];
+  const has = (flag: string) => all.filter((f) => (fmap[firmKey(f)] || []).includes(flag)).length;
   return (
     <div className="min-h-screen bg-[#f6f8fa]">
-      <div className="max-w-[820px] mx-auto px-4 sm:px-5 py-5 pb-16">
-        <Link href="/jobs" className="text-[13px] text-blue-600 no-underline">&larr; Board</Link>
-
-        <div className="mt-3 rounded-2xl p-5 text-white shadow-sm bg-gradient-to-br from-blue-700 to-indigo-700">
-          <div className="text-[22px] font-extrabold">Recruiter Call & Email Sheet</div>
-          <div className="text-[14px] opacity-90 mt-0.5">Software engineering staffing - Southern NH + Greater Boston</div>
-          <div className="text-[12px] opacity-80 mt-2.5 leading-relaxed">
-            Tap 📞 to call, ✉️ to email, <span className="inline-block align-middle text-white">{LI}</span> for LinkedIn. <b className="text-emerald-200">Green phone</b> = verified line · <b className="text-amber-200">amber</b> = toll-free. <b className="text-emerald-200">~mi</b> = approx driving distance from Pelham. Firms with no public email show a contact-form link (nothing was guessed).
+      <div className="max-w-[900px] mx-auto px-4 sm:px-5 py-4 sm:py-7 pb-16">
+        <div className="mb-4 flex items-center gap-3">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/icon.png" alt="AI-Jobs" width={52} height={52} className="block w-11 h-11 sm:w-[52px] sm:h-[52px] rounded-[12px] shadow-sm shrink-0" />
+          <div className="min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#1f2328] mb-0.5 whitespace-nowrap">AI-Jobs</h1>
+            <div className="text-[12px] sm:text-[13px] text-gray-500">{all.length} recruiters &middot; NH + Boston &middot; zero-token</div>
           </div>
         </div>
 
-        <Section icon="🏠" title="Southern NH - closest to home" color="text-teal-700" firms={NH} accent="text-teal-700 bg-teal-100" fmap={fmap} />
-        <Section icon="🏙️" title="Greater Boston - tech boutiques" color="text-blue-700" firms={BOUTIQUE} accent="text-blue-700 bg-blue-100" fmap={fmap} />
-        <Section icon="🏢" title="Greater Boston - national tech firms (local office)" color="text-blue-700" firms={NATIONAL} accent="text-blue-700 bg-blue-100" fmap={fmap} />
+        <ViewTabs />
+
+        <div className="flex flex-nowrap sm:flex-wrap gap-1.5 sm:gap-2 mb-2">
+          <Tile n={all.length} label="Firms" grad="from-gray-700 to-gray-900" />
+          <Tile n={NH.length} label="Southern NH" grad="from-teal-500 to-emerald-600" />
+          <Tile n={BOUTIQUE.length + NATIONAL.length} label="Boston" grad="from-blue-600 to-indigo-700" />
+          <Tile n={has("called")} label="Called" grad="from-emerald-500 to-green-600" />
+          <Tile n={has("emailed")} label="Emailed" grad="from-indigo-500 to-violet-600" />
+          <Tile n={has("replied")} label="Replied" grad="from-fuchsia-500 to-pink-600" />
+        </div>
+
+        <div className="text-[12px] text-gray-500 leading-relaxed mb-1 px-1">
+          Tap 📞 to call, ✉️ to email, <span className="inline-block align-middle text-[#0a66c2]">{LI}</span> for LinkedIn, then check off <b>Called</b>/<b>Emailed</b>. <b className="text-green-700">Green phone</b> = verified · <b className="text-amber-600">amber</b> = toll-free · <b className="text-emerald-700">~mi</b> = driving distance from Pelham. Nothing was guessed - form-only firms show a form link.
+        </div>
+
+        <Section icon="🏠" title="Southern NH - closest to home" grad="from-teal-500 to-emerald-600" firms={NH} accent="text-teal-700 bg-teal-100" fmap={fmap} />
+        <Section icon="🏙️" title="Greater Boston - tech boutiques" grad="from-blue-600 to-indigo-700" firms={BOUTIQUE} accent="text-blue-700 bg-blue-100" fmap={fmap} />
+        <Section icon="🏢" title="Greater Boston - national tech firms" grad="from-sky-500 to-blue-600" firms={NATIONAL} accent="text-blue-700 bg-blue-100" fmap={fmap} />
 
         <div className="mt-6 rounded-2xl border border-indigo-200 bg-indigo-50 px-4 py-3.5">
           <div className="font-bold text-[14px] text-indigo-800 mb-1.5">📧 Email to send before you call</div>
