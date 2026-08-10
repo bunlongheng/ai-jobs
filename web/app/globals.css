@@ -56,10 +56,13 @@ a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid 
   animation: bdrift 26s ease-in-out infinite alternate;
 }
 .backdrop::after {
-  content: ""; position: absolute; inset: 0; opacity: .45;
-  background-image: radial-gradient(rgba(15,23,42,.06) 1px, transparent 1.4px);
-  background-size: 22px 22px;
-  animation: bdrift 44s ease-in-out infinite alternate-reverse;
+  content: ""; position: absolute; inset: 0; opacity: 1;
+  background-image:
+    radial-gradient(rgba(30,41,59,.13) 1.3px, transparent 1.7px),
+    linear-gradient(rgba(30,41,59,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30,41,59,.05) 1px, transparent 1px);
+  background-size: 26px 26px, 26px 26px, 26px 26px;
+  animation: bdrift 50s ease-in-out infinite alternate-reverse;
 }
 .backdrop-ai::before {
   background:

@@ -45,6 +45,7 @@ type Firm = {
 const NH: Firm[] = [
   { name: "Techneeds", city: "Salem NH", miles: 6, phone: "(603) 898-3000", tel: "+16038983000", verifiedPhone: true, domain: "techneeds.com", site: "techneeds.com", siteUrl: "https://www.techneeds.com", form: "https://www.techneeds.com/contact-us/", specialty: "Tech, engineering & manufacturing" },
   { name: "Alexander Technology Group", city: "Bedford NH", miles: 22, phone: "(603) 637-1466", tel: "+16036371466", verifiedPhone: true, domain: "alexandertg.com", site: "alexandertg.com", siteUrl: "https://www.alexandertg.com", specialty: "Pure IT / software staffing", star: true, people: [
+    { n: "Kevin Smithwood (Recruiting Manager) - spoke + emailed", em: "ksmithwood@alexandertg.com" },
     { n: "John Whelan (runs NH office)", li: "johnwhelan01", em: "jwhelan@alexandertg.com" },
     { n: "Paul Silvio (President)", li: "psilvio", em: "psilvio@alexandertg.com" },
     { n: "Scott Dinneen", li: "scott-dinneen-54bb608", em: "sdinneen@alexandertg.com" },
