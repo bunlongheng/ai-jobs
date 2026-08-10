@@ -11,7 +11,7 @@ export default function ViewTabs() {
     `px-2.5 py-1 rounded-md text-[12px] font-bold no-underline transition-colors ${active ? "bg-white shadow-sm text-blue-700" : "text-gray-500 hover:text-gray-700"}`;
   return (
     <div className="inline-flex items-center gap-0.5 bg-gray-100 rounded-lg p-0.5 shrink-0">
-      <Link href="/jobs" className={cls(!onRecruiter)} title="I find jobs">Myself</Link>
+      <Link href="/jobs" className={cls(!onRecruiter)} title="AI finds jobs for me">AI</Link>
       <Link href="/jobs/recruiters" className={cls(onRecruiter)} title="Recruiters find for me">Recruiter</Link>
     </div>
   );

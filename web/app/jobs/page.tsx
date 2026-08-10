@@ -11,6 +11,7 @@ import ReadyScanIcon from "./ReadyScanIcon";
 import CollapsiblePanel from "./CollapsiblePanel";
 import PanelNav from "./PanelNav";
 import ViewTabs from "./ViewTabs";
+import Backdrop from "./Backdrop";
 import ScanSpinner from "./ScanSpinner";
 import { techMeta } from "@/lib/tech";
 import { nearHome } from "@/lib/near-home";
@@ -339,7 +340,8 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
   const todayOf = (arr: number[]) => arr[arr.length - 1] || 0;
 
   return (
-    <main className="min-h-screen bg-[#f6f8fa] text-[#1f2328]" style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" }}>
+    <main className="min-h-screen text-[#1f2328]" style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" }}>
+      <Backdrop variant="ai" />
       <div className="max-w-[900px] mx-auto px-4 sm:px-5 py-4 sm:py-7 pb-16">
         <AutoRefresh />
         <div className="mb-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">

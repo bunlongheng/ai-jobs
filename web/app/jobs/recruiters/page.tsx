@@ -2,6 +2,7 @@ import { getLogo } from "@/lib/logos";
 import { db } from "@/lib/db";
 import RecruiterStatus from "../RecruiterStatus";
 import ViewTabs from "../ViewTabs";
+import Backdrop from "../Backdrop";
 
 export const dynamic = "force-dynamic"; // reads cached firm logos + outreach status live
 
@@ -104,8 +105,10 @@ const GLOBAL: Firm[] = [
   { name: "X-Team", city: "Global remote", miles: -1, domain: "x-team.com", site: "x-team.com", siteUrl: "https://x-team.com", apply: "https://x-team.com/careers", specialty: "Long-term remote teams for senior devs" },
 ];
 
+// Proper LinkedIn brandmark (blue rounded square + white "in") - self-coloured, so it looks clean
+// at small sizes instead of the blobby monochrome glyph. (owner request 2026-08-10)
 const LI = (
-  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M4.98 3.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.78 2.65 4.78 6.1V21H20v-5.5c0-1.3-.02-3-1.83-3-1.83 0-2.11 1.43-2.11 2.9V21H12z" /></svg>
+  <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden className="rounded-[3px]"><rect width="24" height="24" rx="4" fill="#0A66C2" /><path fill="#fff" d="M7.2 9.6H4.7V19h2.5V9.6zM5.95 5.2a1.45 1.45 0 1 0 0 2.9 1.45 1.45 0 0 0 0-2.9zM19.3 19h-2.5v-4.7c0-1.18-.42-1.98-1.48-1.98-.8 0-1.28.54-1.5 1.06-.07.19-.09.45-.09.71V19h-2.5v-9.4h2.5v1.28c.33-.5.92-1.2 2.24-1.2 1.64 0 2.83 1.07 2.83 3.36V19z" /></svg>
 );
 
 function distBadge(m: number) {
@@ -145,7 +148,10 @@ function Card({ f, accent, flags }: { f: Firm; accent: string; flags: string[] }
             </div>
           </div>
         </div>
-        {f.tel ? <a href={`tel:${f.tel}`} className={`font-bold text-[15px] no-underline shrink-0 inline-flex items-center gap-1 ${f.verifiedPhone ? "text-green-700" : "text-amber-600"}`}><Ic k="phone" s={13} />{f.phone}</a> : null}
+        <div className="flex flex-col items-end gap-2 shrink-0">
+          {f.tel ? <a href={`tel:${f.tel}`} className={`font-bold text-[15px] no-underline inline-flex items-center gap-1 ${f.verifiedPhone ? "text-green-700" : "text-amber-600"}`}><Ic k="phone" s={13} />{f.phone}</a> : null}
+          <RecruiterStatus firm={firmKey(f)} initial={flags} />
+        </div>
       </div>
       <div className="text-[13px] text-gray-500 mt-2">{f.specialty} · <a href={f.siteUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 no-underline">{f.site}</a></div>
       <div className="mt-2 flex items-center gap-3 flex-wrap">
@@ -154,9 +160,6 @@ function Card({ f, accent, flags }: { f: Firm; accent: string; flags: string[] }
         {f.apply ? <a href={f.apply} target="_blank" rel="noopener noreferrer" className="text-[13px] font-bold text-violet-600 no-underline inline-flex items-center gap-1"><Ic k="check" s={13} />Apply / sign up</a> : null}
       </div>
       {f.people?.length ? <div className="mt-2 bg-slate-50 rounded-lg px-2.5 py-1.5">{f.people.map((p, i) => <PersonRow key={i} p={p} domain={f.domain} />)}</div> : null}
-      <div className="mt-2.5 pt-2.5 border-t border-gray-100 flex justify-end">
-        <RecruiterStatus firm={firmKey(f)} initial={flags} />
-      </div>
     </div>
   );
 }
@@ -194,7 +197,8 @@ export default function RecruitersPage() {
   const all = [...NH, ...BOUTIQUE, ...NATIONAL, ...US, ...GLOBAL];
   const has = (flag: string) => all.filter((f) => (fmap[firmKey(f)] || []).includes(flag)).length;
   return (
-    <div className="min-h-screen bg-[#f6f8fa]">
+    <div className="min-h-screen">
+      <Backdrop variant="rec" />
       <div className="max-w-[900px] mx-auto px-4 sm:px-5 py-4 sm:py-7 pb-16">
         <div className="mb-4 flex items-start justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
