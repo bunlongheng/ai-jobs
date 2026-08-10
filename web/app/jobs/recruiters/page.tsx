@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import RecruiterStatus from "../RecruiterStatus";
 import ViewTabs from "../ViewTabs";
 import Backdrop from "../Backdrop";
+import PhonePitch from "../PhonePitch";
 
 export const dynamic = "force-dynamic"; // reads cached firm logos + outreach status live
 
@@ -94,18 +95,6 @@ const US: Firm[] = [
   { name: "Mondo", city: "Philadelphia PA", miles: -1, domain: "mondo.com", site: "mondo.com", siteUrl: "https://mondo.com", form: "https://mondo.com/contact/", specialty: "National IT/tech staffing, remote listings" },
 ];
 
-const GLOBAL: Firm[] = [
-  { name: "Trust in SODA", city: "London / Boston", miles: -1, phone: "+44 203 762 2010", tel: "+442037622010", verifiedPhone: true, domain: "trustinsoda.com", site: "trustinsoda.com", siteUrl: "https://www.trustinsoda.com", email: "info@trustinsoda.com", specialty: "SWE / DevOps / Cloud recruiting, multi-region" },
-  { name: "Gun.io", city: "Nashville TN", miles: -1, phone: "(615) 541-8095", tel: "+16155418095", verifiedPhone: true, domain: "gun.io", site: "gun.io", siteUrl: "https://gun.io", apply: "https://gun.io/find-work/", specialty: "Elite freelance / senior SWE at vetted SaaS clients" },
-  { name: "Turing", city: "Global remote", miles: -1, domain: "turing.com", site: "turing.com", siteUrl: "https://www.turing.com", apply: "https://developers.turing.com/signup", specialty: "Vetted remote React/Node devs to US companies" },
-  { name: "Arc.dev", city: "Global remote", miles: -1, domain: "arc.dev", site: "arc.dev", siteUrl: "https://arc.dev", apply: "https://arc.dev/talent", specialty: "Remote dev platform, skill + English vetting" },
-  { name: "Lemon.io", city: "Global remote", miles: -1, domain: "lemon.io", site: "lemon.io", siteUrl: "https://lemon.io", apply: "https://lemon.io/for-developers/", specialty: "Curated senior dev marketplace for startups" },
-  { name: "Revelo", city: "LatAm / remote", miles: -1, domain: "revelo.com", site: "revelo.com", siteUrl: "https://www.revelo.com", apply: "https://careers.revelo.com/", specialty: "Nearshore full-stack TS / React / Node" },
-  { name: "Braintrust", city: "Global remote", miles: -1, domain: "usebraintrust.com", site: "usebraintrust.com", siteUrl: "https://www.usebraintrust.com", apply: "https://www.usebraintrust.com/join", specialty: "AI-matched remote engineering marketplace" },
-  { name: "Andela", city: "Global remote", miles: -1, domain: "andela.com", site: "andela.com", siteUrl: "https://andela.com", apply: "https://www.andela.com/for-talent", specialty: "Global engineering marketplace, 135+ countries" },
-  { name: "X-Team", city: "Global remote", miles: -1, domain: "x-team.com", site: "x-team.com", siteUrl: "https://x-team.com", apply: "https://x-team.com/careers", specialty: "Long-term remote teams for senior devs" },
-];
-
 // Proper LinkedIn brandmark (blue rounded square + white "in") - self-coloured, so it looks clean
 // at small sizes instead of the blobby monochrome glyph. (owner request 2026-08-10)
 const LI = (
@@ -195,7 +184,7 @@ function Tile({ n, label, grad, icon }: { n: number; label: string; grad: string
 
 export default function RecruitersPage() {
   const fmap = flagsMap();
-  const all = [...NH, ...BOUTIQUE, ...NATIONAL, ...US, ...GLOBAL];
+  const all = [...NH, ...BOUTIQUE, ...NATIONAL, ...US];
   const has = (flag: string) => all.filter((f) => (fmap[firmKey(f)] || []).includes(flag)).length;
   return (
     <div className="min-h-screen">
@@ -207,7 +196,7 @@ export default function RecruitersPage() {
             <img src="/icon.png" alt="AI-Jobs" width={52} height={52} className="block w-11 h-11 sm:w-[52px] sm:h-[52px] rounded-[12px] shadow-sm shrink-0" />
             <div className="min-w-0">
               <h1 className="text-2xl sm:text-3xl font-bold text-[#1f2328] mb-0.5 whitespace-nowrap">AI-Jobs</h1>
-              <div className="text-[12px] sm:text-[13px] text-gray-500">{all.length} recruiters &middot; NH &middot; Boston &middot; US &middot; global</div>
+              <div className="text-[12px] sm:text-[13px] text-gray-500">{all.length} recruiters &middot; NH &middot; Boston &middot; US</div>
             </div>
           </div>
           <ViewTabs />
@@ -228,27 +217,10 @@ export default function RecruitersPage() {
         <Section icon="city" title="Greater Boston - tech boutiques" grad="from-blue-600 to-indigo-700" firms={BOUTIQUE} accent="text-blue-700 bg-blue-100" fmap={fmap} />
         <Section icon="building" title="Greater Boston - national tech firms" grad="from-sky-500 to-blue-600" firms={NATIONAL} accent="text-blue-700 bg-blue-100" fmap={fmap} />
         <Section icon="users" title="US - nationwide & remote-friendly" grad="from-violet-600 to-purple-700" firms={US} accent="text-violet-700 bg-violet-100" fmap={fmap} />
-        <Section icon="building" title="Global - remote dev platforms (for your field)" grad="from-fuchsia-600 to-pink-600" firms={GLOBAL} accent="text-fuchsia-700 bg-fuchsia-100" fmap={fmap} />
-
-        <div className="mt-6 rounded-2xl border border-indigo-200 bg-indigo-50 px-4 py-3.5">
-          <div className="font-bold text-[14px] text-indigo-800 mb-1.5 inline-flex items-center gap-1.5"><Ic k="mail" s={15} />Email to send before you call</div>
-          <div className="text-[13px] text-indigo-900 leading-relaxed"><b>Subject:</b> Senior full-stack engineer (NH/Boston) - open to new roles<br /><br />
-            Hi [name/team],<br /><br />
-            I&apos;m Bunlong Heng, a senior full-stack engineer based in New Hampshire with about 12 years in TypeScript, React, and Node. I&apos;m looking for my next role - open to remote or hybrid around the Boston/NH area.<br /><br />
-            I&apos;d love to know if you place software engineers and whether you have anything open that might be a fit. My resume is attached, and my work is at bunlongheng.com and github.com/bunlongheng.<br /><br />
-            Happy to hop on a quick call whenever works - thanks for your time.<br /><br />
-            With great excitement,<br />
-            Bunlong Heng · bheng.code@gmail.com · 978-677-0861
-          </div>
-        </div>
-
-        <div className="mt-4 rounded-2xl border border-indigo-200 bg-white px-4 py-3.5">
-          <div className="font-bold text-[14px] text-indigo-800 mb-1.5 inline-flex items-center gap-1.5"><Ic k="phone" s={15} />Your phone opener</div>
-          <div className="text-[13px] text-gray-700 leading-relaxed">&quot;Hi, my name&apos;s Bunlong Heng. I&apos;m a senior full-stack engineer up in New Hampshire, looking for my next role - open to remote or hybrid around Boston, about 12 years in TypeScript, React, and Node. I wanted to see if you place software engineers, and whether you&apos;ve got anything that might be a fit. Would it be alright to send you my resume?&quot;</div>
-        </div>
 
         <div className="text-center text-[11px] text-gray-400 mt-5">Distances are approximate driving miles from Pelham NH. Every phone/email was seen on the firm&apos;s own page or a directory - none pattern-guessed. Confirm named recruiters still cover your market.</div>
       </div>
+      <PhonePitch />
     </div>
   );
 }
