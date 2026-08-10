@@ -352,13 +352,12 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            <ViewTabs />
             <CommandK jobs={searchJobs} logos={cmdkLogos} />
             <ScoreMenu min={min} buckets={buckets} tiers={[...SCORE_TIERS]} />
             <JobsMenu />
           </div>
         </div>
-
-        <ViewTabs />
 
         {/* All hero tiles stay on ONE row on a phone (flex-nowrap + shrinkable) so they never
             wrap and shove the job list down. Compact font/padding on mobile. (owner 2026-08-08) */}
