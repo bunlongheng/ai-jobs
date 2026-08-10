@@ -8,13 +8,13 @@ const PITCH = "Hi, my name's Bunlong Heng. I'm a senior full-stack engineer up i
 const PHONE = "M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.4a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z";
 
 export default function PhonePitch() {
-  // Starts collapsed to just Bunlong's profile photo in the bottom-right; tap it to read the opener.
-  const [open, setOpen] = useState(false);
+  // Expanded by default, pinned top-left; the minimize (-) collapses it to just Bunlong's photo.
+  const [open, setOpen] = useState(true);
 
   if (!open) {
     return (
       <button onClick={() => setOpen(true)} title="What to say on the call"
-        className="fixed bottom-4 right-4 z-50 w-14 h-14 rounded-full border-[3px] border-white shadow-lg overflow-hidden hover:scale-105 transition-transform bg-white">
+        className="fixed top-4 left-4 z-50 w-14 h-14 rounded-full border-[3px] border-white shadow-lg overflow-hidden hover:scale-105 transition-transform bg-white">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/me.png" alt="Bunlong" width={56} height={56} className="w-full h-full object-cover" />
       </button>
@@ -22,12 +22,12 @@ export default function PhonePitch() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 w-[calc(100vw-2rem)] sm:w-[320px]">
+    <div className="fixed top-4 left-4 z-50 w-[calc(100vw-2rem)] sm:w-[320px]">
       <div className="relative bg-white border border-gray-200 rounded-2xl shadow-xl px-4 pt-4 pb-4">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/me.png" alt="Bunlong" width={52} height={52} className="absolute -top-5 -right-4 w-[52px] h-[52px] rounded-full border-[3px] border-white shadow-md object-cover" />
-        <button onClick={() => setOpen(false)} title="Hide" className="absolute top-2 left-2 text-gray-300 hover:text-gray-500 text-lg leading-none">&minus;</button>
-        <div className="text-[10px] font-bold uppercase tracking-wide text-indigo-500 mb-1.5 pl-4">Say on the call</div>
+        <img src="/me.png" alt="Bunlong" width={52} height={52} className="absolute -top-5 -left-4 w-[52px] h-[52px] rounded-full border-[3px] border-white shadow-md object-cover" />
+        <button onClick={() => setOpen(false)} title="Hide" className="absolute top-2 right-2 text-gray-300 hover:text-gray-500 text-lg leading-none">&minus;</button>
+        <div className="text-[10px] font-bold uppercase tracking-wide text-indigo-500 mb-1.5 pl-9">Say on the call</div>
         <div className="text-[13.5px] leading-relaxed text-[#1f2328]">{PITCH}</div>
       </div>
     </div>

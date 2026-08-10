@@ -1,18 +1,21 @@
 import { getLogo } from "@/lib/logos";
 import { db } from "@/lib/db";
 import RecruiterStatus from "../RecruiterStatus";
+import RecruiterNote from "../RecruiterNote";
 import ViewTabs from "../ViewTabs";
 import Backdrop from "../Backdrop";
 import PhonePitch from "../PhonePitch";
 
 export const dynamic = "force-dynamic"; // reads cached firm logos + outreach status live
 
-// Per-firm outreach flags (called/emailed/replied), keyed by "name|city". (owner 2026-08-09)
-function flagsMap(): Record<string, string[]> {
+// Per-firm outreach state (flags + "spoke to" note), keyed by "name|city". (owner 2026-08-09)
+type FirmState = { flags: string[]; note: string };
+function flagsMap(): Record<string, FirmState> {
   const d = db();
-  d.prepare("CREATE TABLE IF NOT EXISTS recruiter_status (firm TEXT PRIMARY KEY, status TEXT, updated_at TEXT)").run();
-  const rows = d.prepare("SELECT firm, status FROM recruiter_status").all() as { firm: string; status: string }[];
-  return Object.fromEntries(rows.map((r) => [r.firm, (r.status || "").split(",").filter(Boolean)]));
+  d.prepare("CREATE TABLE IF NOT EXISTS recruiter_status (firm TEXT PRIMARY KEY, status TEXT, note TEXT, updated_at TEXT)").run();
+  try { d.prepare("ALTER TABLE recruiter_status ADD COLUMN note TEXT").run(); } catch { /* already there */ }
+  const rows = d.prepare("SELECT firm, status, note FROM recruiter_status").all() as { firm: string; status: string; note: string }[];
+  return Object.fromEntries(rows.map((r) => [r.firm, { flags: (r.status || "").split(",").filter(Boolean), note: r.note || "" }]));
 }
 const firmKey = (f: Firm) => `${f.name}|${f.city}`;
 
@@ -101,11 +104,15 @@ const LI = (
   <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden className="rounded-[3px]"><rect width="24" height="24" rx="4" fill="#0A66C2" /><path fill="#fff" d="M7.2 9.6H4.7V19h2.5V9.6zM5.95 5.2a1.45 1.45 0 1 0 0 2.9 1.45 1.45 0 0 0 0-2.9zM19.3 19h-2.5v-4.7c0-1.18-.42-1.98-1.48-1.98-.8 0-1.28.54-1.5 1.06-.07.19-.09.45-.09.71V19h-2.5v-9.4h2.5v1.28c.33-.5.92-1.2 2.24-1.2 1.64 0 2.83 1.07 2.83 3.36V19z" /></svg>
 );
 
-function distBadge(m: number) {
-  if (m < 0) return <span className="text-[11px] font-bold rounded-full px-2 py-0.5 text-violet-700 bg-violet-100" title="Remote / nationwide - work from home">remote</span>;
+// Same pill shape as the city badge (consistency). When it's a real distance, it links to Google
+// Maps directions from Pelham NH so a click shows the route/time. (owner request 2026-08-10)
+const BADGE = "text-[11px] font-bold rounded-md px-2 py-0.5";
+function distBadge(m: number, city: string) {
+  if (m < 0) return <span className={`${BADGE} text-violet-700 bg-violet-100`} title="Remote / nationwide - work from home">remote</span>;
   const cls = m <= 15 ? "text-emerald-700 bg-emerald-100" : m <= 35 ? "text-blue-700 bg-blue-100" : "text-gray-500 bg-gray-100";
   const tag = m <= 15 ? "near" : m <= 35 ? "commutable" : "far";
-  return <span className={`text-[11px] font-bold rounded-full px-2 py-0.5 ${cls}`} title={`${tag} - approx driving miles from Pelham NH`}>~{m} mi</span>;
+  const maps = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent("Pelham, NH")}&destination=${encodeURIComponent(city)}`;
+  return <a href={maps} target="_blank" rel="noopener noreferrer" className={`${BADGE} no-underline hover:brightness-95 ${cls}`} title={`${tag} - about ${m} mi from Pelham NH. Click for Google Maps directions.`}>~{m} mi</a>;
 }
 
 // Contacts as a compact aligned mini-table (Name | LinkedIn | Email) - clean to scan when calling.
@@ -130,7 +137,7 @@ function PeopleTable({ people, domain }: { people: Person[]; domain: string }) {
   );
 }
 
-function Card({ f, accent, flags }: { f: Firm; accent: string; flags: string[] }) {
+function Card({ f, accent, st }: { f: Firm; accent: string; st: FirmState }) {
   const logo = getLogo(f.domain);
   return (
     <div className={`bg-white border rounded-2xl px-4 py-3.5 mb-2.5 shadow-sm ${f.star ? "border-teal-300 ring-1 ring-teal-200" : "border-gray-200"}`}>
@@ -142,30 +149,29 @@ function Card({ f, accent, flags }: { f: Firm; accent: string; flags: string[] }
             : <span className="w-[26px] h-[26px] rounded-[6px] bg-gray-100 text-gray-500 text-[11px] font-bold inline-flex items-center justify-center shrink-0">{f.name.slice(0, 1)}</span>}
           <div className="min-w-0">
             <div className="font-bold text-[15px] text-[#1f2328] leading-tight">{f.name} {f.star ? <span title="Strongest local lead">⭐</span> : null}</div>
-            <div className="flex items-center gap-1.5 mt-1">
-              <span className={`text-[11px] font-bold rounded px-1.5 py-0.5 ${accent}`}>{f.city}</span>
-              {distBadge(f.miles)}
+            <div className="flex items-center gap-2 mt-1 flex-wrap">
+              <span className={`${BADGE} ${accent}`}>{f.city}</span>
+              {distBadge(f.miles, f.city)}
+              {f.email ? <a href={`mailto:${f.email}`} className="text-[12px] font-bold text-indigo-600 no-underline inline-flex items-center gap-1"><Ic k="mail" s={12} />{f.email}</a>
+                : f.form ? <a href={f.form} target="_blank" rel="noopener noreferrer" className="text-[11.5px] text-gray-500 no-underline inline-flex items-center gap-1"><Ic k="form" s={12} />contact form</a> : null}
+              {f.apply ? <a href={f.apply} target="_blank" rel="noopener noreferrer" className="text-[12px] font-bold text-violet-600 no-underline inline-flex items-center gap-1"><Ic k="check" s={12} />Apply</a> : null}
             </div>
           </div>
         </div>
         <div className="flex flex-col items-end gap-2 shrink-0">
           {f.tel ? <a href={`tel:${f.tel}`} className="font-bold text-[15px] no-underline inline-flex items-center gap-1 text-[#1f2328]"><Ic k="phone" s={13} cls="text-gray-500" />{f.phone}</a> : null}
-          <RecruiterStatus firm={firmKey(f)} initial={flags} />
+          <RecruiterStatus firm={firmKey(f)} initial={st.flags} />
+          <RecruiterNote firm={firmKey(f)} initial={st.note} />
         </div>
       </div>
       <div className="text-[13px] text-gray-500 mt-2">{f.specialty} · <a href={f.siteUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 no-underline">{f.site}</a></div>
-      <div className="mt-2 flex items-center gap-3 flex-wrap">
-        {f.email ? <a href={`mailto:${f.email}`} className="text-[13px] font-bold text-indigo-600 no-underline inline-flex items-center gap-1"><Ic k="mail" s={13} />{f.email}</a>
-          : f.form ? <a href={f.form} target="_blank" rel="noopener noreferrer" className="text-[12.5px] text-gray-500 no-underline inline-flex items-center gap-1"><Ic k="form" s={13} />contact form (no public email)</a> : null}
-        {f.apply ? <a href={f.apply} target="_blank" rel="noopener noreferrer" className="text-[13px] font-bold text-violet-600 no-underline inline-flex items-center gap-1"><Ic k="check" s={13} />Apply / sign up</a> : null}
-      </div>
       {f.people?.length ? <PeopleTable people={f.people} domain={f.domain} /> : null}
     </div>
   );
 }
 
 // A region rendered as a board-style panel: gradient header (icon + title + count) over a card list.
-function Section({ icon, title, grad, firms, accent, fmap }: { icon: string; title: string; grad: string; firms: Firm[]; accent: string; fmap: Record<string, string[]> }) {
+function Section({ icon, title, grad, firms, accent, fmap }: { icon: string; title: string; grad: string; firms: Firm[]; accent: string; fmap: Record<string, FirmState> }) {
   return (
     <div className="mt-4 rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
       <div className={`bg-gradient-to-r ${grad} px-4 py-2.5 flex items-center gap-2`}>
@@ -174,7 +180,7 @@ function Section({ icon, title, grad, firms, accent, fmap }: { icon: string; tit
         <span className="text-xs font-bold rounded-full px-2.5 py-0.5 bg-white/30 text-white">{firms.length}</span>
       </div>
       <div className="p-3 sm:p-4">
-        {firms.map((f) => <Card key={f.name + f.city} f={f} accent={accent} flags={fmap[firmKey(f)] || []} />)}
+        {firms.map((f) => <Card key={f.name + f.city} f={f} accent={accent} st={fmap[firmKey(f)] || { flags: [], note: "" }} />)}
       </div>
     </div>
   );
@@ -195,7 +201,7 @@ function Tile({ n, label, grad, icon }: { n: number; label: string; grad: string
 export default function RecruitersPage() {
   const fmap = flagsMap();
   const all = [...NH, ...BOUTIQUE, ...NATIONAL, ...US];
-  const has = (flag: string) => all.filter((f) => (fmap[firmKey(f)] || []).includes(flag)).length;
+  const has = (flag: string) => all.filter((f) => (fmap[firmKey(f)]?.flags || []).includes(flag)).length;
   return (
     <div className="min-h-screen">
       <Backdrop variant="rec" />
