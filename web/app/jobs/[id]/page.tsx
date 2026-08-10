@@ -1,5 +1,6 @@
 import { getApp, type Field } from "@/lib/queries";
 import { getKit } from "@/lib/kit";
+import { extractAllTech, techMeta, techCategory, techVersion } from "@/lib/tech";
 import { getLogo } from "@/lib/logos";
 import { nearHome } from "@/lib/near-home";
 import { altitude, ALT_META } from "@/lib/altitude";
@@ -174,6 +175,10 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
   const meta: string[] = [];
   if (app.rejected_at) meta.push(`Rejected ${app.rejected_at}`);
   const prescan = app.pf_status ? `Prescan: ${app.pf_status}${app.pf_total ? ` ${app.pf_covered}/${app.pf_total}` : ""}` : "";
+  // Every technology this job's text (title + JD + tailored resume + notes) names, with an icon,
+  // a category, and any version stated in the post (else "generic"). (owner request 2026-08-09)
+  const techText = `${app.title || ""} ${typeof app.jd === "string" ? app.jd : ""} ${kit.resumeText || ""} ${app.notes || ""}`;
+  const techSlugs = extractAllTech(techText);
 
   // Posting age from the scan date (source_run = "linkedin-YYYY-MM-DD"). LinkedIn/Indeed
   // publish no hard "apply by" deadline, so we surface how long it has sat instead - the
@@ -269,6 +274,51 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
             </div>
           ) : null}
         </div>
+
+        {techSlugs.length ? (
+          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden mb-3.5">
+            <div className="px-4 py-3 flex items-center gap-2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
+              <h2 className="text-sm font-bold text-[#1f2328]">Tech stack</h2>
+              <span className="text-[11px] font-bold text-blue-600 bg-blue-50 rounded-full px-2 py-0.5 ml-1">{techSlugs.length}</span>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse text-[13px]">
+                <thead>
+                  <tr className="bg-[#f6f8fa] text-gray-400 text-[11px] uppercase tracking-wide text-left">
+                    <th className="px-4 py-2 font-medium">Tech</th>
+                    <th className="px-3 py-2 font-medium">Category</th>
+                    <th className="px-4 py-2 font-medium">Version</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {techSlugs.map((s) => {
+                    const label = techMeta(s)?.label || s;
+                    const uri = getLogo(`tech:${s}`);
+                    const ver = techVersion(s, techText);
+                    return (
+                      <tr key={s} className="border-t border-gray-100">
+                        <td className="px-4 py-2.5">
+                          <a href={`https://www.google.com/search?q=${encodeURIComponent(label)}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2.5 no-underline">
+                            {uri
+                              /* eslint-disable-next-line @next/next/no-img-element */
+                              ? <img src={uri} alt={label} width={20} height={20} className="w-5 h-5 rounded-[5px] object-contain bg-white border border-gray-100 shrink-0" />
+                              : <span className="w-5 h-5 rounded-[5px] bg-gray-100 text-gray-500 text-[9px] font-bold inline-flex items-center justify-center shrink-0">{label.slice(0, 2)}</span>}
+                            <span className="font-semibold text-blue-700">{label}</span>
+                          </a>
+                        </td>
+                        <td className="px-3 py-2.5 text-gray-600">{techCategory(s)}</td>
+                        <td className="px-4 py-2.5">{ver
+                          ? <span className="text-[12px] font-mono text-rose-600 bg-rose-50 rounded px-1.5 py-0.5">{ver}</span>
+                          : <span className="text-[12px] text-gray-300">generic</span>}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ) : null}
 
         <ReachOut company={app.company || ""} title={app.title || ""} jd={typeof app.jd === "string" ? app.jd : ""} />
 

@@ -453,7 +453,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
                         <ScanSpinner id={r.id} />
                         {(() => { const a = altitude(r.company, r.title, !!nearHome(r.location)); const m = ALT_META[a]; return <span title={`${m.label} - ${m.hint}`} className={`shrink-0 w-1.5 h-1.5 rounded-full ${a === "reach" ? "bg-amber-400" : a === "near-home" ? "bg-emerald-500" : "bg-blue-500"}`} />; })()}
                         <span className="flex-1 min-w-0 truncate text-[#1f2328]">{r.title}</span>
-                        {(r.pf_direct_url || r.url) ? <a data-external href={r.pf_direct_url || r.url} target="_blank" rel="noopener noreferrer" title={r.pf_direct_url ? "Open the application form" : "Open posting"} className="shrink-0 no-underline align-middle font-bold" style={{ color: LINKC[g.status] || "#2563eb" }}>&#8599;</a> : null}
+                        {(r.pf_direct_url || r.url) ? <a data-external href={r.pf_direct_url || r.url || undefined} target="_blank" rel="noopener noreferrer" title={r.pf_direct_url ? "Open the application form" : "Open posting"} className="shrink-0 no-underline align-middle font-bold" style={{ color: LINKC[g.status] || "#2563eb" }}>&#8599;</a> : null}
                       </div>
                     </td>
                     <td className="px-1 py-2 text-center">{techCell(r)}</td>
