@@ -21,8 +21,8 @@ const formUrl = (u) => (u.includes("ashbyhq.com") ? u.replace(/\/$/, "") + "/app
 
 const ids = process.argv.slice(2);
 const jobs = ids.length
-  ? ids.map((id) => db.prepare("SELECT id, url, company FROM applications WHERE id=?").get(id)).filter(Boolean)
-  : db.prepare("SELECT id, url, company FROM applications WHERE status='kit_ready' ORDER BY score DESC").all();
+  ? ids.map((id) => db.prepare("SELECT id, url, pf_direct_url, company FROM applications WHERE id=?").get(id)).filter(Boolean)
+  : db.prepare("SELECT id, url, pf_direct_url, company FROM applications WHERE status='kit_ready' ORDER BY score DESC").all();
 
 const profileDir = process.env.PRERUN_PROFILE || path.join(os.homedir(), ".cache/jobfill-prerun-profile");
 const ctx = await chromium.launchPersistentContext(profileDir, {
@@ -39,7 +39,10 @@ for (const j of jobs) {
   const page = await ctx.newPage();
   const before = db.prepare("SELECT COALESCE(MAX(id),0) m FROM events WHERE app_id=? AND outcome='filled'").get(j.id).m;
   try {
-    await page.goto(formUrl(j.url), { waitUntil: "domcontentloaded", timeout: 45000 });
+    // Prefer a resolved direct ATS form URL (a real greenhouse/ashby/lever link pulled out of a
+    // HN/listing post) over the listing url, so listing-sourced jobs can still fill green and
+    // reach Ready. Stamping is by job id, so the url can differ from the row's url. (owner 2026-08-09)
+    await page.goto(formUrl(j.pf_direct_url || j.url), { waitUntil: "domcontentloaded", timeout: 45000 });
     await sleep(5000);
     const body = (await page.locator("body").innerText().catch(() => "")).slice(0, 300);
     if (/security verification|verify you are human|cloudflare/i.test(body)) {

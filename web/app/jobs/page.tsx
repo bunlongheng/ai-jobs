@@ -146,6 +146,10 @@ function notReadyBadge(r: AppRow) {
   );
   const u = r.url || "";
   if (r.pf_status === "wall") return chip("not fillable", "bg-rose-50 text-rose-500", "Blocked (Cloudflare) - fill in your Chrome", <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></svg>);
+  // A real ATS form was resolved from the post (pf_direct_url) but it's a JS SPA (Ashby/Lever/
+  // Workday) whose form only loads after clicking "Apply" - so it can't headless-prescan. It IS
+  // applyable though: open the form (arrow) and run JobFill in your Chrome. (owner 2026-08-09)
+  if (r.pf_direct_url) return chip("open + fill", "bg-indigo-50 text-indigo-600", "Real ATS form found in the post - open it (arrow) and run JobFill in your Chrome (SPA, can't auto-verify)", <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>);
   if (r.pf_status === "noform") return chip("not fillable", "bg-rose-50 text-rose-500", "This URL has no application form (redirects to a listing) - not auto-fillable", <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></svg>);
   if (u.includes("news.ycombinator.com")) return chip("email apply", "bg-violet-50 text-violet-600", "HN 'who is hiring' post - you apply by EMAIL, there is no web form to pre-scan", <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>);
   if (u.includes("linkedin.com")) return chip("on linkedin", "bg-blue-50 text-blue-500", "LinkedIn listing - apply on LinkedIn; there is no external form to pre-scan", <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>);
@@ -449,7 +453,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
                         <ScanSpinner id={r.id} />
                         {(() => { const a = altitude(r.company, r.title, !!nearHome(r.location)); const m = ALT_META[a]; return <span title={`${m.label} - ${m.hint}`} className={`shrink-0 w-1.5 h-1.5 rounded-full ${a === "reach" ? "bg-amber-400" : a === "near-home" ? "bg-emerald-500" : "bg-blue-500"}`} />; })()}
                         <span className="flex-1 min-w-0 truncate text-[#1f2328]">{r.title}</span>
-                        {r.url ? <a data-external href={r.url} target="_blank" rel="noopener noreferrer" title="Open posting" className="shrink-0 no-underline align-middle font-bold" style={{ color: LINKC[g.status] || "#2563eb" }}>&#8599;</a> : null}
+                        {(r.pf_direct_url || r.url) ? <a data-external href={r.pf_direct_url || r.url} target="_blank" rel="noopener noreferrer" title={r.pf_direct_url ? "Open the application form" : "Open posting"} className="shrink-0 no-underline align-middle font-bold" style={{ color: LINKC[g.status] || "#2563eb" }}>&#8599;</a> : null}
                       </div>
                     </td>
                     <td className="px-1 py-2 text-center">{techCell(r)}</td>
