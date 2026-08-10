@@ -1,7 +1,18 @@
 import Link from "next/link";
 import { getLogo } from "@/lib/logos";
+import { db } from "@/lib/db";
+import RecruiterStatus from "../RecruiterStatus";
 
-export const dynamic = "force-dynamic"; // reads cached firm logos live
+export const dynamic = "force-dynamic"; // reads cached firm logos + outreach status live
+
+// Per-firm outreach flags (called/emailed/replied), keyed by "name|city". (owner 2026-08-09)
+function flagsMap(): Record<string, string[]> {
+  const d = db();
+  d.prepare("CREATE TABLE IF NOT EXISTS recruiter_status (firm TEXT PRIMARY KEY, status TEXT, updated_at TEXT)").run();
+  const rows = d.prepare("SELECT firm, status FROM recruiter_status").all() as { firm: string; status: string }[];
+  return Object.fromEntries(rows.map((r) => [r.firm, (r.status || "").split(",").filter(Boolean)]));
+}
+const firmKey = (f: Firm) => `${f.name}|${f.city}`;
 
 // Recruiter/staffing call + email sheet - real, source-verified firms in Southern NH + Greater
 // Boston that place software engineers. Phones/emails were seen on the firm's own page; toll-free
@@ -76,7 +87,7 @@ function PersonRow({ p, domain }: { p: Person; domain: string }) {
   );
 }
 
-function Card({ f, accent }: { f: Firm; accent: string }) {
+function Card({ f, accent, flags }: { f: Firm; accent: string; flags: string[] }) {
   const logo = getLogo(f.domain);
   return (
     <div className={`bg-white border rounded-2xl px-4 py-3.5 mb-2.5 shadow-sm ${f.star ? "border-teal-300 ring-1 ring-teal-200" : "border-gray-200"}`}>
@@ -102,23 +113,27 @@ function Card({ f, accent }: { f: Firm; accent: string }) {
           : f.form ? <a href={f.form} target="_blank" rel="noopener noreferrer" className="text-[12.5px] text-gray-500 no-underline inline-flex items-center gap-1">📝 contact form (no public email)</a> : null}
       </div>
       {f.people?.length ? <div className="mt-2 bg-slate-50 rounded-lg px-2.5 py-1.5">{f.people.map((p, i) => <PersonRow key={i} p={p} domain={f.domain} />)}</div> : null}
+      <div className="mt-2.5 pt-2.5 border-t border-gray-100 flex justify-end">
+        <RecruiterStatus firm={firmKey(f)} initial={flags} />
+      </div>
     </div>
   );
 }
 
-function Section({ icon, title, color, firms, accent }: { icon: string; title: string; color: string; firms: Firm[]; accent: string }) {
+function Section({ icon, title, color, firms, accent, fmap }: { icon: string; title: string; color: string; firms: Firm[]; accent: string; fmap: Record<string, string[]> }) {
   return (
     <>
       <div className="flex items-center gap-2 mt-7 mb-3">
         <span className="text-lg">{icon}</span>
         <h2 className={`text-[16px] font-extrabold ${color}`}>{title}</h2>
       </div>
-      {firms.map((f) => <Card key={f.name + f.city} f={f} accent={accent} />)}
+      {firms.map((f) => <Card key={f.name + f.city} f={f} accent={accent} flags={fmap[firmKey(f)] || []} />)}
     </>
   );
 }
 
 export default function RecruitersPage() {
+  const fmap = flagsMap();
   return (
     <div className="min-h-screen bg-[#f6f8fa]">
       <div className="max-w-[820px] mx-auto px-4 sm:px-5 py-5 pb-16">
@@ -132,9 +147,9 @@ export default function RecruitersPage() {
           </div>
         </div>
 
-        <Section icon="🏠" title="Southern NH - closest to home" color="text-teal-700" firms={NH} accent="text-teal-700 bg-teal-100" />
-        <Section icon="🏙️" title="Greater Boston - tech boutiques" color="text-blue-700" firms={BOUTIQUE} accent="text-blue-700 bg-blue-100" />
-        <Section icon="🏢" title="Greater Boston - national tech firms (local office)" color="text-blue-700" firms={NATIONAL} accent="text-blue-700 bg-blue-100" />
+        <Section icon="🏠" title="Southern NH - closest to home" color="text-teal-700" firms={NH} accent="text-teal-700 bg-teal-100" fmap={fmap} />
+        <Section icon="🏙️" title="Greater Boston - tech boutiques" color="text-blue-700" firms={BOUTIQUE} accent="text-blue-700 bg-blue-100" fmap={fmap} />
+        <Section icon="🏢" title="Greater Boston - national tech firms (local office)" color="text-blue-700" firms={NATIONAL} accent="text-blue-700 bg-blue-100" fmap={fmap} />
 
         <div className="mt-6 rounded-2xl border border-indigo-200 bg-indigo-50 px-4 py-3.5">
           <div className="font-bold text-[14px] text-indigo-800 mb-1.5">📧 Email to send before you call</div>
