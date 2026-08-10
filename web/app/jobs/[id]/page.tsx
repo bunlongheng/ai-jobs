@@ -175,10 +175,12 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
   const meta: string[] = [];
   if (app.rejected_at) meta.push(`Rejected ${app.rejected_at}`);
   const prescan = app.pf_status ? `Prescan: ${app.pf_status}${app.pf_total ? ` ${app.pf_covered}/${app.pf_total}` : ""}` : "";
-  // Tech tags for the hero: every technology the JOB itself names (title + JD only - NOT the
-  // tailored resume, which would pollute it with the owner's own stack). (owner request 2026-08-09)
-  const techText = `${app.title || ""} ${typeof app.jd === "string" ? app.jd : ""}`;
-  const techSlugs = extractAllTech(techText);
+  // Tech tags for the hero: the job's STORED tech (extracted from the job text at scan time,
+  // never the resume - same source the board uses) plus anything else the title/JD names, so a
+  // sparse JD still shows the curated stack. (owner request 2026-08-09)
+  let storedTech: string[] = [];
+  try { storedTech = JSON.parse(app.tech || "[]"); } catch { /* bad json */ }
+  const techSlugs = [...new Set([...storedTech, ...extractAllTech(`${app.title || ""} ${typeof app.jd === "string" ? app.jd : ""}`)])].filter((s) => techMeta(s));
 
   // Posting age from the scan date (source_run = "linkedin-YYYY-MM-DD"). LinkedIn/Indeed
   // publish no hard "apply by" deadline, so we surface how long it has sat instead - the
