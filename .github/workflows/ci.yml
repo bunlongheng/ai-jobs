@@ -18,5 +18,5 @@ jobs:
       - run: npm run lint
       - run: npm test
       - run: npm run build
-      - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
+      # E2E (Playwright) stays out of the fast per-push gate - it needs a running server and is
+      # slow. Run it locally with `npm run test:e2e`, or wire a scheduled workflow for nightly.
