@@ -8,7 +8,7 @@
 // remote + hybrid OK (hybrid scored slightly below remote, never disqualified);
 // any tech_exclude / employment_exclude word-boundary hit disqualifies to 0.
 
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
@@ -26,7 +26,10 @@ export const SHOW_THRESHOLD = 40;   // summary table shows >= 40
 const GENERIC_GLOBE_MD5 = "b8a0bf372c762e966cc99ede8682bc71";
 
 export function loadProfile() {
-  return JSON.parse(readFileSync(PROFILE_PATH, "utf8"));
+  // Fall back to the committed example so a fresh clone (no `npm run setup` yet) still works,
+  // and so CI can score without the gitignored profile.json present.
+  const p = existsSync(PROFILE_PATH) ? PROFILE_PATH : join(ROOT, "profile.example.json");
+  return JSON.parse(readFileSync(p, "utf8"));
 }
 
 export function openDb() {
