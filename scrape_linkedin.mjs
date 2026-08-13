@@ -7,7 +7,7 @@
 
 import {
   loadProfile, openDb, cleanUrl, scoreDedupeInsert, printSummary,
-} from "/Users/bheng/Sites/jobs/scoring.mjs";
+} from "./scoring.mjs";
 
 const BASE = "https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search";
 const UA =

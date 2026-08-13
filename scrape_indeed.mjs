@@ -15,7 +15,7 @@
 import { createRequire } from 'module';
 import {
   loadProfile, openDb, scoreDedupeInsert, printSummary,
-} from '/Users/bheng/Sites/jobs/scoring.mjs';
+} from './scoring.mjs';
 
 // Resolve Playwright from wherever it is installed (honors PLAYWRIGHT_PATH).
 // Falls back to the bheng project's node_modules so this works without a local install.

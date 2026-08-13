@@ -13,10 +13,10 @@ import { createRequire } from "node:module";
 import crypto from "node:crypto";
 
 const require = createRequire(import.meta.url);
-const Database = require("/Users/bheng/Sites/jobs/web/node_modules/better-sqlite3");
+const Database = require(new URL("./web/node_modules/better-sqlite3", import.meta.url).pathname);
 
-export const DB_PATH = "/Users/bheng/Sites/jobs/web/jobs.db";
-export const PROFILE_PATH = "/Users/bheng/Sites/jobs/profile.json";
+export const DB_PATH = process.env.JOBS_DB || new URL("./web/jobs.db", import.meta.url).pathname;
+export const PROFILE_PATH = process.env.PROFILE_PATH || new URL("./profile.json", import.meta.url).pathname;
 export const INSERT_THRESHOLD = 50; // score >= 50 inserts
 export const SHOW_THRESHOLD = 40;   // summary table shows >= 40
 

@@ -1,6 +1,6 @@
 import { signIn } from "@/auth";
 
-// Google sign-in gate. Only bheng.code@gmail.com is accepted (enforced in auth.ts).
+// Google sign-in gate. Only ADMIN_EMAIL is accepted (enforced in auth.ts).
 export default function Login() {
   return (
     <main className="min-h-screen bg-[#f6f8fa] flex items-center justify-center p-6">

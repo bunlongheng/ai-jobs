@@ -6,9 +6,8 @@
  * SECURITY: x-forwarded-for is deliberately NOT consulted (attacker-controlled). This
  * must never be the sole gate in production - callers also require NODE_ENV !== production.
  */
-// Loopback + private LAN ranges (owner decision 2026-08-05: trust the home LAN so the
-// iPad can open the board at http://10.0.0.218:3017 without a login, as it used to).
-// Trade-off accepted: any device on the home WiFi can reach this PII app unauthenticated;
+// Loopback + private LAN ranges. Trusts the home LAN so local devices bypass auth.
+// Trade-off: any device on the local WiFi can reach this PII app unauthenticated;
 // remote access is still gated (only localhost + RFC1918 hosts match, never public IPs).
 const LOCAL_HOST_RE = /^(localhost|127\.0\.0\.1|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}|.*\.localhost)(:\d+)?$/;
 

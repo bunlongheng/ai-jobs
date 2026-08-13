@@ -2,8 +2,7 @@
 import { useState } from "react";
 
 // Copy-to-clipboard button. Works in secure contexts (HTTPS/localhost) via the async
-// Clipboard API, and falls back to execCommand for plain-HTTP LAN (e.g. the iPad at
-// http://10.0.0.218:3017, where navigator.clipboard is undefined). (owner request 2026-08-05)
+// Clipboard API, and falls back to execCommand for plain-HTTP LAN where navigator.clipboard is undefined.
 function copyText(text: string) {
   if (navigator.clipboard && window.isSecureContext) {
     navigator.clipboard.writeText(text).catch(() => fallback(text));

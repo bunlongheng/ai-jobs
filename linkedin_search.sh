@@ -4,8 +4,8 @@
 # dedupes against web/jobs.db, inserts >=50 matches. This is the /jobs-search step
 # scoped to LinkedIn. Indeed/ATS are excluded - Indeed's Cloudflare fallback opens a
 # visible Chrome, which must never happen unattended. Run by com.bheng.linkedin-search.
-NODE=/Users/bheng/.nvm/versions/node/v22.23.1/bin/node
-cd /Users/bheng/Sites/jobs || exit 1
+NODE=$(command -v node)
+cd "$(cd "$(dirname "$0")" && pwd)" || exit 1
 echo "==================== linkedin search $(date '+%Y-%m-%d %H:%M:%S') ===================="
 "$NODE" scrape_linkedin.mjs
 echo "-------------------- hacker news 'who is hiring' --------------------"

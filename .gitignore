@@ -1,5 +1,12 @@
+# env / secrets - never commit
+.env
+.env.*
+!.env.example
+!.env.sample
+
 # transient / bulky - regenerable per run
 *.png
+!docs/screenshots/*.png
 applications/**/*.pdf
 applications/**/*.html
 applications/**/apply-preview.png

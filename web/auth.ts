@@ -1,7 +1,7 @@
 /**
  * NextAuth v5 (Auth.js) - single-user gate.
  *
- * Only ADMIN_EMAIL (default bheng.code@gmail.com) can sign in; every other Google
+ * Only ADMIN_EMAIL can sign in; every other Google
  * identity is rejected in the signIn callback before any session is issued.
  *
  * JWT sessions (no DB adapter) - the app's store is SQLite, and a single user needs
@@ -12,7 +12,7 @@ import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import { isLocal } from "@/lib/is-local";
 
-const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "bheng.code@gmail.com").trim().toLowerCase();
+const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "").trim().toLowerCase();
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,

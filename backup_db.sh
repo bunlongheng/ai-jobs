@@ -5,7 +5,7 @@
 # Keeps the last 14 snapshots, off-machine via iCloud/Dropbox when available.
 set -e
 
-WEB="/Users/bheng/Sites/jobs/web"
+WEB="${JOBS_ROOT:-$(cd "$(dirname "$0")" && pwd)}/web"
 SRC="$WEB/jobs.db"
 
 # Pick an off-machine destination when one exists, else fall back to $HOME.
