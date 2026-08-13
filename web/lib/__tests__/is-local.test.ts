@@ -14,7 +14,7 @@ describe("isLocal", () => {
   it("gates LAN, tailnet, and public hosts", () => {
     expect(isLocal(req({ host: "192.168.1.9:3017" }))).toBe(false);
     expect(isLocal(req({ host: "10.0.0.5:3017" }))).toBe(false);
-    expect(isLocal(req({ host: "m4.tailc55bed.ts.net" }))).toBe(false);
+    expect(isLocal(req({ host: "myhostname.tailnet-abc.ts.net" }))).toBe(false);
     expect(isLocal(req({ host: "evil.example.com" }))).toBe(false);
   });
 
@@ -22,7 +22,7 @@ describe("isLocal", () => {
     // A forwarded-header check was tried but Next sets x-forwarded-* on every request, so
     // the decision is Host-only. A localhost Host bypasses regardless of forwarding.
     expect(isLocal(req({ host: "localhost", "x-forwarded-for": "127.0.0.1" }))).toBe(true);
-    expect(isLocal(req({ host: "m4.tailc55bed.ts.net", "x-forwarded-for": "100.99.41.27" }))).toBe(false);
+    expect(isLocal(req({ host: "myhostname.tailnet-abc.ts.net", "x-forwarded-for": "100.99.41.27" }))).toBe(false);
   });
 
   it("handles a missing Host header", () => {

@@ -40,25 +40,28 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
 
   // Apply-by-email (Hacker News / direct recruiter outreach): the email IS the application.
   // Compose ONE ready-to-send email = subject + cover body + links + walk-through invite.
-  // No name/contact sign-off in the body - the owner's Gmail signature ("Best regard,
-  // Bunlong Heng, email, phone, logo") auto-appends. Form-based ATS apps don't email, so
-  // this block only shows for HN. (owner 2026-08-05)
+  // No name/contact sign-off in the body - your Gmail signature auto-appends.
+  // Form-based ATS apps don't email, so this block only shows for HN.
   const isEmailApply = (app.url || "").toLowerCase().includes("news.ycombinator.com");
-  const emailSubject = `Application: ${app.title ?? ""} - Bunlong Heng`;
+  const OWNER_NAME = process.env.OWNER_NAME || "";
+  const emailSubject = `Application: ${app.title ?? ""}${OWNER_NAME ? ` - ${OWNER_NAME}` : ""}`;
   const coverBody = (() => {
     let b = (kit.coverText || "").trim();
     const i = b.search(/with great excitement|best regard|sincerely/i); // drop any existing sign-off
     if (i >= 0) b = b.slice(0, i).trim();
     return b;
   })();
+  const PORTFOLIO_URL = process.env.PORTFOLIO_URL || "";
+  const GITHUB_URL = process.env.GITHUB_URL || "";
+  const LINKEDIN_URL = process.env.LINKEDIN_URL || "";
   const emailBody = [
     coverBody,
     "",
-    "A few links if useful:",
-    "Portfolio - https://www.bunlongheng.com",
-    "Resume - https://www.bunlongheng.com/resume",
-    "GitHub - https://github.com/bunlongheng",
-    "LinkedIn - https://www.linkedin.com/in/bunlongheng",
+    ...(PORTFOLIO_URL || GITHUB_URL || LINKEDIN_URL ? ["A few links if useful:"] : []),
+    ...(PORTFOLIO_URL ? [`Portfolio - ${PORTFOLIO_URL}`] : []),
+    ...(PORTFOLIO_URL ? [`Resume - ${PORTFOLIO_URL}/resume`] : []),
+    ...(GITHUB_URL ? [`GitHub - ${GITHUB_URL}`] : []),
+    ...(LINKEDIN_URL ? [`LinkedIn - ${LINKEDIN_URL}`] : []),
     "",
     "Happy to walk through any of these projects if one catches your eye - just let me know and we can find a time.",
   ].join("\n");
@@ -168,7 +171,7 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
         {kit.usedMaster ? (
           <div className="bg-white border border-gray-300 rounded-xl px-6 py-5 mb-3.5">
             <h2 className="text-[15px] font-bold mb-1">Resume (this version)</h2>
-            <p className="text-[13px] text-gray-400">Used the master resume (resume-bunlong.pdf).</p>
+            <p className="text-[13px] text-gray-400">Used the master resume PDF.</p>
           </div>
         ) : null}
         {kit.hasResumePdf ? (
@@ -198,7 +201,7 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
                 <CopyButton text={emailSubject} tone="onLight" />
               </div>
               <pre className="whitespace-pre-wrap text-[14px] leading-relaxed text-[#1f2328]" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>{emailBody}</pre>
-              <p className="text-[11px] text-gray-400 mt-4 pt-3 border-t border-gray-100">Your Gmail signature (Best regard, Bunlong Heng + contact) appends below this automatically.</p>
+              <p className="text-[11px] text-gray-400 mt-4 pt-3 border-t border-gray-100">Your Gmail signature appends below this automatically.</p>
             </div>
           </div>
         ) : (

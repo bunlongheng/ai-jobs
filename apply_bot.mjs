@@ -20,7 +20,7 @@ import os from 'os';
 import path from 'path';
 const require = createRequire(import.meta.url);
 let chromium;
-for (const p of ['playwright', os.homedir() + '/Sites/bheng/node_modules/playwright']) {
+for (const p of ['playwright', process.env.PLAYWRIGHT_PATH_ALT].filter(Boolean)) {
   try { ({ chromium } = require(p)); break; } catch (_) {}
 }
 if (!chromium) { console.error('playwright not found'); process.exit(1); }
@@ -29,8 +29,7 @@ const HOME = os.homedir();
 const id = process.argv[2];
 if (!id) { console.error('usage: node apply_bot.mjs <job-id> [--url <applyUrl>]'); process.exit(1); }
 let urlArg = null;
-// The user (Bunlong) explicitly authorized autonomous submission on 2026-07-14
-// ("I am fine you submit for me"), on the conditions that EVERY submission is
+// The owner explicitly authorized autonomous submission, on the conditions that EVERY submission is
 // logged with a full copy of the submitted values, the tracker is updated, and a
 // Stickies note is posted per job. --auto honors that: it only submits forms it
 // verifies are 100% complete, and holds+logs anything it cannot.
@@ -56,8 +55,7 @@ try { CUSTOM = JSON.parse(fs.readFileSync(`${dir}/answers.json`, 'utf8')); } cat
 // per-job radio/toggle rules (same shape as YESNO) - e.g. years-of-experience buckets
 let YESNO_EXTRA = [];
 try { YESNO_EXTRA = JSON.parse(fs.readFileSync(`${dir}/yesno.json`, 'utf8')); } catch (_) {}
-// ALWAYS prefer Bunlong's master resume PDF (his stated preference - never a
-// generated/tailored substitute). Fall back to a kit resume.pdf only if missing.
+// Prefer the master resume PDF (MASTER_RESUME env var, or resume-master.pdf). Fall back to a kit resume.pdf if missing.
 const master = (A.resume_pdf || '').replace(/^~/, os.homedir());
 const resumePdf = master && fs.existsSync(master) ? master
   : (fs.existsSync(`${dir}/resume.pdf`) ? `${dir}/resume.pdf` : null);
@@ -107,7 +105,7 @@ const CHOICE = {
   workauth: ['yes', 'authorized', 'i am authorized'],
   sponsorship: ['no'],
   gender: eeo.gender && /female|woman/i.test(eeo.gender) ? ['woman', 'female'] : ['man', 'male'],
-  // things Bunlong has NOT explicitly told us -> default to "I don't wish to
+  // things the owner has NOT explicitly set -> default to "I don't wish to
   // answer", never assume (no guessing Heterosexual / cisgender / a sub-ethnicity).
   transgender: eeo.transgender ? [eeo.transgender.toLowerCase(), "i don't wish", "don't wish"] : ["i don't wish", "don't wish", 'decline', 'prefer not'],
   orientation: eeo.orientation ? [eeo.orientation.toLowerCase(), "i don't wish", "don't wish"] : ["i don't wish", "don't wish", 'decline', 'prefer not'],
@@ -463,7 +461,7 @@ try {
   }).catch(() => []);
   for (const c of consented) report.push([c, 'consent: checked']);
 
-  // ---- full COPY of everything on the form (the audit trail Bunlong requires) ----
+  // ---- full COPY of everything on the form (audit trail) ----
   const submitted = await page.evaluate(() => {
     const rows = [];
     document.querySelectorAll('input,textarea,select').forEach(el => {
@@ -521,7 +519,7 @@ try {
       const clicked = await btn.click({ timeout: 6000 }).then(() => true).catch(() => false);
       await sleep(5000);
 
-      // ---- Greenhouse email security-code step: enter the code Bunlong's Gmail
+      // ---- Greenhouse email security-code step: enter the code from Gmail
       // received (the assistant writes it to security_code.txt), then resubmit. ----
       const needsCode = await page.locator('text=/security code|enter the code|verification code/i').count().catch(() => 0);
       if (needsCode) {

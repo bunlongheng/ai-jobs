@@ -18,11 +18,9 @@ import {
 } from './scoring.mjs';
 
 // Resolve Playwright from wherever it is installed (honors PLAYWRIGHT_PATH).
-// Falls back to the bheng project's node_modules so this works without a local install.
 const require = createRequire(import.meta.url);
 let chromium;
-for (const p of [process.env.PLAYWRIGHT_PATH, 'playwright',
-                 process.env.HOME + '/Sites/bheng/node_modules/playwright']) {
+for (const p of [process.env.PLAYWRIGHT_PATH, 'playwright']) {
   if (!p) continue;
   try { ({ chromium } = require(p)); break; } catch (_) {}
 }

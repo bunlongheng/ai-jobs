@@ -106,8 +106,13 @@ Copy `.env.example` to `web/.env.local` and set:
 | `GOOGLE_CLIENT_ID` | required | Google OAuth client ID |
 | `GOOGLE_CLIENT_SECRET` | required | Google OAuth client secret |
 | `AUTH_SECRET` | required | Auth.js session secret (any random string) |
-| `AUTH_URL` | required | Your public URL (Tailscale host or localhost) |
+| `AUTH_URL` | `http://localhost:3017` | Your public URL (Tailscale host or prod URL) |
 | `JOBS_DB` | `./jobs.db` | Path to the SQLite file |
+| `OWNER_NAME` | `` | Your name for email subjects |
+| `PORTFOLIO_URL` | `` | Your portfolio URL (added to email apply body) |
+| `GITHUB_URL` | `` | Your GitHub profile URL |
+| `LINKEDIN_URL` | `` | Your LinkedIn profile URL |
+| `MASTER_RESUME` | `resume-master.pdf` | Filename of your master resume PDF |
 
 For local-only use, `localhost:3017` bypasses Google auth entirely - no `ADMIN_EMAIL` needed.
 

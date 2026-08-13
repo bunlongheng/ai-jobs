@@ -7,7 +7,7 @@ export const ROOT = path.resolve(process.cwd(), "..");
 export const PROFILE = path.join(ROOT, "profile.json");
 export const RULES = path.join(ROOT, "jobfill", "rules.json");
 export const COMMANDS = path.join(ROOT, "jobfill", "commands.jsonl");
-export const MASTER_RESUME = path.join(ROOT, "resume-bunlong.pdf");
+export const MASTER_RESUME = path.join(ROOT, process.env.MASTER_RESUME || "resume-master.pdf");
 export const KITS_DIR = path.join(ROOT, "applications");
 
 /** Web pages must not probe this PII API: any http(s) Origin is refused.

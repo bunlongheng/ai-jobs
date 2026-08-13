@@ -12,15 +12,16 @@ import fs from 'fs';
 import os from 'os';
 const require = createRequire(import.meta.url);
 let chromium;
-for (const p of ['playwright', os.homedir() + '/Sites/bheng/node_modules/playwright']) {
+for (const p of ['playwright', process.env.PLAYWRIGHT_PATH_ALT].filter(Boolean)) {
   try { ({ chromium } = require(p)); break; } catch (_) {}
 }
 if (!chromium) { console.error('playwright not found'); process.exit(1); }
 
 const HOME = os.homedir();
-const JOB = `${HOME}/Sites/jobs`;
+const JOB = process.env.JOBS_ROOT || `${HOME}/Sites/jobs`;
 const prof = JSON.parse(fs.readFileSync(`${JOB}/profile.json`)).apply_answers;
-const resume = `${JOB}/resume-bunlong.pdf`;
+const RESUME_NAME = process.env.MASTER_RESUME || 'resume-master.pdf';
+const resume = `${JOB}/${RESUME_NAME}`;
 // Args: --id <ghId> --jid <tracker-id> [--headless]. Defaults keep original behavior.
 const argv = process.argv.slice(2);
 const argOf = (f, d) => { const i = argv.indexOf(f); return i >= 0 ? argv[i + 1] : d; };
