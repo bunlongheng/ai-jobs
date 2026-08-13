@@ -8,12 +8,14 @@
 Scrape jobs, score them against your profile, tailor a resume + cover, and autofill the
 application - all local, all private, zero data sent to a third party.
 
+[![CI](https://github.com/bunlongheng/ai-jobs/actions/workflows/ci.yml/badge.svg)](https://github.com/bunlongheng/ai-jobs/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)
 ![React](https://img.shields.io/badge/React-19-149eca?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript)
 ![SQLite](https://img.shields.io/badge/SQLite-better--sqlite3-003b57?logo=sqlite)
 ![Self-hosted](https://img.shields.io/badge/self--hosted-local%20only-16a34a)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/bunlongheng/ai-jobs/issues)
 
 <img src="docs/screenshots/recruiters.png" alt="AI-Jobs recruiter call sheet" width="820" />
 
