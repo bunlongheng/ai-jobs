@@ -1,0 +1,19 @@
+{
+  "_comment": "Sample recruiter data. Copy this to recruiters.json (gitignored) and replace with your own firms. Groups: nh=near-home, boutique=regional boutiques, national=big national firms, us=nationwide/remote. miles: driving miles from your home, or -1 for remote. Set verifiedPhone true only when you saw the number on the firm's own page.",
+  "nh": [
+    { "name": "Acme Tech Staffing", "city": "Yourtown ST", "miles": 8, "phone": "(555) 010-1000", "tel": "+15550101000", "verifiedPhone": true, "domain": "example.com", "site": "example.com", "siteUrl": "https://www.example.com", "form": "https://www.example.com/contact", "specialty": "Local IT & software staffing" },
+    { "name": "Northbridge Talent Group", "city": "Nearby City ST", "miles": 14, "phone": "(555) 010-2000", "tel": "+15550102000", "verifiedPhone": true, "domain": "example.org", "site": "example.org", "siteUrl": "https://www.example.org", "email": "hello@example.org", "specialty": "Pure IT / software staffing", "star": true, "people": [
+      { "n": "Jane Recruiter (Recruiting Manager)", "em": "jane@example.org" },
+      { "n": "John Lead (runs the local office)", "li": "john-lead", "em": "john@example.org" }
+    ] }
+  ],
+  "boutique": [
+    { "name": "Metro Tech Partners", "city": "Big City ST", "miles": 30, "phone": "(555) 010-3000", "tel": "+15550103000", "verifiedPhone": true, "domain": "example.net", "site": "example.net", "siteUrl": "https://example.net", "form": "https://example.net/contact", "specialty": "Pure-play tech (software, data, cyber)", "people": [{ "n": "Sam Sourcer", "li": "sam-sourcer" }] }
+  ],
+  "national": [
+    { "name": "Bigco Technologies", "city": "Big City ST", "miles": 30, "phone": "(800) 010-4000", "tel": "+18000104000", "verifiedPhone": false, "domain": "bigco.example", "site": "bigco.example", "siteUrl": "https://www.bigco.example", "form": "https://www.bigco.example", "specialty": "Toll-free - national IT staffing, use their portal" }
+  ],
+  "us": [
+    { "name": "RemoteDevs", "city": "Remote (US)", "miles": -1, "domain": "remotedevs.example", "site": "remotedevs.example", "siteUrl": "https://remotedevs.example", "email": "apply@remotedevs.example", "apply": "https://remotedevs.example/apply", "specialty": "Fully remote nationwide SWE roles" }
+  ]
+}

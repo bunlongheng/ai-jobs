@@ -1,21 +1,28 @@
+import fs from "node:fs";
+import path from "node:path";
 import { getLogo } from "@/lib/logos";
 import { db } from "@/lib/db";
 import RecruiterStatus from "../RecruiterStatus";
 import RecruiterNote from "../RecruiterNote";
+import RecruiterMeeting from "../RecruiterMeeting";
+import RecruiterPhone from "../RecruiterPhone";
 import ViewTabs from "../ViewTabs";
 import Backdrop from "../Backdrop";
 import PhonePitch from "../PhonePitch";
+import { FocusProvider, FocusCard } from "../CardFocus";
 
 export const dynamic = "force-dynamic"; // reads cached firm logos + outreach status live
 
 // Per-firm outreach state (flags + "spoke to" note), keyed by "name|city". (owner 2026-08-09)
-type FirmState = { flags: string[]; note: string };
+type FirmState = { flags: string[]; note: string; meeting: string; badPhone: boolean };
 function flagsMap(): Record<string, FirmState> {
   const d = db();
   d.prepare("CREATE TABLE IF NOT EXISTS recruiter_status (firm TEXT PRIMARY KEY, status TEXT, note TEXT, updated_at TEXT)").run();
   try { d.prepare("ALTER TABLE recruiter_status ADD COLUMN note TEXT").run(); } catch { /* already there */ }
-  const rows = d.prepare("SELECT firm, status, note FROM recruiter_status").all() as { firm: string; status: string; note: string }[];
-  return Object.fromEntries(rows.map((r) => [r.firm, { flags: (r.status || "").split(",").filter(Boolean), note: r.note || "" }]));
+  try { d.prepare("ALTER TABLE recruiter_status ADD COLUMN meeting_at TEXT").run(); } catch { /* already there */ }
+  try { d.prepare("ALTER TABLE recruiter_status ADD COLUMN bad_phone INTEGER DEFAULT 0").run(); } catch { /* already there */ }
+  const rows = d.prepare("SELECT firm, status, note, meeting_at, bad_phone FROM recruiter_status").all() as { firm: string; status: string; note: string; meeting_at: string; bad_phone: number }[];
+  return Object.fromEntries(rows.map((r) => [r.firm, { flags: (r.status || "").split(",").filter(Boolean), note: r.note || "", meeting: r.meeting_at || "", badPhone: !!r.bad_phone }]));
 }
 const firmKey = (f: Firm) => `${f.name}|${f.city}`;
 
@@ -30,7 +37,21 @@ const P: Record<string, string> = {
   check: "M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4 12 14.01l-3-3",
   user: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z",
   form: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M9 13h6M9 17h4",
+  cal: "M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z",
 };
+
+// Format a stored "YYYY-MM-DDTHH:mm" (local) as "Aug 14, 2:30 PM" - deterministic (no Date/locale),
+// so the server-rendered badge never mismatches on hydration.
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+function fmtMeeting(v: string): string {
+  const m = v.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+  if (!m) return v;
+  const [, , mo, d, hh, mm] = m;
+  let h = parseInt(hh, 10);
+  const ap = h >= 12 ? "PM" : "AM";
+  h = h % 12 || 12;
+  return `${MONTHS[parseInt(mo, 10) - 1]} ${parseInt(d, 10)}, ${h}:${mm} ${ap}`;
+}
 function Ic({ k, s = 14, cls = "" }: { k: string; s?: number; cls?: string }) {
   return <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls} aria-hidden><path d={P[k]} /></svg>;
 }
@@ -38,7 +59,7 @@ function Ic({ k, s = 14, cls = "" }: { k: string; s?: number; cls?: string }) {
 // Recruiter/staffing call + email sheet - real, source-verified firms in Southern NH + Greater
 // Boston that place software engineers. Phones/emails were seen on the firm's own page; toll-free
 // lines and form-only firms are flagged; nothing is pattern-guessed. Distances are approximate
-// driving miles from Pelham NH (home). (owner request 2026-08-09)
+// driving miles from your home base. (owner request 2026-08-09)
 type Person = { n: string; li?: string; em?: string };
 type Firm = {
   name: string; city: string; miles: number; phone?: string; tel?: string; verifiedPhone?: boolean;
@@ -46,57 +67,31 @@ type Firm = {
   email?: string; form?: string; apply?: string; specialty: string; people?: Person[]; star?: boolean;
 };
 
-const NH: Firm[] = [
-  { name: "Techneeds", city: "Salem NH", miles: 6, phone: "(603) 898-3000", tel: "+16038983000", verifiedPhone: true, domain: "techneeds.com", site: "techneeds.com", siteUrl: "https://www.techneeds.com", form: "https://www.techneeds.com/contact-us/", specialty: "Tech, engineering & manufacturing" },
-  { name: "Alexander Technology Group", city: "Bedford NH", miles: 22, phone: "(603) 637-1466", tel: "+16036371466", verifiedPhone: true, domain: "alexandertg.com", site: "alexandertg.com", siteUrl: "https://www.alexandertg.com", specialty: "Pure IT / software staffing", star: true, people: [
-    { n: "Kevin Smithwood (Recruiting Manager) - spoke + emailed", em: "ksmithwood@alexandertg.com" },
-    { n: "John Whelan (runs NH office)", li: "johnwhelan01", em: "jwhelan@alexandertg.com" },
-    { n: "Paul Silvio (President)", li: "psilvio", em: "psilvio@alexandertg.com" },
-    { n: "Scott Dinneen", li: "scott-dinneen-54bb608", em: "sdinneen@alexandertg.com" },
-    { n: "Tim Darcy", li: "timothy-j-darcy-20aa917", em: "tdarcy@alexandertg.com" },
-  ] },
-  { name: "The DAVIS Companies", city: "Manchester NH", miles: 25, phone: "(603) 891-0111", tel: "+16038910111", verifiedPhone: true, domain: "daviscos.com", site: "daviscos.com", siteUrl: "https://www.daviscos.com", email: "edavis@daviscos.com", specialty: "Technical & IT staffing/recruiting", people: [
-    { n: "Eric Davis (VP Partnerships)", em: "edavis@daviscos.com" },
-    { n: "Andrea Pion (VP Client Programs)", em: "apion@daviscos.com" },
-    { n: "Claire Gibree (HR)", em: "cgibree@daviscos.com" },
-  ] },
-  { name: "Robert Half Technology", city: "Manchester NH", miles: 25, phone: "(603) 932-4231", tel: "+16039324231", verifiedPhone: true, domain: "roberthalf.com", site: "roberthalf.com", siteUrl: "https://www.roberthalf.com", form: "https://www.roberthalf.com", specialty: "Tech practice (SWE, data, AI) · Nashua (603) 932-4842 · no email, use their portal", people: [{ n: "Andrew Hall (Lead Recruiter, RH Tech)", li: "" }] },
-  { name: "Market Street Talent", city: "Portsmouth NH", miles: 45, phone: "(603) 431-0070", tel: "+16034310070", verifiedPhone: true, domain: "marketstreettalent.com", site: "marketstreettalent.com", siteUrl: "https://www.marketstreettalent.com", email: "goodfit@marketstreettalent.com", specialty: "IT-only staffing boutique" },
-  { name: "PRI Technology", city: "Manchester NH", miles: 25, phone: "(603) 641-2000", tel: "+16036412000", verifiedPhone: true, domain: "pritechnology.com", site: "pritechnology.com", siteUrl: "https://pritechnology.com", email: "info@prisearch.com", specialty: "IT staffing (parent: Perennial Resources)" },
-  { name: "Seaglass Technology Partners", city: "Portsmouth NH", miles: 45, phone: "(603) 319-8083", tel: "+16033198083", verifiedPhone: true, domain: "seaglassit.com", site: "seaglassit.com", siteUrl: "https://seaglassit.com", email: "mnguyen@seaglassit.com", specialty: "Software dev, infrastructure, IT", people: [{ n: "Mariam Nguyen", em: "mnguyen@seaglassit.com" }, { n: "Recruiting team also: krogers@, khogan@, egoodridge@" }] },
-  { name: "NESC Staffing", city: "Portsmouth NH", miles: 45, phone: "(603) 431-9740", tel: "+16034319740", verifiedPhone: true, domain: "nesc.com", site: "nesc.com", siteUrl: "https://www.nesc.com", email: "info@nesc.com", specialty: "Technical & engineering staffing" },
-  { name: "HW Staffing (Top Prospect IT)", city: "Nashua NH", miles: 12, phone: "(603) 966-2725", tel: "+16039662725", verifiedPhone: true, domain: "hwstaffing.com", site: "hwstaffing.com", siteUrl: "https://hwstaffing.com", email: "info@hwstaffing.com", specialty: "Acquired Top Prospect (IT) - ask for IT desk" },
-  { name: "Insight Global", city: "Manchester NH", miles: 25, phone: "(855) 485-8853", tel: "+18554858853", verifiedPhone: false, domain: "insightglobal.com", site: "insightglobal.com", siteUrl: "https://insightglobal.com", email: "consultantexperience@insightglobal.com", specialty: "Toll-free · 3rd largest US IT staffing", people: [{ n: "Wes Newcomb (Nashua NH)", li: "jw-newcomb" }] },
-];
+// Recruiter data is PII (real names, emails, phones), so it lives OUTSIDE source in a gitignored
+// data/recruiters.json - copy data/recruiters.example.json to it and fill your own. Falls back to
+// the committed sample so the page renders on a fresh clone. (open-source prep 2026-08-10)
+type RecruiterData = { nh: Firm[]; boutique: Firm[]; national: Firm[]; us: Firm[] };
+function loadRecruiters(): RecruiterData {
+  const dir = path.join(process.cwd(), "data");
+  const real = path.join(dir, "recruiters.json");
+  const sample = path.join(dir, "recruiters.example.json");
+  const file = fs.existsSync(real) ? real : sample;
+  const raw = JSON.parse(fs.readFileSync(file, "utf8"));
+  return { nh: raw.nh || [], boutique: raw.boutique || [], national: raw.national || [], us: raw.us || [] };
+}
 
-const BOUTIQUE: Firm[] = [
-  { name: "Motion Recruitment", city: "Boston", miles: 35, phone: "(617) 804-0399", tel: "+16178040399", verifiedPhone: true, domain: "motionrecruitment.com", site: "motionrecruitment.com", siteUrl: "https://motionrecruitment.com", form: "https://motionrecruitment.com/contact", specialty: "Pure-play tech (software, mobile, data, cyber)", people: [{ n: "Michael Couhig", li: "michael-couhig-a30589200" }, { n: "Trevor Murdock", li: "trevor-murdock-048186297" }] },
-  { name: "Talener", city: "Boston", miles: 35, phone: "(617) 651-8070", tel: "+16176518070", verifiedPhone: true, domain: "talener.com", site: "talener.com", siteUrl: "https://talener.com", email: "info@talener.com", specialty: "Pure IT/tech (Java, .NET, QA, mobile, AI/ML)", people: [{ n: "Bethany Moulthrop (Tech Recruitment Partner)" }] },
-  { name: "Eliassen Group", city: "Reading MA", miles: 22, phone: "(800) 354-2773", tel: "+18003542773", verifiedPhone: false, domain: "eliassen.com", site: "eliassen.com", siteUrl: "https://eliassen.com", form: "https://www.eliassen.com/contact", specialty: "Toll-free · IT staffing & consulting", people: [{ n: "Rebecca Gavel (Lead Recruiter)" }] },
-  { name: "Planet Technology", city: "Bedford MA", miles: 30, phone: "(888) 845-2539", tel: "+18888452539", verifiedPhone: false, domain: "theplanetgroup.com", site: "theplanetgroup.com", siteUrl: "https://theplanetgroup.com", form: "https://www.theplanetgroup.com/contact-us", specialty: "Toll-free · dedicated tech staffing", people: [{ n: "Sean Dowling (Sr VP Tech Recruiting)", li: "sdowling" }] },
-  { name: "Beacon Hill Technologies", city: "Boston", miles: 35, phone: "(617) 326-4000", tel: "+16173264000", verifiedPhone: true, domain: "bhsg.com", site: "bhsg.com", siteUrl: "https://bhsg.com", form: "https://bhsg.com/contact-us/", specialty: "Tech division (Agile, apps, infosec, infra)", people: [{ n: "James Nguyen (Sr)" }, { n: "Ryan Lang", li: "ryan-lang-967a22236" }, { n: "Michaella Walsh", li: "michaellawalsh" }, { n: "Summer Reigles", li: "summer-reigles" }] },
-  { name: "Sullivan & Cogliano", city: "Waltham MA", miles: 33, phone: "(781) 890-7890", tel: "+17818907890", verifiedPhone: true, domain: "sullivancogliano.com", site: "sullivancogliano.com", siteUrl: "https://sullivancogliano.com", email: "jobs@sullivancogliano.com", specialty: "IT staffing (software/hardware/network eng)" },
-  { name: "INSPYR Solutions", city: "Boston", miles: 35, phone: "(617) 412-4300", tel: "+16174124300", verifiedPhone: true, domain: "inspyrsolutions.com", site: "inspyrsolutions.com", siteUrl: "https://inspyrsolutions.com", form: "https://www.inspyrsolutions.com/contact-us/", specialty: "Pure-play IT staffing (formerly Advantis)" },
-  { name: "The Judge Group", city: "Waltham MA", miles: 33, phone: "(781) 966-3600", tel: "+17819663600", verifiedPhone: true, domain: "judge.com", site: "judge.com", siteUrl: "https://judge.com", email: "info@judge.com", specialty: "IT staffing + tech consulting" },
-];
-
-const NATIONAL: Firm[] = [
-  { name: "TEKsystems", city: "Boston", miles: 35, phone: "(617) 449-3000", tel: "+16174493000", verifiedPhone: true, domain: "teksystems.com", site: "teksystems.com", siteUrl: "https://www.teksystems.com", form: "https://www.teksystems.com", specialty: "Pure IT staffing · no applicant email, use careers site", people: [{ n: "Richika Kaushik (Sr Tech TA)" }, { n: "George Sommerville" }] },
-  { name: "Robert Half Technology", city: "Boston", miles: 35, phone: "(617) 843-2915", tel: "+16178432915", verifiedPhone: true, domain: "roberthalf.com", site: "roberthalf.com", siteUrl: "https://www.roberthalf.com", form: "https://www.roberthalf.com", specialty: "Tech practice · use their portal", people: [{ n: "Andrew Hall (Lead Recruiter, RH Tech)" }] },
-  { name: "Randstad Technologies", city: "Boston", miles: 35, phone: "(617) 864-1871", tel: "+16178641871", verifiedPhone: true, domain: "randstadusa.com", site: "randstaddigital.com", siteUrl: "https://www.randstaddigital.com", form: "https://www.randstadusa.com/contact/", specialty: "Tech/digital · Woburn eng (781) 938-1910" },
-  { name: "Kforce", city: "Boston", miles: 35, phone: "(877) 453-6723", tel: "+18774536723", verifiedPhone: false, domain: "kforce.com", site: "kforce.com", siteUrl: "https://www.kforce.com", form: "https://www.kforce.com/contact-us/", specialty: "Toll-free · Technology + Finance practices" },
-];
-
-// Remote work = distance is irrelevant, so miles: -1 renders a "remote" badge. Many are platforms
-// you sign up on rather than call, so they carry an `apply` link instead of a phone. (owner 2026-08-09)
-const US: Firm[] = [
-  { name: "CyberCoders", city: "Irvine CA", miles: -1, phone: "(949) 333-3380", tel: "+19493333380", verifiedPhone: true, domain: "cybercoders.com", site: "cybercoders.com", siteUrl: "https://www.cybercoders.com", form: "https://www.cybercoders.com/contactus/", specialty: "National tech recruiter, remote + onsite SWE" },
-  { name: "Genesis10", city: "New York NY", miles: -1, phone: "(212) 688-5522", tel: "+12126885522", verifiedPhone: true, domain: "genesis10.com", site: "genesis10.com", siteUrl: "https://www.genesis10.com", email: "Contactus@genesis10.com", specialty: "Contract/direct-hire incl. remote SWE" },
-  { name: "Collabera", city: "Basking Ridge NJ", miles: -1, phone: "(877) 264-6424", tel: "+18772646424", verifiedPhone: true, domain: "collabera.com", site: "collabera.com", siteUrl: "https://www.collabera.com", email: "info@collabera.com", specialty: "Contract/direct-hire SWE, remote, 60+ offices" },
-  { name: "Toptal", city: "Remote (US)", miles: -1, phone: "(888) 867-7001", tel: "+18888677001", verifiedPhone: true, domain: "toptal.com", site: "toptal.com", siteUrl: "https://www.toptal.com", email: "support@toptal.com", apply: "https://www.toptal.com/talent/apply", specialty: "Top-3% senior devs, fully remote" },
-  { name: "Jobot", city: "Newport Beach CA", miles: -1, domain: "jobot.com", site: "jobot.com", siteUrl: "https://jobot.com", email: "feedback@jobot.com", specialty: "AI recruiter, nationwide remote SWE roles" },
-  { name: "Mondo", city: "Philadelphia PA", miles: -1, domain: "mondo.com", site: "mondo.com", siteUrl: "https://mondo.com", form: "https://mondo.com/contact/", specialty: "National IT/tech staffing, remote listings" },
-];
+// Personal bits for this page come from profile.json (gitignored) with the committed example as a
+// fallback, so nothing is hardcoded: `pitch` = the call script, `home` = the origin for distances /
+// Google Maps directions. (open-source prep 2026-08-10)
+function loadProfileBits(): { pitch: string; home: string } {
+  for (const p of [path.join(process.cwd(), "..", "profile.json"), path.join(process.cwd(), "..", "profile.example.json")]) {
+    try {
+      const j = JSON.parse(fs.readFileSync(p, "utf8"));
+      return { pitch: j.pitch || "", home: (j.identity && j.identity.location) || "your home base" };
+    } catch { /* try next */ }
+  }
+  return { pitch: "", home: "your home base" };
+}
 
 // Proper LinkedIn brandmark (blue rounded square + white "in") - self-coloured, so it looks clean
 // at small sizes instead of the blobby monochrome glyph. (owner request 2026-08-10)
@@ -105,14 +100,14 @@ const LI = (
 );
 
 // Same pill shape as the city badge (consistency). When it's a real distance, it links to Google
-// Maps directions from Pelham NH so a click shows the route/time. (owner request 2026-08-10)
-const BADGE = "text-[11px] font-bold rounded-md px-2 py-0.5";
-function distBadge(m: number, city: string) {
+// Maps directions from your home base so a click shows the route/time. (owner request 2026-08-10)
+const BADGE = "text-[10px] font-medium rounded-md px-1.5 py-0.5";
+function distBadge(m: number, city: string, home: string) {
   if (m < 0) return <span className={`${BADGE} text-violet-700 bg-violet-100`} title="Remote / nationwide - work from home">remote</span>;
   const cls = m <= 15 ? "text-emerald-700 bg-emerald-100" : m <= 35 ? "text-blue-700 bg-blue-100" : "text-gray-500 bg-gray-100";
   const tag = m <= 15 ? "near" : m <= 35 ? "commutable" : "far";
-  const maps = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent("Pelham, NH")}&destination=${encodeURIComponent(city)}`;
-  return <a href={maps} target="_blank" rel="noopener noreferrer" className={`${BADGE} no-underline hover:brightness-95 ${cls}`} title={`${tag} - about ${m} mi from Pelham NH. Click for Google Maps directions.`}>~{m} mi</a>;
+  const maps = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(home)}&destination=${encodeURIComponent(city)}`;
+  return <a href={maps} target="_blank" rel="noopener noreferrer" className={`${BADGE} no-underline hover:brightness-95 ${cls}`} title={`${tag} - about ${m} mi from ${home}. Click for Google Maps directions.`}>~{m} mi</a>;
 }
 
 // Contacts as a compact aligned mini-table (Name | LinkedIn | Email) - clean to scan when calling.
@@ -137,9 +132,10 @@ function PeopleTable({ people, domain }: { people: Person[]; domain: string }) {
   );
 }
 
-function Card({ f, accent, st }: { f: Firm; accent: string; st: FirmState }) {
+function Card({ f, accent, st, home }: { f: Firm; accent: string; st: FirmState; home: string }) {
   const logo = getLogo(f.domain);
   return (
+    <FocusCard id={firmKey(f)}>
     <div className={`bg-white border rounded-2xl px-4 py-3.5 mb-2.5 shadow-sm ${f.star ? "border-teal-300 ring-1 ring-teal-200" : "border-gray-200"}`}>
       <div className="flex justify-between items-start gap-3 flex-wrap">
         <div className="flex items-center gap-2.5 min-w-0">
@@ -151,27 +147,33 @@ function Card({ f, accent, st }: { f: Firm; accent: string; st: FirmState }) {
             <div className="font-bold text-[15px] text-[#1f2328] leading-tight">{f.name} {f.star ? <span title="Strongest local lead">⭐</span> : null}</div>
             <div className="flex items-center gap-2 mt-1 flex-wrap">
               <span className={`${BADGE} ${accent}`}>{f.city}</span>
-              {distBadge(f.miles, f.city)}
-              {f.email ? <a href={`mailto:${f.email}`} className="text-[12px] font-bold text-indigo-600 no-underline inline-flex items-center gap-1"><Ic k="mail" s={12} />{f.email}</a>
-                : f.form ? <a href={f.form} target="_blank" rel="noopener noreferrer" className="text-[11.5px] text-gray-500 no-underline inline-flex items-center gap-1"><Ic k="form" s={12} />contact form</a> : null}
-              {f.apply ? <a href={f.apply} target="_blank" rel="noopener noreferrer" className="text-[12px] font-bold text-violet-600 no-underline inline-flex items-center gap-1"><Ic k="check" s={12} />Apply</a> : null}
+              {distBadge(f.miles, f.city, home)}
+              {st.note.trim() ? <span className={`${BADGE} text-slate-700 bg-slate-100 inline-flex items-center gap-1`} title="Spoke to"><Ic k="user" s={10} />{st.note.trim()}</span> : null}
+              {st.meeting ? <span className={`${BADGE} text-rose-700 bg-rose-100 inline-flex items-center gap-1`} title="Next meeting"><Ic k="cal" s={10} />{fmtMeeting(st.meeting)}</span> : null}
+              {f.email ? <a href={`mailto:${f.email}`} title="Email" className={`${BADGE} text-indigo-700 bg-indigo-100 no-underline inline-flex items-center gap-1 hover:brightness-95`}><Ic k="mail" s={10} />{f.email}</a>
+                : f.form ? <a href={f.form} target="_blank" rel="noopener noreferrer" title="Contact form" className={`${BADGE} text-gray-600 bg-gray-100 no-underline inline-flex items-center gap-1 hover:brightness-95`}><Ic k="form" s={10} />contact form</a> : null}
+              {f.apply ? <a href={f.apply} target="_blank" rel="noopener noreferrer" title="Apply" className={`${BADGE} text-violet-700 bg-violet-100 no-underline inline-flex items-center gap-1 hover:brightness-95`}><Ic k="check" s={10} />Apply</a> : null}
             </div>
           </div>
         </div>
         <div className="flex flex-col items-end gap-2 shrink-0">
-          {f.tel ? <a href={`tel:${f.tel}`} className="font-bold text-[15px] no-underline inline-flex items-center gap-1 text-[#1f2328]"><Ic k="phone" s={13} cls="text-gray-500" />{f.phone}</a> : null}
-          <RecruiterStatus firm={firmKey(f)} initial={st.flags} />
-          <RecruiterNote firm={firmKey(f)} initial={st.note} />
+          {f.tel ? <RecruiterPhone firm={firmKey(f)} phone={f.phone || ""} tel={f.tel} initialBroken={st.badPhone} /> : null}
+          <div className="flex items-center gap-1.5 justify-end flex-wrap">
+            <RecruiterNote firm={firmKey(f)} initial={st.note} />
+            <RecruiterStatus firm={firmKey(f)} initial={st.flags} />
+            <RecruiterMeeting firm={firmKey(f)} initial={st.meeting} />
+          </div>
         </div>
       </div>
       <div className="text-[13px] text-gray-500 mt-2">{f.specialty} · <a href={f.siteUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 no-underline">{f.site}</a></div>
       {f.people?.length ? <PeopleTable people={f.people} domain={f.domain} /> : null}
     </div>
+    </FocusCard>
   );
 }
 
 // A region rendered as a board-style panel: gradient header (icon + title + count) over a card list.
-function Section({ icon, title, grad, firms, accent, fmap }: { icon: string; title: string; grad: string; firms: Firm[]; accent: string; fmap: Record<string, FirmState> }) {
+function Section({ icon, title, grad, firms, accent, fmap, home }: { icon: string; title: string; grad: string; firms: Firm[]; accent: string; fmap: Record<string, FirmState>; home: string }) {
   return (
     <div className="mt-4 rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
       <div className={`bg-gradient-to-r ${grad} px-4 py-2.5 flex items-center gap-2`}>
@@ -180,7 +182,7 @@ function Section({ icon, title, grad, firms, accent, fmap }: { icon: string; tit
         <span className="text-xs font-bold rounded-full px-2.5 py-0.5 bg-white/30 text-white">{firms.length}</span>
       </div>
       <div className="p-3 sm:p-4">
-        {firms.map((f) => <Card key={f.name + f.city} f={f} accent={accent} st={fmap[firmKey(f)] || { flags: [], note: "" }} />)}
+        {firms.map((f) => <Card key={f.name + f.city} f={f} accent={accent} st={fmap[firmKey(f)] || { flags: [], note: "", meeting: "", badPhone: false }} home={home} />)}
       </div>
     </div>
   );
@@ -200,9 +202,12 @@ function Tile({ n, label, grad, icon }: { n: number; label: string; grad: string
 
 export default function RecruitersPage() {
   const fmap = flagsMap();
+  const { nh: NH, boutique: BOUTIQUE, national: NATIONAL, us: US } = loadRecruiters();
+  const { pitch, home } = loadProfileBits();
   const all = [...NH, ...BOUTIQUE, ...NATIONAL, ...US];
   const has = (flag: string) => all.filter((f) => (fmap[firmKey(f)]?.flags || []).includes(flag)).length;
   return (
+    <FocusProvider>
     <div className="min-h-screen">
       <Backdrop variant="rec" />
       <div className="max-w-[900px] mx-auto px-4 sm:px-5 py-4 sm:py-7 pb-16">
@@ -222,18 +227,18 @@ export default function RecruitersPage() {
           <Tile n={all.length} label="Firms" grad="from-gray-700 to-gray-900" icon="users" />
           <Tile n={has("called")} label="Called" grad="from-emerald-500 to-green-600" icon="phone" />
           <Tile n={has("emailed")} label="Emailed" grad="from-indigo-500 to-violet-600" icon="mail" />
-          <Tile n={has("replied")} label="Replied" grad="from-fuchsia-500 to-pink-600" icon="check" />
         </div>
 
 
-        <Section icon="home" title="Southern NH - closest to home" grad="from-teal-500 to-emerald-600" firms={NH} accent="text-teal-700 bg-teal-100" fmap={fmap} />
-        <Section icon="city" title="Greater Boston - tech boutiques" grad="from-blue-600 to-indigo-700" firms={BOUTIQUE} accent="text-blue-700 bg-blue-100" fmap={fmap} />
-        <Section icon="building" title="Greater Boston - national tech firms" grad="from-sky-500 to-blue-600" firms={NATIONAL} accent="text-blue-700 bg-blue-100" fmap={fmap} />
-        <Section icon="users" title="US - nationwide & remote-friendly" grad="from-violet-600 to-purple-700" firms={US} accent="text-violet-700 bg-violet-100" fmap={fmap} />
+        <Section icon="home" title="Southern NH - closest to home" grad="from-teal-500 to-emerald-600" firms={NH} accent="text-teal-700 bg-teal-100" fmap={fmap} home={home} />
+        <Section icon="city" title="Greater Boston - tech boutiques" grad="from-blue-600 to-indigo-700" firms={BOUTIQUE} accent="text-blue-700 bg-blue-100" fmap={fmap} home={home} />
+        <Section icon="building" title="Greater Boston - national tech firms" grad="from-sky-500 to-blue-600" firms={NATIONAL} accent="text-blue-700 bg-blue-100" fmap={fmap} home={home} />
+        <Section icon="users" title="US - nationwide & remote-friendly" grad="from-violet-600 to-purple-700" firms={US} accent="text-violet-700 bg-violet-100" fmap={fmap} home={home} />
 
-        <div className="text-center text-[11px] text-gray-400 mt-5">Distances are approximate driving miles from Pelham NH. Every phone/email was seen on the firm&apos;s own page or a directory - none pattern-guessed. Confirm named recruiters still cover your market.</div>
+        <div className="text-center text-[11px] text-gray-400 mt-5">Distances are approximate driving miles from {home}. Every phone/email was seen on the firm&apos;s own page or a directory - none pattern-guessed. Confirm named recruiters still cover your market.</div>
       </div>
-      <PhonePitch />
+      <PhonePitch pitch={pitch} />
     </div>
+    </FocusProvider>
   );
 }

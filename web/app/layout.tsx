@@ -12,7 +12,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const APP_URL = process.env.APP_URL || "https://m4.tailc55bed.ts.net";
+const APP_URL = process.env.APP_URL || "http://localhost:3017";
 const DESC = "Job-hunt pipeline - find, score, tailor, apply, track";
 
 export const metadata: Metadata = {

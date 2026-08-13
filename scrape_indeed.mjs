@@ -15,14 +15,14 @@
 import { createRequire } from 'module';
 import {
   loadProfile, openDb, scoreDedupeInsert, printSummary,
-} from '/Users/bheng/Sites/jobs/scoring.mjs';
+} from './scoring.mjs';
 
 // Resolve Playwright from wherever it is installed (honors PLAYWRIGHT_PATH).
 // Falls back to the bheng project's node_modules so this works without a local install.
 const require = createRequire(import.meta.url);
 let chromium;
 for (const p of [process.env.PLAYWRIGHT_PATH, 'playwright',
-                 process.env.HOME + '/Sites/bheng/node_modules/playwright']) {
+                 (process.env.PLAYWRIGHT_PATH || "playwright")]) {
   if (!p) continue;
   try { ({ chromium } = require(p)); break; } catch (_) {}
 }
@@ -48,11 +48,10 @@ const QUERIES = override ? [{ q: override, l: 'Remote' }] : [
   // PHP / Laravel full-stack (owner: Laravel 4->13, 12+ yrs; wants these surfaced 2026-08-05)
   { q: 'senior php laravel engineer', l: 'Remote' },
   { q: 'full stack laravel developer', l: 'United States' },
-  // New Hampshire local - owner is in Pelham NH and will consider on-site/hybrid within
-  // ~10mi (Nashua/Salem/Windham/Hudson NH + Lowell/Dracut MA). (owner 2026-08-05)
-  { q: 'software engineer', l: 'Nashua, NH' },
-  { q: 'full stack developer', l: 'Salem, NH' },
-  { q: 'software engineer', l: 'Pelham, NH' },
+  // Local on-site/hybrid queries - EDIT these to your own area (or delete this block).
+  { q: 'software engineer', l: 'Your City, ST' },
+  { q: 'full stack developer', l: 'Your City, ST' },
+  { q: 'software engineer', l: 'Your City, ST' },
   // AI-assisted / build-with-AI product roles (owner target 2026-08-03, e.g. Origami "AI Product Engineer")
   { q: 'AI product engineer', l: 'Remote' },
   { q: 'forward deployed engineer', l: 'Remote' },

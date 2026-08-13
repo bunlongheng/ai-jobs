@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { crossOriginBlocked } from "@/lib/jobfill";
 
 export const dynamic = "force-dynamic";
 
@@ -8,6 +9,7 @@ export const dynamic = "force-dynamic";
  *  distinct from a thumbs-down dislike. Already-applied/rejected history is left untouched.
  *  {unhold:true} restores held jobs to kit_ready. (owner request 2026-08-06) */
 export async function POST(req: Request) {
+  const xo = crossOriginBlocked(req); if (xo) return xo;
   let body: { company?: string; unhold?: boolean };
   try { body = await req.json(); } catch { return NextResponse.json({ error: "bad json" }, { status: 400 }); }
   const company = String(body.company || "").trim();

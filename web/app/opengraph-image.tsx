@@ -38,7 +38,7 @@ export default function OpengraphImage() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 24, marginBottom: 34 }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
+          { }
           <img src={icon} width={96} height={96} style={{ borderRadius: 22 }} alt="" />
           <div style={{ display: "flex", flexDirection: "column" }}>
             <div style={{ fontSize: 60, fontWeight: 800, lineHeight: 1 }}>Jobs</div>

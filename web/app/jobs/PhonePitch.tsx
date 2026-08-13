@@ -1,34 +1,36 @@
 "use client";
 import { useState } from "react";
+import { useFocus } from "./CardFocus";
 
-// A quiet floating reminder note (bottom-right) with what to say on the call, and Bunlong's photo
-// overlapping the top-right corner. No panel header - just the note. Minimizes to a phone button.
-// (owner request 2026-08-10)
-const PITCH = "Hi, my name's Bunlong Heng. I'm a senior full-stack engineer up in New Hampshire, looking for my next role - open to remote or hybrid around Boston, about 12 years in TypeScript, React, and Node. I wanted to see if you place software engineers, and whether you've got anything that might be a fit. Would it be alright to send you my resume?";
-const PHONE = "M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.4a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z";
+// A quiet floating reminder note with what to say on the call, and your photo overlapping the
+// top-left corner. The script text comes from profile.json (pitch), passed in as a prop so no
+// personal data is hardcoded. Collapses to your photo. (owner request 2026-08-10)
+export default function PhonePitch({ pitch }: { pitch: string }) {
+  // Collapsed by default to just a phone icon (top-left); tap to reveal what to say on the call.
+  // Clicking a recruiter card (focus) auto-opens it so the script is up while you dial. Derived,
+  // not an effect: expanded whenever a card is focused OR you opened it manually.
+  const [open, setOpen] = useState(false);
+  const { focused } = useFocus();
+  const expanded = open || focused !== null;
 
-export default function PhonePitch() {
-  // Expanded by default, pinned top-left; the minimize (-) collapses it to just Bunlong's photo.
-  const [open, setOpen] = useState(true);
-
-  if (!open) {
+  if (!expanded) {
     return (
       <button onClick={() => setOpen(true)} title="What to say on the call"
         className="fixed top-4 left-4 z-50 w-14 h-14 rounded-full border-[3px] border-white shadow-lg overflow-hidden hover:scale-105 transition-transform bg-white">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/me.png" alt="Bunlong" width={56} height={56} className="w-full h-full object-cover" />
+        <img src="/me.png" alt="Profile" width={56} height={56} className="w-full h-full object-cover" />
       </button>
     );
   }
 
   return (
-    <div className="fixed top-4 left-4 z-50 w-[calc(100vw-2rem)] sm:w-[320px]">
-      <div className="relative bg-white border border-gray-200 rounded-2xl shadow-xl px-4 pt-4 pb-4">
+    <div className="fixed top-1/2 -translate-y-1/2 left-4 sm:left-[max(1rem,calc(50vw-49rem))] z-50 w-[calc(100vw-2rem)] sm:w-[320px]">
+      <div className="relative bg-white border border-gray-200 rounded-2xl shadow-xl pl-6 pr-4 pt-6 pb-4">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/me.png" alt="Bunlong" width={52} height={52} className="absolute -top-5 -left-4 w-[52px] h-[52px] rounded-full border-[3px] border-white shadow-md object-cover" />
+        <img src="/me.png" alt="Profile" width={52} height={52} className="absolute -top-5 -left-4 w-[52px] h-[52px] rounded-full border-[3px] border-white shadow-md object-cover" />
         <button onClick={() => setOpen(false)} title="Hide" className="absolute top-2 right-2 text-gray-300 hover:text-gray-500 text-lg leading-none">&minus;</button>
         <div className="text-[10px] font-bold uppercase tracking-wide text-indigo-500 mb-1.5 pl-9">Say on the call</div>
-        <div className="text-[13.5px] leading-relaxed text-[#1f2328]">{PITCH}</div>
+        <div className="text-[13.5px] leading-relaxed text-[#1f2328]">{pitch}</div>
       </div>
     </div>
   );

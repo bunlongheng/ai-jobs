@@ -6,7 +6,7 @@
   <key>ProgramArguments</key>
   <array>
     <string>/bin/zsh</string>
-    <string>/Users/bheng/Sites/jobs/backup_db.sh</string>
+    <string>__HOME__/Sites/jobs/backup_db.sh</string>
   </array>
   <!-- WAL-safe online snapshot of jobs.db (the single source of truth) to iCloud/JobsBackups,
        keeping the last 14. Runs at load and every 6h so a crash never loses more than a few
@@ -15,9 +15,9 @@
   <key>StartInterval</key><integer>21600</integer>
   <key>EnvironmentVariables</key>
   <dict>
-    <key>PATH</key><string>/Users/bheng/.nvm/versions/node/v22.23.1/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    <key>PATH</key><string>__NODE_BIN__:/usr/bin:/bin:/usr/sbin:/sbin</string>
   </dict>
-  <key>WorkingDirectory</key><string>/Users/bheng/Sites/jobs/web</string>
+  <key>WorkingDirectory</key><string>__HOME__/Sites/jobs/web</string>
   <key>StandardOutPath</key><string>/tmp/jobs-backup.log</string>
   <key>StandardErrorPath</key><string>/tmp/jobs-backup.log</string>
 </dict>

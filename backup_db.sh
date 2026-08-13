@@ -10,8 +10,8 @@
 #      Writes work under launchd; pruning does not, so it is left unpruned (tiny files, secondary).
 set -e
 
-WEB="/Users/bheng/Sites/jobs/web"
-SRC="$WEB/jobs.db"
+WEB="$(cd "$(dirname "$0")/web" && pwd)"
+SRC="${JOBS_DB:-$WEB/jobs.db}"
 
 LOCAL_DIR="$HOME/.jobs-db-backups"
 mkdir -p "$LOCAL_DIR"

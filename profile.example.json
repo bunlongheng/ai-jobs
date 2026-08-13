@@ -1,0 +1,214 @@
+{
+  "schema": 1,
+  "updated": "2020-01-01",
+  "identity": {
+    "name": "Your Name",
+    "email": "you@example.com",
+    "phone": "555-555-0100",
+    "site": "https://your-portfolio.example",
+    "github": "https://github.com/yourhandle",
+    "linkedin": "https://www.linkedin.com/in/yourhandle",
+    "location": "Your City, ST",
+    "resume_pdf": "resume-you.pdf"
+  },
+  "targets": {
+    "titles": [
+      "Senior Full Stack Engineer",
+      "Staff Full Stack Engineer",
+      "Senior Software Engineer",
+      "Staff Software Engineer"
+    ],
+    "seniority": [
+      "Senior",
+      "Staff"
+    ],
+    "remote": "remote preferred; salary floor as set below",
+    "locations": [
+      "Remote (US)",
+      "Your metro area"
+    ],
+    "comp_min_base_usd": 140000,
+    "comp_target_base_usd": 200000,
+    "_confirm": []
+  },
+  "must_haves": [
+    "Remote (US) preferred; hybrid OK up to 2 days/week",
+    "Senior or Staff full-stack IC scope",
+    "Modern stack: React/Next/Node/TypeScript"
+  ],
+  "deal_breakers": [
+    "On-site or hybrid required more than 2 days/week",
+    "Junior or mid-level only",
+    "Primarily non-technical / pure people-management",
+    "Java as a primary language",
+    "Angular / AngularJS",
+    "C# / .NET",
+    "Contract / contractor / temporary roles"
+  ],
+  "stack": {
+    "frontend": [
+      "React",
+      "Next.js",
+      "TypeScript",
+      "Tailwind",
+      "Vue.js"
+    ],
+    "backend": [
+      "Node.js",
+      "Express",
+      "Laravel",
+      "Python",
+      "Django"
+    ],
+    "cloud": [
+      "AWS",
+      "Vercel",
+      "Cloudflare",
+      "Docker",
+      "Kubernetes",
+      "Terraform",
+      "Nginx"
+    ],
+    "security": [
+      "Auth0",
+      "IAM",
+      "SAML 2.0",
+      "OpenID Connect",
+      "OWASP",
+      "WAF",
+      "Zero Trust",
+      "PenTest+",
+      "CEH"
+    ],
+    "data": [
+      "PostgreSQL",
+      "MySQL",
+      "DynamoDB",
+      "RDS",
+      "Supabase",
+      "Snowflake",
+      "BigQuery"
+    ],
+    "observability": [
+      "Datadog",
+      "CloudWatch",
+      "Sentry"
+    ],
+    "ai": [
+      "Prompt Engineering",
+      "MCP",
+      "RAG",
+      "Vector Search",
+      "Agent Orchestration"
+    ]
+  },
+  "certs": [
+    "Example Cert (2020)"
+  ],
+  "highlights": [
+    "Shipped a production system used by N users",
+    "Led migration from X to Y, cutting Z by N%"
+  ],
+  "apply_answers": {
+    "full_name": "Your Name",
+    "email": "you@example.com",
+    "phone": "555-555-0100",
+    "location": "Your City, ST",
+    "work_authorization": "US citizen",
+    "requires_sponsorship": "No, not now or in the future",
+    "willing_to_relocate": "No - remote or local only",
+    "remote_ok": "Yes - remote preferred; hybrid OK up to 2 days/week",
+    "earliest_start": "2 weeks from offer acceptance",
+    "notice_period": "2 weeks",
+    "desired_base_salary_usd": "140000-200000",
+    "years_experience": "12+",
+    "github": "https://github.com/yourhandle",
+    "portfolio": "https://your-portfolio.example",
+    "linkedin": "https://www.linkedin.com/in/yourhandle",
+    "resume_pdf": "resume-you.pdf",
+    "references": "Available on request",
+    "cover_letter_default": "always",
+    "eeo": {
+      "gender": "Prefer not to say",
+      "race": "Prefer not to say",
+      "veteran": "Prefer not to say",
+      "disability": "Prefer not to say",
+      "ethnicity_options": [],
+      "orientation": "Prefer not to say",
+      "transgender": "Prefer not to say"
+    },
+    "work_arrangement": "Remote preferred; hybrid OK up to 2 days/week",
+    "security_clearance": "None",
+    "current_company": "Current Employer",
+    "current_title": "Senior Software Engineer"
+  },
+  "sources": {
+    "indeed": {
+      "type": "connector",
+      "enabled": true,
+      "how": "Claude UI -> Search & Tools -> Add connectors -> Indeed -> sign in. Native job-search/job-detail tools.",
+      "note": "First-party Anthropic connector (claude.com/connectors/indeed). ToS-clean."
+    },
+    "linkedin": {
+      "type": "manual",
+      "enabled": true,
+      "how": "Paste LinkedIn job URLs into /job-search, or forward LinkedIn saved-search email alerts. No scraping.",
+      "note": "User chose skip-live-scraping to avoid ToS/account-ban risk. Do NOT wire a cookie-based LinkedIn MCP."
+    }
+  },
+  "scoring": {
+    "weights": {
+      "title_seniority_match": 25,
+      "stack_overlap": 25,
+      "remote_comp_fit": 20,
+      "domain_relevance": 15,
+      "company_quality": 15
+    },
+    "apply_threshold": 50,
+    "notes": "Score 0-100. Below apply_threshold = skip. 50-84 = tailor + apply. 85+ = priority. Do not penalize offers at or above your salary floor."
+  },
+  "tech_exclude": [
+    "java",
+    "angular",
+    "angularjs",
+    "c#",
+    "c sharp",
+    ".net",
+    "dotnet"
+  ],
+  "employment_exclude": [
+    "contract",
+    "contractor",
+    "c2c",
+    "corp-to-corp",
+    "corp to corp",
+    "1099",
+    "temporary",
+    "temp-to-hire",
+    "w2 contract"
+  ],
+  "education": {
+    "school": "Your University",
+    "degree": "B.S.",
+    "field": "Computer Science",
+    "start_month": "September",
+    "start_year": "2010",
+    "end_month": "May",
+    "end_year": "2014",
+    "grad_year": "2014",
+    "still_student": false
+  },
+  "pitch": "Hi, my name's Your Name. I'm a senior software engineer looking for my next role - fully remote. I wanted to see if you place software engineers, and whether you've got anything that might be a fit. Would it be alright to send you my resume?",
+  "near_home": [
+    {
+      "match": "\\byour ?town,?\\s*st\\b",
+      "town": "Your Town, ST",
+      "miles": 0
+    },
+    {
+      "match": "\\bnearby city,?\\s*st\\b",
+      "town": "Nearby City, ST",
+      "miles": 8
+    }
+  ]
+}

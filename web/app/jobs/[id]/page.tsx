@@ -5,6 +5,7 @@ import { getLogo } from "@/lib/logos";
 import { nearHome } from "@/lib/near-home";
 import { altitude, ALT_META } from "@/lib/altitude";
 import ReachOut from "../ReachOut";
+import JobDescription from "../JobDescription";
 import FindEmailButton from "../FindEmailButton";
 import Reactions from "../Reactions";
 import CopyButton from "../CopyButton";
@@ -14,6 +15,16 @@ import fs from "fs";
 import path from "path";
 
 export const dynamic = "force-dynamic";
+
+// Outreach identity (name, links, contact) comes from profile.json at the repo root, so no
+// personal data is hardcoded in source. Falls back to profile.example.json on a fresh clone.
+// (open-source prep 2026-08-10)
+function loadIdentity(): { name?: string; email?: string; phone?: string; site?: string; github?: string; linkedin?: string } {
+  for (const p of [path.join(process.cwd(), "..", "profile.json"), path.join(process.cwd(), "..", "profile.example.json")]) {
+    try { return JSON.parse(fs.readFileSync(p, "utf8")).identity || {}; } catch { /* try next */ }
+  }
+  return {};
+}
 
 // Load the JobFill rules once so we can resolve a paste-ready ANSWER for each screening
 // question the prescan flagged MANUAL - the owner wants an answer to copy, not just a flag.
@@ -88,28 +99,27 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
   // sign-off + contact. Gmail's URL-compose does NOT auto-insert the account signature, so
   // the sign-off block MUST live in the body. (owner 2026-08-05)
   const isEmailApply = (app.url || "").toLowerCase().includes("news.ycombinator.com");
-  const emailSubject = `Application: ${app.title ?? ""} - Bunlong Heng`;
+  const me = loadIdentity();
+  const emailSubject = `Application: ${app.title ?? ""}${me.name ? ` - ${me.name}` : ""}`;
   const coverBody = (() => {
     let b = (kit.coverText || "").trim();
     const i = b.search(/with great excitement|best regard|sincerely/i); // drop any existing sign-off
     if (i >= 0) b = b.slice(0, i).trim();
     return b;
   })();
+  const links = [
+    me.site && `Portfolio - ${me.site}`,
+    me.site && `Resume - ${me.site.replace(/\/$/, "")}/resume`,
+    me.github && `GitHub - ${me.github}`,
+    me.linkedin && `LinkedIn - ${me.linkedin}`,
+  ].filter(Boolean) as string[];
   const emailBody = [
     coverBody,
     "",
-    "A few links if useful:",
-    "Portfolio - https://www.bunlongheng.com",
-    "Resume - https://www.bunlongheng.com/resume",
-    "GitHub - https://github.com/bunlongheng",
-    "LinkedIn - https://www.linkedin.com/in/bunlongheng",
-    "",
+    ...(links.length ? ["A few links if useful:", ...links, ""] : []),
     "Happy to walk through any of these projects if one catches your eye - just let me know and we can find a time.",
     "",
-    "With great excitement,",
-    "Bunlong Heng",
-    "bheng.code@gmail.com",
-    "978-677-0861",
+    ...["With great excitement,", me.name, me.email, me.phone].filter(Boolean),
   ].join("\n");
   // Find the apply-to email in the posting. Handles plain addresses AND the HN-style obfuscation
   // "name [at] company [dot] com". VALIDATES the result so we never inject garbage into the To:
@@ -186,11 +196,11 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
   // publish no hard "apply by" deadline, so we surface how long it has sat instead - the
   // older a listing, the likelier it has closed. Age flag only; never auto-archives. (2026-08-02)
   const seenIso = (app.source_run || "").match(/(\d{4}-\d{2}-\d{2})/)?.[1] || (app.updated_at || "").slice(0, 10) || "";
+  // eslint-disable-next-line react-hooks/purity -- server component: per-request "now" for a read-only job-age flag
   const ageDays = seenIso ? Math.max(0, Math.floor((Date.now() - new Date(`${seenIso}T00:00:00`).getTime()) / 86400000)) : null;
   const showAge = ageDays !== null && ["planned", "kit_ready", "manual_only"].includes(app.status || "");
   const stale = ageDays !== null && ageDays >= 28;
   const aging = ageDays !== null && ageDays >= 15 && ageDays < 28;
-  const ageCls = stale ? "text-rose-700 bg-rose-100" : aging ? "text-amber-700 bg-amber-100" : "text-gray-500 bg-gray-100";
   const ageLabel = ageDays === null ? "" : `Seen ${ageDays}d ago${stale ? " · likely expired" : aging ? " · apply soon" : ""}`;
 
   // Source (LinkedIn / Indeed / Ashby ...) derived from the apply URL, for its icon.
@@ -206,7 +216,7 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
 
   return (
     <main className="min-h-screen bg-[#f6f8fa] text-[#1f2328]" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
-      <div className="max-w-[900px] mx-auto px-5 py-6 pb-16">
+      <div className="max-w-[900px] mx-auto px-5 py-6 pb-16" style={{ zoom: 0.85 }}>
         <Link href={backHref} className="text-xs text-blue-700 no-underline">&larr; back to board</Link>
 
         <div className="bg-white border border-gray-200 rounded-2xl px-6 py-5 mt-3 mb-4 shadow-sm">
@@ -243,9 +253,9 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
                     const nh = nearHome(app.location);
                     if (!nh) return null;
                     return (
-                      <span title={`${nh.town} - about ${nh.miles} miles from Pelham, NH`} className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-0.5">
+                      <span title={`${nh.town} - about ${nh.miles} miles from home`} className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-0.5">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z" /><circle cx="12" cy="10" r="2.5" /></svg>
-                        Near home {nh.miles === 0 ? "(Pelham)" : `~${nh.miles}mi`}
+                        Near home {nh.miles > 0 ? `~${nh.miles}mi` : ""}
                       </span>
                     );
                   })()}
@@ -278,7 +288,7 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
             <div className="text-right shrink-0">
               <span className={`inline-block text-[11px] px-2.5 py-1 rounded-md uppercase font-bold tracking-wide border ${STPILL[app.status || "planned"] || "bg-gray-100 text-gray-500 border-gray-200"}`}>{app.status}</span>
               <div className="text-[26px] font-extrabold text-blue-700 mt-2 leading-none">{app.score ?? "-"}</div>
-              <div className="mt-2.5 flex justify-end items-center"><Reactions id={app.id} liked={app.liked} status={app.status} appliedAt={app.applied_at} company={app.company} /></div>
+              <div className="mt-2.5 flex justify-end items-center gap-2 flex-wrap"><ReachOut company={app.company || ""} title={app.title || ""} jd={typeof app.jd === "string" ? app.jd : ""} me={me} /><Reactions id={app.id} liked={app.liked} status={app.status} appliedAt={app.applied_at} company={app.company} /></div>
             </div>
           </div>
           {/* Every action now lives in the icon row above (Applied + Hold-off included), so the
@@ -294,14 +304,14 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
           ) : null}
         </div>
 
-        <ReachOut company={app.company || ""} title={app.title || ""} jd={typeof app.jd === "string" ? app.jd : ""} />
-
         {app.jd ? (
           <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden mb-3.5">
             <div className="bg-gradient-to-r from-slate-600 to-slate-800 px-4 py-2.5">
               <h2 className="text-sm text-white tracking-wide flex items-center gap-2"><HIcon d={HD.jd} />Job description</h2>
             </div>
-            <div className="text-[13px] leading-relaxed px-6 py-5 whitespace-pre-wrap text-[#1f2328]">{typeof app.jd === "string" ? app.jd : String(app.jd ?? "")}</div>
+            <div className="px-6 py-5">
+              <JobDescription text={typeof app.jd === "string" ? app.jd : String(app.jd ?? "")} />
+            </div>
           </div>
         ) : null}
 
@@ -315,7 +325,7 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
         {kit.usedMaster ? (
           <div className="bg-white border border-gray-300 rounded-xl px-6 py-5 mb-3.5">
             <h2 className="text-[15px] font-bold mb-1">Resume (this version)</h2>
-            <p className="text-[13px] text-gray-400">Used the master resume (resume-bunlong.pdf).</p>
+            <p className="text-[13px] text-gray-400">Used the master resume PDF.</p>
           </div>
         ) : null}
         {kit.hasResumePdf ? (

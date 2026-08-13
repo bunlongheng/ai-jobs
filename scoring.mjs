@@ -10,13 +10,16 @@
 
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 import crypto from "node:crypto";
 
 const require = createRequire(import.meta.url);
-const Database = require("/Users/bheng/Sites/jobs/web/node_modules/better-sqlite3");
+const ROOT = dirname(fileURLToPath(import.meta.url));
+const Database = require(join(ROOT, "web/node_modules/better-sqlite3"));
 
-export const DB_PATH = "/Users/bheng/Sites/jobs/web/jobs.db";
-export const PROFILE_PATH = "/Users/bheng/Sites/jobs/profile.json";
+export const DB_PATH = process.env.JOBS_DB || join(ROOT, "web/jobs.db");
+export const PROFILE_PATH = process.env.PROFILE_PATH || join(ROOT, "profile.json");
 export const INSERT_THRESHOLD = 50; // score >= 50 inserts
 export const SHOW_THRESHOLD = 40;   // summary table shows >= 40
 
@@ -27,7 +30,12 @@ export function loadProfile() {
 }
 
 export function openDb() {
-  return new Database(DB_PATH);
+  const db = new Database(DB_PATH);
+  db.pragma("journal_mode = WAL");
+  // Create the tables on a fresh clone so a scraper works before the app has ever run.
+  // Same schema.sql the app loads - single source of truth. (open-source fix 2026-08-11)
+  db.exec(readFileSync(join(ROOT, "web/lib/schema.sql"), "utf8"));
+  return db;
 }
 
 // Word-boundary match that works for plain words AND tokens like "c#", ".net",

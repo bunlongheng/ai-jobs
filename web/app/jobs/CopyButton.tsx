@@ -4,7 +4,7 @@ import { toast } from "./Toast";
 
 // Copy-to-clipboard button. Works in secure contexts (HTTPS/localhost) via the async
 // Clipboard API, and falls back to execCommand for plain-HTTP LAN (e.g. the iPad at
-// http://10.0.0.218:3017, where navigator.clipboard is undefined). (owner request 2026-08-05)
+// a plain-HTTP LAN origin, where navigator.clipboard is undefined). (owner request 2026-08-05)
 function copyText(text: string) {
   if (navigator.clipboard && window.isSecureContext) {
     navigator.clipboard.writeText(text).catch(() => fallback(text));

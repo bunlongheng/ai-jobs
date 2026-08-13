@@ -7,7 +7,6 @@ const FLAGS: { k: string; label: string; on: string; d: string }[] = [
   { k: "called", label: "Called", on: "bg-green-600 border-green-600 text-white", d: "M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.4a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z" },
   { k: "emailed", label: "Emailed", on: "bg-indigo-600 border-indigo-600 text-white", d: "M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM22 7l-10 6L2 7" },
   { k: "voicemail", label: "Voicemail", on: "bg-amber-500 border-amber-500 text-white", d: "M6 9a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM18 9a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM6 17h12" },
-  { k: "replied", label: "Replied", on: "bg-teal-600 border-teal-600 text-white", d: "M9 14 4 9l5-5M4 9h10a5 5 0 0 1 5 5v3" },
 ];
 
 export default function RecruiterStatus({ firm, initial }: { firm: string; initial: string[] }) {

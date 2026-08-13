@@ -7,11 +7,14 @@
 
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 const require = createRequire(import.meta.url);
-const Database = require("/Users/bheng/Sites/jobs/web/node_modules/better-sqlite3");
+const ROOT = dirname(fileURLToPath(import.meta.url));
+const Database = require(join(ROOT, "web/node_modules/better-sqlite3"));
 
-const ENV_PATH = "/Users/bheng/Sites/jobs/web/.env.local";
-const DB_PATH = process.env.JOBS_DB || "/Users/bheng/Sites/jobs/web/jobs.db";
+const ENV_PATH = join(ROOT, "web/.env.local");
+const DB_PATH = process.env.JOBS_DB || join(ROOT, "web/jobs.db");
 const LOG = "/tmp/rejection-sweep.log";
 
 function readEnv() {

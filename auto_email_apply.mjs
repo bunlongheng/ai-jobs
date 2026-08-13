@@ -1,7 +1,7 @@
 // auto_email_apply.mjs - autonomously apply to HN "Who is Hiring" jobs by email.
 // For every kit_ready HN job with a prepped cover, resolve the real apply email from
 // the HN comment, compose the application (cover + links + resume PDF attached), send
-// it AS Bunlong (bheng.code@gmail.com) via the Gmail API, and flip the row to applied.
+// it AS you (identity from profile.json) via the Gmail API, and flip the row to applied.
 //
 // Sends for real ONLY with `--send`. A bare run is a DRY RUN: it resolves recipients
 // and prints exactly what it would send, so extraction can be proven before any email
@@ -17,15 +17,24 @@
 
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 const require = createRequire(import.meta.url);
-const Database = require("/Users/bheng/Sites/jobs/web/node_modules/better-sqlite3");
+const ROOT = dirname(fileURLToPath(import.meta.url));
+const Database = require(join(ROOT, "web/node_modules/better-sqlite3"));
 
-const ENV_PATH = "/Users/bheng/Sites/jobs/web/.env.local";
-const DB_PATH = process.env.JOBS_DB || "/Users/bheng/Sites/jobs/web/jobs.db";
-const RESUME_PDF = "/Users/bheng/Sites/jobs/resume-bunlong.pdf";
-const LOG = "/tmp/auto-email-apply.log";
-const FROM_NAME = "Bunlong Heng";
-const FROM_EMAIL = "bheng.code@gmail.com";
+// Identity + resume path come from profile.json (single source of truth); env vars override.
+let profile = {};
+try { profile = JSON.parse(readFileSync(join(ROOT, "profile.json"), "utf8")); } catch { /* no profile yet */ }
+const id = profile.identity || {};
+
+const ENV_PATH = join(ROOT, "web/.env.local");
+const DB_PATH = process.env.JOBS_DB || join(ROOT, "web/jobs.db");
+const RESUME_PDF = process.env.RESUME_PDF || join(ROOT, id.resume_pdf || "resume.pdf");
+const LOG = process.env.AUTO_EMAIL_LOG || "/tmp/auto-email-apply.log";
+const FROM_NAME = process.env.FROM_NAME || id.name || "";
+const FROM_EMAIL = process.env.FROM_EMAIL || id.email || "";
+const RESUME_FILENAME = (FROM_NAME ? FROM_NAME.replace(/\s+/g, "-") + "-" : "") + "Resume.pdf";
 const GAPI = "https://gmail.googleapis.com/gmail/v1/users/me";
 const ALGOLIA = "https://hn.algolia.com/api/v1";
 
@@ -134,15 +143,16 @@ function buildBody(coverMd, title) {
   let b = dedash(coverMd || "").trim();
   const i = b.search(/with great excitement|best regard|sincerely/i); // drop any existing sign-off
   if (i >= 0) b = b.slice(0, i).trim();
+  const links = [
+    id.site && `Portfolio - ${id.site}`,
+    id.site && `Resume - ${String(id.site).replace(/\/$/, "")}/resume`,
+    id.github && `GitHub - ${id.github}`,
+    id.linkedin && `LinkedIn - ${id.linkedin}`,
+  ].filter(Boolean);
   return [
     b,
     "",
-    "A few links if useful:",
-    "Portfolio - https://www.bunlongheng.com",
-    "Resume - https://www.bunlongheng.com/resume",
-    "GitHub - https://github.com/bunlongheng",
-    "LinkedIn - https://www.linkedin.com/in/bunlongheng",
-    "",
+    ...(links.length ? ["A few links if useful:", ...links, ""] : []),
     "Happy to walk through any of these projects if one catches your eye - just let me know and we can find a time.",
     "",
     "With great excitement,",
@@ -169,9 +179,9 @@ function buildRaw({ to, subject, body, pdfB64 }) {
     Buffer.from(body, "utf8").toString("base64").match(/.{1,76}/g).join(nl),
     "",
     `--${boundary}`,
-    'Content-Type: application/pdf; name="Bunlong-Heng-Resume.pdf"',
+    `Content-Type: application/pdf; name="${RESUME_FILENAME}"`,
     "Content-Transfer-Encoding: base64",
-    'Content-Disposition: attachment; filename="Bunlong-Heng-Resume.pdf"',
+    `Content-Disposition: attachment; filename="${RESUME_FILENAME}"`,
     "",
     pdfB64.match(/.{1,76}/g).join(nl),
     "",
@@ -243,7 +253,7 @@ async function main() {
       continue;
     }
 
-    const subject = `Application: ${row.title} - Bunlong Heng`;
+    const subject = `Application: ${row.title}${FROM_NAME ? ` - ${FROM_NAME}` : ""}`;
     const body = buildBody(row.cover_md, row.title);
     const line = `${SEND ? "SEND" : "WOULD"} -> ${email}  (${why})  | ${row.company} - ${row.title}`;
 

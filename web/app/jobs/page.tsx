@@ -47,14 +47,6 @@ function LetterTile({ name, size = 20, round = false }: { name: string; size?: n
   return <span className={`inline-flex items-center justify-center align-middle text-white font-bold shrink-0 ${round ? "rounded-full" : "rounded-[5px]"}`} style={{ width: size, height: size, background: bg, fontSize: Math.round(size * 0.5) }}>{init}</span>;
 }
 
-const TILE: Record<string, string> = {
-  kit_ready: "bg-green-50 border-green-200 text-green-700",     // green = ready to apply
-  applied: "bg-blue-50 border-blue-200 text-blue-700",           // blue = applied
-  manual_only: "bg-amber-50 border-amber-200 text-amber-700",    // orange = manual
-  rejected: "bg-red-50 border-red-200 text-red-600",             // red = rejected
-  skipped: "bg-gray-50 border-gray-200 text-gray-400",
-  interviewing: "bg-purple-50 border-purple-200 text-purple-700",
-};
 // Color-coded gradient header per bucket (owner scheme 2026-08-05):
 // New = light/baby blue (just arrived) -> Ready = dark blue (real, pre-scanned) ->
 // Applied = green (done). Manual amber, Rejected/Archived rose/gray, Interviewing purple.

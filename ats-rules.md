@@ -43,5 +43,5 @@ resumes fail before a human ever looks.
 
 ## Honesty rule (overrides all)
 Optimize structure, keywords, and framing of REAL experience only. If a quantified result is not
-true and known, do not invent it - mark it `[ADD METRIC]` for Bunlong to fill, or reframe the bullet
+true and known, do not invent it - mark it `[ADD METRIC]` for the candidate to fill, or reframe the bullet
 as a real (unquantified) achievement.

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "JobFill",
-  "version": "0.47.0",
+  "version": "0.48.0",
   "description": "Fill the open job application page from the local job-hunt kit (the Jobs app (localhost:3017)). You review and click Submit.",
   "icons": {
     "16": "icon16.png",
@@ -19,7 +19,24 @@
   "host_permissions": [
     "http://127.0.0.1:3017/*",
     "http://localhost:3017/*",
-    "https://*/*"
+    "https://*.greenhouse.io/*",
+    "https://*.ashbyhq.com/*",
+    "https://*.lever.co/*",
+    "https://*.myworkdayjobs.com/*",
+    "https://*.smartrecruiters.com/*",
+    "https://*.workable.com/*",
+    "https://*.bamboohr.com/*",
+    "https://*.icims.com/*",
+    "https://*.jobvite.com/*",
+    "https://*.taleo.net/*",
+    "https://*.breezy.hr/*",
+    "https://*.rippling.com/*",
+    "https://*.dover.com/*",
+    "https://*.wellfound.com/*",
+    "https://*.teamtailor.com/*",
+    "https://*.recruitee.com/*",
+    "https://*.paylocity.com/*",
+    "https://*.adp.com/*"
   ],
   "background": {
     "service_worker": "background.js"

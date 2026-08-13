@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>Label</key><string>com.bheng.jobs</string>
+  <key>ProgramArguments</key><array><string>__NODE_BIN__/npm</string><string>run</string><string>start</string></array>
+  <key>WorkingDirectory</key><string>__HOME__/Sites/jobs</string>
+  <key>EnvironmentVariables</key><dict><key>PATH</key><string>__NODE_BIN__:/usr/bin:/bin</string><key>JOBS_DB</key><string>__HOME__/Sites/jobs/jobs.db</string></dict>
+  <key>RunAtLoad</key><true/><key>KeepAlive</key><true/>
+  <key>StandardOutPath</key><string>/tmp/jobs.log</string><key>StandardErrorPath</key><string>/tmp/jobs.log</string>
+</dict></plist>

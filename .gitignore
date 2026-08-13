@@ -1,5 +1,14 @@
 # transient / bulky - regenerable per run
 *.png
+# ...except the app's own committed UI assets (branding + a placeholder avatar). The real
+# avatar (web/public/me.png) stays ignored - it's a personal photo; setup seeds a placeholder.
+!web/public/icon.png
+!web/public/icon-192.png
+!web/public/icon-512.png
+!web/public/apple-icon.png
+!web/public/me.example.png
+# README screenshots (sample data only)
+!docs/screenshots/*.png
 applications/**/*.pdf
 applications/**/*.html
 applications/**/apply-preview.png
@@ -44,6 +53,12 @@ jobfill/commands.jsonl
 legacy-python/
 portals.json
 resume-master.md
+web/data/recruiters.json
+
+# per-user LaunchAgent plists (contain absolute home paths) - ship the *.example only
+com.bheng.jobs*.plist
+web/com.bheng.jobs.plist
+jobfill/com.bheng.jobfill.plist
 
 # captured application answers (PII - never commit)
 jobfill/captured-answers.jsonl
@@ -52,3 +67,8 @@ jobfill/captured-answers.jsonl
 web/public/scan-status.json
 .ready-eval.json
 .ready-report.json
+
+# dead legacy autonomous-apply bots (retired; extension is the only form-writer)
+apply_bot.mjs
+dropbox_apply.mjs
+login_greenhouse.mjs

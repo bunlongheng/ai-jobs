@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 
-// Discrete scroll-spy dot rail (bottom-right), like the one on bunlongheng.com. Shows one
+// Discrete scroll-spy dot rail (bottom-right), a discrete scroll-spy dot rail. Shows one
 // dot per panel present on the board; the active dot (panel currently in view) lights up in
 // that panel's color, and clicking a dot scrolls to it. (owner request 2026-08-05)
 const PANELS = [
@@ -18,6 +18,7 @@ export default function PanelNav() {
 
   useEffect(() => {
     const els = PANELS.map((p) => document.getElementById(p.id)).filter(Boolean) as HTMLElement[];
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time DOM measurement of which panels exist on mount
     setPresent(els.map((e) => e.id));
     if (els.length < 2) return;
     const obs = new IntersectionObserver(

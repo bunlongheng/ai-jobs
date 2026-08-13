@@ -16,7 +16,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 let chromium;
 for (const p of [process.env.PLAYWRIGHT_PATH, 'playwright',
-                 process.env.HOME + '/Sites/bheng/node_modules/playwright']) {
+                 (process.env.PLAYWRIGHT_PATH || "playwright")]) {
   if (!p) continue;
   try { ({ chromium } = require(p)); break; } catch (_) {}
 }

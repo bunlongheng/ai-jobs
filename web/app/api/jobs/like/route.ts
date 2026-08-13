@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { crossOriginBlocked } from "@/lib/jobfill";
 
 export const dynamic = "force-dynamic";
 
 /** Board reactions: heart (liked=1), dislike/hide (liked=-1), or clear (0).
- *  Called by the board's own client (same-origin), so no extension origin guard. */
+ *  Called by the board's own client (same-origin); a cross-origin POST is refused. */
 export async function POST(req: Request) {
+  const xo = crossOriginBlocked(req); if (xo) return xo;
   let body: { id?: string; liked?: number; expired?: boolean; deleted?: boolean };
   try { body = await req.json(); } catch { return NextResponse.json({ error: "bad json" }, { status: 400 }); }
   const id = String(body.id || "");

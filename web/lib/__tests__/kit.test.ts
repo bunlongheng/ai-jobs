@@ -10,15 +10,15 @@ beforeAll(async () => {
   ({ getKit } = await import("../kit"));
   dbFn().prepare("INSERT INTO applications (id, status, resume_md, screening_md) VALUES (?,?,?,?)").run(
     "k", "kit_ready",
-    "# Resume\n**Bunlong** builds things.\n\n<img src=x onerror=alert(1)>",
-    "| Field | Answer |\n|---|---|\n| Name | Bunlong |",
+    "# Resume\n**Alex** builds things.\n\n<img src=x onerror=alert(1)>",
+    "| Field | Answer |\n|---|---|\n| Name | Alex |",
   );
 });
 
 describe("getKit", () => {
   it("renders markdown to HTML", () => {
     const k = getKit("k");
-    expect(k.resumeHtml).toContain("<strong>Bunlong</strong>");
+    expect(k.resumeHtml).toContain("<strong>Alex</strong>");
     expect(k.screeningHtml).toContain("<table");
   });
   it("sanitizes dangerous markup (no onerror)", () => {

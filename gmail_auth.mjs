@@ -9,8 +9,11 @@
 
 import http from "node:http";
 import { readFileSync, writeFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 
-const ENV_PATH = "/Users/bheng/Sites/jobs/web/.env.local";
+const ROOT = dirname(fileURLToPath(import.meta.url));
+const ENV_PATH = join(ROOT, "web/.env.local");
 const PORT = 4785;
 const REDIRECT = `http://localhost:${PORT}`;
 const SCOPE = "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send";
@@ -50,7 +53,7 @@ async function main() {
       prompt: "consent",
     });
 
-  console.log("\n1) Open this URL and approve (sign in as bheng.code@gmail.com):\n\n" + authUrl + "\n");
+  console.log("\n1) Open this URL and approve (sign in as your ADMIN_EMAIL account):\n\n" + authUrl + "\n");
   console.log("Waiting for the redirect on " + REDIRECT + " ...\n");
 
   const server = http.createServer(async (req, res) => {

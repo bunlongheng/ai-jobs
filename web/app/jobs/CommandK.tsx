@@ -35,6 +35,7 @@ export default function CommandK({ jobs, logos = {} }: { jobs: J[]; logos?: Reco
     return () => document.removeEventListener("keydown", onKey);
   }, []);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- reset the palette's query/selection when it opens
   useEffect(() => { if (open) { setQ(""); setActive(0); setTimeout(() => inputRef.current?.focus(), 10); } }, [open]);
 
   const results = useMemo(() => {
