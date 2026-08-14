@@ -65,6 +65,17 @@ export function crossOriginBlocked(req: Request): NextResponse | null {
   return null;
 }
 
+/** For same-machine-only side effects (spawning headless scans, paid Hunter lookups): require
+ *  same-origin AND a loopback Host. The board triggers these from localhost (Host=localhost ->
+ *  loopback); a non-browser LAN client (no Origin, Host=10.x) is refused - closing the LAN
+ *  side-effect residual that plain crossOriginBlocked (which allows no-Origin) leaves open. */
+export function localOnlyBlocked(req: Request): NextResponse | null {
+  const xo = crossOriginBlocked(req);
+  if (xo) return xo;
+  if (!isLoopback(req)) return NextResponse.json({ error: "this action is loopback-only" }, { status: 403 });
+  return null;
+}
+
 export function readJson<T>(p: string, fallback: T): T {
   try { return JSON.parse(fs.readFileSync(p, "utf8")) as T; } catch { return fallback; }
 }

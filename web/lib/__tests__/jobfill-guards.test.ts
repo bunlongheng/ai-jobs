@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { originBlocked, crossOriginBlocked, isLoopback } from "../jobfill";
+import { originBlocked, crossOriginBlocked, isLoopback, localOnlyBlocked } from "../jobfill";
 
 // Minimal Request stub: only the headers.get() the guards read.
 const req = (h: Record<string, string>) =>
@@ -34,6 +34,21 @@ describe("originBlocked (extension-only routes)", () => {
   });
   it("blocks a non-loopback (LAN) client even with no Origin", () => {
     expect(originBlocked(req({ host: "10.1.2.3:3017" }))?.status).toBe(403);
+  });
+});
+
+describe("localOnlyBlocked (same-machine side-effect routes: scans, Hunter)", () => {
+  it("allows a same-origin request from loopback (the board on localhost)", () => {
+    expect(localOnlyBlocked(req({ host: "localhost:3017", origin: "http://localhost:3017" }))).toBeNull();
+  });
+  it("blocks a cross-origin request", () => {
+    expect(localOnlyBlocked(req({ host: "localhost:3017", origin: "http://evil.example" }))?.status).toBe(403);
+  });
+  it("blocks same-origin on a LAN host (not loopback) - closes the LAN side-effect residual", () => {
+    expect(localOnlyBlocked(req({ host: "10.1.2.3:3017", origin: "http://10.1.2.3:3017" }))?.status).toBe(403);
+  });
+  it("blocks a no-origin request from a LAN host (non-browser client)", () => {
+    expect(localOnlyBlocked(req({ host: "10.1.2.3:3017" }))?.status).toBe(403);
   });
 });
 

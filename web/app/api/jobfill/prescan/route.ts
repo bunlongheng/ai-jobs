@@ -3,7 +3,7 @@ import { spawn } from "child_process";
 import path from "path";
 import fs from "fs";
 import { db } from "@/lib/db";
-import { crossOriginBlocked } from "@/lib/jobfill";
+import { localOnlyBlocked } from "@/lib/jobfill";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +22,7 @@ const TARGETS = `SELECT COUNT(*) n FROM applications
 // so the board's per-row spinners light up via scan-status.json. Zero AI tokens. Guards
 // against starting a second run while one is live. (owner request 2026-08-06)
 export async function POST(req: Request) {
-  const xo = crossOriginBlocked(req); if (xo) return xo;
+  const blocked = localOnlyBlocked(req); if (blocked) return blocked;
   const statusFile = path.join(process.cwd(), "public", "scan-status.json");
   try {
     const s = JSON.parse(fs.readFileSync(statusFile, "utf8"));

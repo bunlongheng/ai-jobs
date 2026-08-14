@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { findEmail } from "@/lib/hunter";
-import { crossOriginBlocked } from "@/lib/jobfill";
+import { localOnlyBlocked } from "@/lib/jobfill";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +29,7 @@ function domainFromText(text: string, company: string): string {
 }
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const xo = crossOriginBlocked(req); if (xo) return xo;
+  const blocked = localOnlyBlocked(req); if (blocked) return blocked;
   const { id } = await params;
   const d = db();
   const job = d.prepare("SELECT id, company, url, jd, notes, found_email, found_email_meta FROM applications WHERE id=?").get(id) as
