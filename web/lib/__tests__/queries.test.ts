@@ -22,6 +22,7 @@ beforeAll(async () => {
   ins.run("b", "Linear", "Fullstack", 76, "kit_ready", null, null, 0, 0);
   ins.run("c", "Reddit", "Staff", 86, "applied", null, null, null, null);
   ins.run("d", "Old Co", "SWE", 50, "rejected", null, null, null, null);
+  ins.run("e", "Vercel", "Senior FE", 82, "planned", null, null, null, null); // a raw scraped lead
 });
 
 afterAll(() => { try { fs.unlinkSync(TMP); fs.unlinkSync(TMP + "-wal"); fs.unlinkSync(TMP + "-shm"); } catch {} });
@@ -37,6 +38,17 @@ describe("getBoard", () => {
     expect(ready?.rows.map((r) => r.company)).toEqual(["Coinbase"]);
     const notReady = groups.find((g) => g.status === "kit_only");
     expect(notReady?.rows.map((r) => r.company)).toEqual(["Linear"]);
+  });
+
+  it("shows scraped 'planned' jobs as a 'New matches' group (regression: never hide a fresh scan)", () => {
+    const { groups, counts } = getBoard();
+    expect(counts.planned).toBe(1);
+    const nm = groups.find((g) => g.status === "planned");
+    expect(nm?.label).toBe("New matches");
+    expect(nm?.rows.map((r) => r.company)).toEqual(["Vercel"]);
+    // New matches renders at the top (work queue), before Ready/Applied.
+    const order = groups.map((g) => g.status);
+    expect(order.indexOf("planned")).toBeLessThan(order.indexOf("kit_ready"));
   });
 
   it("orders stages canonically (ready before applied, archived last)", () => {

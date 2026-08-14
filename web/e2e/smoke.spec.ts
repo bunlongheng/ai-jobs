@@ -1,20 +1,21 @@
 import { test, expect } from "@playwright/test";
 
-test("unauthenticated board redirects to login", async ({ page }) => {
-  await page.goto("/jobs");
-  await expect(page).toHaveURL(/\/login/);
-  await expect(page.getByRole("heading", { name: "Jobs" })).toBeVisible();
+// Smoke against a prod build on 127.0.0.1 (loopback) - is-local bypasses the Google gate, so the
+// board is browsable. These confirm the app boots and the core pages render without error, even
+// on a fresh DB (no jobs). Auth is Google-only; there is no password login to drive.
+
+test("login page shows the Google sign-in", async ({ page }) => {
+  await page.goto("/login");
+  await expect(page.getByRole("button", { name: /Sign in with Google/i })).toBeVisible();
 });
 
-test("login then board renders, drill-down opens", async ({ page }) => {
-  await page.goto("/login");
-  await page.getByLabel("Password").fill(process.env.JOBS_PASSWORD || "test");
-  await page.getByRole("button", { name: "Unlock" }).click();
+test("board renders on localhost without signing in", async ({ page }) => {
+  await page.goto("/jobs");
   await expect(page).toHaveURL(/\/jobs/);
-  await expect(page.getByRole("heading", { name: "Jobs" })).toBeVisible();
-  // first company link -> drill-down
-  const firstCompany = page.locator("table tbody tr td a").first();
-  await firstCompany.click();
-  await expect(page).toHaveURL(/\/jobs\/.+/);
-  await expect(page.getByText("back to board")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "AI-Jobs" })).toBeVisible();
+});
+
+test("recruiter call sheet renders (sample data on a fresh clone)", async ({ page }) => {
+  await page.goto("/jobs/recruiters");
+  await expect(page.getByRole("heading", { name: "AI-Jobs" })).toBeVisible();
 });

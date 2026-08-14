@@ -1,9 +1,7 @@
 import { defineConfig } from "@playwright/test";
 
-// e2e smoke against a prod build. Credentials come from the environment (CI sets
-// them; local runs fall back to a generic value). No real secret in this file.
-const fallback = "test";
-
+// e2e smoke against a prod build on 127.0.0.1 - loopback, so is-local bypasses the Google gate
+// and the board is browsable without signing in. No real secret in this file.
 export default defineConfig({
   testDir: "./e2e",
   timeout: 30_000,
@@ -13,8 +11,8 @@ export default defineConfig({
     url: "http://127.0.0.1:3017/login",
     reuseExistingServer: true,
     env: {
-      JOBS_SECRET: process.env.JOBS_SECRET || fallback,
-      JOBS_PASSWORD: process.env.JOBS_PASSWORD || fallback,
+      // Auth.js needs a secret to initialize even though loopback bypasses the sign-in check.
+      AUTH_SECRET: process.env.AUTH_SECRET || "e2e-smoke-secret-not-a-real-key",
       JOBS_DB: process.env.JOBS_DB || "",
     },
   },
