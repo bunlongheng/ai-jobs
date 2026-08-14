@@ -1,0 +1,26 @@
+name: nightly-e2e
+# The Playwright e2e stays out of the fast per-push gate (needs a running server, slow) but must
+# not rot - this runs it nightly and on demand, so an auth-gate/redirect regression is caught.
+on:
+  schedule:
+    - cron: "0 8 * * *" # daily 08:00 UTC
+  workflow_dispatch:
+defaults:
+  run:
+    working-directory: web
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      # seed the gitignored local files from the committed *.example templates so the app boots
+      - run: cd .. && node scripts/setup.mjs
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
