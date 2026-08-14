@@ -3,7 +3,7 @@ import fs from "fs";
 import { NextResponse } from "next/server";
 
 // Repo root (= old Python-engine layout, now data-only): web/ lives one level down.
-export const ROOT = path.resolve(process.cwd(), "..");
+const ROOT = path.resolve(process.cwd(), "..");
 export const PROFILE = path.join(ROOT, "profile.json");
 export const RULES = path.join(ROOT, "jobfill", "rules.json");
 export const COMMANDS = path.join(ROOT, "jobfill", "commands.jsonl");

@@ -16,7 +16,7 @@ import { isLocal } from "@/lib/is-local";
 // silently granting a hardcoded account. Set it in .env.local.
 const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "").trim().toLowerCase();
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+export const { handlers, signIn, auth } = NextAuth({
   trustHost: true,
   providers: [
     Google({

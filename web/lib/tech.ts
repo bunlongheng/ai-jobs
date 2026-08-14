@@ -6,7 +6,7 @@ export type Tech = { slug: string; label: string; domain: string; re: RegExp };
 
 // Order matters: earlier entries win ties (languages/frameworks before infra/db), so the
 // most identity-defining stack shows first. Regexes are conservative to avoid false hits.
-export const TECH: Tech[] = [
+const TECH: Tech[] = [
   { slug: "react", label: "React", domain: "react.dev", re: /\breact(\.js|js)?\b/i },
   { slug: "nextjs", label: "Next.js", domain: "nextjs.org", re: /\bnext\.?js\b/i },
   { slug: "typescript", label: "TypeScript", domain: "typescriptlang.org", re: /\btypescript\b/i },
@@ -53,7 +53,7 @@ const BY_SLUG = new Map(TECH.map((t) => [t.slug, t]));
 export function techMeta(slug: string): Tech | undefined { return BY_SLUG.get(slug); }
 
 // What each tech IS, for the detail-page "Tech stack" card's Category column. (owner 2026-08-09)
-export const TECH_CATEGORY: Record<string, string> = {
+const TECH_CATEGORY: Record<string, string> = {
   react: "UI", nextjs: "Framework", typescript: "Language", node: "Runtime", vue: "UI", angular: "UI", svelte: "UI",
   python: "Language", django: "Framework", flask: "Framework", fastapi: "Framework", go: "Language", rust: "Language",
   ruby: "Language", rails: "Framework", java: "Language", spring: "Framework", kotlin: "Language", dotnet: "Framework",
@@ -65,36 +65,11 @@ export const TECH_CATEGORY: Record<string, string> = {
 export function techCategory(slug: string): string { return TECH_CATEGORY[slug] || "Tech"; }
 
 // EVERY tech mentioned in the text, in identity order (languages/frameworks before infra), for the
-// detail page - unlike extractTech which caps to the top few for the board's one-icon column.
+// detail page
 export function extractAllTech(text: string | null | undefined): string[] {
   if (!text) return [];
   const out: string[] = [];
   const seen = new Set<string>();
   for (const t of TECH) { if (!seen.has(t.slug) && t.re.test(text)) { out.push(t.slug); seen.add(t.slug); } }
   return out;
-}
-
-// Best-effort version pulled from the job text ("React 18", "Python 3.11", "node@20", "Java 17").
-// Jobs rarely state versions, so this is usually empty -> the card shows "generic". Never invents.
-export function techVersion(slug: string, text: string | null | undefined): string {
-  const t = techMeta(slug);
-  if (!t || !text) return "";
-  const label = t.label.replace(/[.+*?^${}()|[\]\\]/g, "\\$&");
-  const m = String(text).match(new RegExp(`\\b${label}\\s*@?\\s*v?\\.?\\s*(\\d{1,2}(?:\\.\\d{1,2}){0,2})\\b`, "i"));
-  return m ? m[1] : "";
-}
-
-// Return up to `n` tech slugs found in the text, distinctive techs first (Go, Python,
-// Rust...) so the ubiquitous React/Next/TS trio never crowds out a telling stack.
-const UBIQUITOUS = new Set(["react", "nextjs", "typescript", "javascript", "node"]);
-export function extractTech(text: string | null | undefined, n = 3): string[] {
-  if (!text) return [];
-  const all: string[] = [];
-  const seen = new Set<string>();
-  for (const t of TECH) {
-    if (seen.has(t.slug)) continue;
-    if (t.re.test(text)) { all.push(t.slug); seen.add(t.slug); }
-  }
-  all.sort((a, b) => (UBIQUITOUS.has(a) ? 1 : 0) - (UBIQUITOUS.has(b) ? 1 : 0));
-  return all.slice(0, n);
 }
