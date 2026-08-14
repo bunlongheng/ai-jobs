@@ -3,6 +3,7 @@ import { spawn } from "child_process";
 import path from "path";
 import fs from "fs";
 import { db } from "@/lib/db";
+import { crossOriginBlocked } from "@/lib/jobfill";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +15,8 @@ const TARGETS = `SELECT COUNT(*) n FROM applications
 // Kick off the READY-SCAN (run_readyscan.sh -> verify_ready.mjs --fix --demote) detached, so the
 // Ready panel icon spins via scan-status.json (kind:ready). Guards against starting while ANY
 // scan (pre-scan or ready-scan) is live. Zero AI tokens. (owner split 2026-08-07)
-export async function POST() {
+export async function POST(req: Request) {
+  const xo = crossOriginBlocked(req); if (xo) return xo;
   const statusFile = path.join(process.cwd(), "public", "scan-status.json");
   try {
     const s = JSON.parse(fs.readFileSync(statusFile, "utf8"));

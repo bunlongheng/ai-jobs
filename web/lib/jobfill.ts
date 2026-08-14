@@ -35,6 +35,13 @@ export function originBlocked(req: Request): NextResponse | null {
   if (o !== null && !o.startsWith("chrome-extension://")) {
     return NextResponse.json({ error: "browser pages may not call this API" }, { status: 403 });
   }
+  // Optionally pin to YOUR JobFill extension: set JOBFILL_EXTENSION_ID (the id Chrome assigns on
+  // Load unpacked) and any other installed extension is refused. Unset = accept any extension
+  // (fine for a single-user machine); the loopback check below is still the hard gate.
+  const pin = process.env.JOBFILL_EXTENSION_ID;
+  if (pin && o !== null && o !== `chrome-extension://${pin}`) {
+    return NextResponse.json({ error: "unrecognized extension" }, { status: 403 });
+  }
   if (!isLoopback(req)) {
     return NextResponse.json({ error: "this API is loopback-only" }, { status: 403 });
   }
