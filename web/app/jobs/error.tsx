@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 
 // Error boundary for the /jobs subtree - any server-render failure shows this instead of Next's
 // default gray screen. Styled to match the board, with a retry. (a11y/UX 2026-08-14)
@@ -13,7 +14,7 @@ export default function JobsError({ error, reset }: { error: Error & { digest?: 
         <p className="text-[13px] text-gray-500 mb-5">The board hit an unexpected error while rendering. Your data is safe - this is just the view.</p>
         <div className="flex items-center justify-center gap-2">
           <button onClick={reset} className="text-[13px] font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg px-4 py-2">Try again</button>
-          <a href="/jobs" className="text-[13px] font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg px-4 py-2 no-underline">Back to board</a>
+          <Link href="/jobs" className="text-[13px] font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg px-4 py-2 no-underline">Back to board</Link>
         </div>
         {error?.digest ? <p className="text-[11px] text-gray-300 mt-4">ref {error.digest}</p> : null}
       </div>

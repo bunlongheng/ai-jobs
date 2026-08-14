@@ -40,4 +40,13 @@ describe("side-effect routes reject cross-origin (guard is wired, not just defin
     const { POST } = await import("@/app/api/jobfill/find-email/[id]/route");
     expect((await POST(xo("/api/jobfill/find-email/x"), { params: Promise.resolve({ id: "x" }) })).status).toBe(403);
   });
+  // The extension-only channel (originBlocked): a web page Origin must be refused too.
+  it("jobfill/command (extension-only)", async () => {
+    const { POST } = await import("@/app/api/jobfill/command/route");
+    expect((await POST(xo("/api/jobfill/command"))).status).toBe(403);
+  });
+  it("jobfill/event (extension-only)", async () => {
+    const { POST } = await import("@/app/api/jobfill/event/route");
+    expect((await POST(xo("/api/jobfill/event"))).status).toBe(403);
+  });
 });
