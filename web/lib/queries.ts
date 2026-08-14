@@ -18,7 +18,14 @@ export function getBoard(minScore = 0): {
   groups: BoardGroup[]; counts: Record<string, number>; buckets: Record<number, number>;
 } {
   // status='deleted' is a full removal - excluded from EVERY panel incl. Archived. (2026-08-05)
-  const all = (db().prepare("SELECT * FROM applications").all() as AppRow[]).filter((r) => r.status !== "deleted");
+  // Only the light columns the board list needs - never the resume_pdf BLOB or the resume/cover/
+  // screening markdown / raw / jd text (those are per-detail, loaded by getApp). SELECT * pulled
+  // megabytes of PDF blobs into memory on every board render. (perf 2026-08-14)
+  const all = (db().prepare(`SELECT id, company, title, score, status, verdict, ats, ai_able, url,
+      location, kit_path, source_run, applied_at, rejected_at, liveness_checked, notes, pf_status,
+      pf_ats, pf_covered, pf_total, pf_date, pf_direct_url, has_resume_pdf, tech, liked, easy_apply,
+      easy_apply_checked, updated_at
+    FROM applications`).all() as AppRow[]).filter((r) => r.status !== "deleted");
   // "Archived" bucket = disliked (liked = -1) OR rejected - one muted panel at the bottom,
   // each row tagged rejected/disliked in the UI. Rejected gets NO separate red panel.
   // (owner request 2026-07-24)
