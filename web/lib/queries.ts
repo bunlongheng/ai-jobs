@@ -58,13 +58,13 @@ export function getBoard(minScore = 0): {
   const byScore = (a: AppRow, b: AppRow) => (b.score || 0) - (a.score || 0);
   const byRecency = (a: AppRow, b: AppRow) => recency(b).localeCompare(recency(a));
   for (const st of STAGES) {
-    // "New match" (planned) is hidden from the board entirely - a raw scraped lead with no
-    // kit yet is not actionable. The nightly run writes its kit and it appears as "Not ready".
-    // (owner request 2026-08-06) Board = Not ready -> Ready -> Applied ...
-    if (st === "planned") continue;
     const g = rows.filter((r) => (r.status || "planned") === st && keep(r));
     if (!g.length) continue;
-    if (st === "kit_ready") {
+    if (st === "planned") {
+      // Raw scraped leads shown as "New matches" (work queue, score-sorted) so they are visible
+      // immediately after a scan - a fresh clone must never look empty. (open-source 2026-08-13)
+      groups.push({ status: "planned", label: LABEL.planned, rows: g.sort(byScore) });
+    } else if (st === "kit_ready") {
       // Not ready ranks by score (work queue); Ready ranks by latest prep. Not-ready
       // renders ABOVE Ready. (owner request 2026-08-05)
       const kitOnly = g.filter((r) => !preScanned(r)).sort(byScore);

@@ -28,20 +28,26 @@ function PanelIcon({ status }: { status: string }) {
 // is taken literally. Score stays on ?min, so the whole view reads off the URL. (owner
 // request 2026-08-05)
 export default function CollapsiblePanel({
-  status, label, count, gradient, archived, breakdown, action, children,
+  status, label, count, gradient, archived, breakdown, action, children, defaultOpen,
 }: {
   status: string; label: string; count: number; gradient: string;
   archived?: boolean; breakdown: React.ReactNode; action?: React.ReactNode; children: React.ReactNode;
+  defaultOpen?: boolean;
 }) {
   const router = useRouter();
   const sp = useSearchParams();
   const raw = sp.get("open");
-  const openSet = raw === null ? new Set(DEFAULT_OPEN) : new Set(raw.split(",").filter(Boolean));
-  const open = openSet.has(status);
+  // With no ?open in the URL, use the server-computed default (defaultOpen) when provided - so a
+  // fresh board with only "New matches" opens it - else fall back to the static DEFAULT_OPEN list.
+  const open = raw === null
+    ? (defaultOpen ?? DEFAULT_OPEN.includes(status))
+    : new Set(raw.split(",").filter(Boolean)).has(status);
 
   function toggle() {
-    const next = new Set(openSet);
-    if (next.has(status)) next.delete(status); else next.add(status);
+    // Base the new open-set on the URL (or DEFAULT_OPEN when absent), then flip THIS panel to
+    // the opposite of its true current state so a defaultOpen panel collapses on first click.
+    const next = raw === null ? new Set(DEFAULT_OPEN) : new Set(raw.split(",").filter(Boolean));
+    if (open) next.delete(status); else next.add(status);
     const params = new URLSearchParams(sp.toString());
     params.set("open", Array.from(next).join(","));
     // replace (not push) so accordion clicks don't flood the back stack; the URL still

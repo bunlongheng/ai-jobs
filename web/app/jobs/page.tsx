@@ -321,7 +321,12 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
   // Total excludes skipped so the tiles reconcile: New + Ready + Manual + Applied = Total.
   // Applied folds in rejected (they were applied to), and there is no separate Rejected tile.
   const total = Object.entries(counts).reduce((a, [k, v]) => a + (k === "skipped" || k === "archived" ? 0 : v), 0);
-  const tiles = ["kit_only", "kit_ready", "manual_only", "applied"].filter((s) => counts[s]);
+  const tiles = ["planned", "kit_only", "kit_ready", "manual_only", "applied"].filter((s) => counts[s]);
+  // Default-open panel: Ready if present (your normal landing), else the first non-archived panel
+  // so a fresh board (only New matches) opens automatically instead of looking empty.
+  const defaultOpenStatus = groups.some((g) => g.status === "kit_ready")
+    ? "kit_ready"
+    : (groups.find((g) => g.status !== "archived")?.status ?? "");
   // 7-day activity for the hero sparklines. Each tile shows the series most relevant to it:
   // detection for New/Not-ready/Total, pre-scan for Ready, applications for Applied.
   const trends = getTrends(7);
@@ -401,7 +406,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
             );
           });
           return (
-          <CollapsiblePanel key={g.status} status={g.status} label={g.label} count={g.rows.length} gradient={HGRAD[g.status] || "from-gray-500 to-gray-600"} archived={g.status === "archived"} breakdown={breakdownPills} action={g.status === "kit_only" ? <PrescanIcon /> : g.status === "kit_ready" ? <ReadyScanIcon /> : undefined}>
+          <CollapsiblePanel key={g.status} status={g.status} label={g.label} count={g.rows.length} gradient={HGRAD[g.status] || "from-gray-500 to-gray-600"} archived={g.status === "archived"} defaultOpen={g.status === defaultOpenStatus} breakdown={breakdownPills} action={g.status === "kit_only" ? <PrescanIcon /> : g.status === "kit_ready" ? <ReadyScanIcon /> : undefined}>
             <table className="w-full table-fixed border-collapse text-[11px] sm:text-[13px]">
               {/* Identical column widths on EVERY panel (thead governs table-fixed) so
                   columns align top-down across panels. Company + Score hide on phones;
