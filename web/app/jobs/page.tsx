@@ -386,7 +386,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
 
 
         {total === 0 ? (
-          <div className="bg-white border border-gray-300 rounded-xl p-8 text-center text-gray-500 text-sm mt-4">No applications yet. Run the engine scan + migrate to populate the board.</div>
+          <div className="bg-white border border-gray-300 rounded-xl p-8 text-center text-gray-500 text-sm mt-4">No applications yet. Run a scraper (e.g. node scrape_linkedin.mjs) to populate the board.</div>
         ) : null}
         {groups.filter((g) => g.status !== "skipped").map((g) => {
           // per-source breakdown for this group's header (LinkedIn 17, Indeed 13, ...)
