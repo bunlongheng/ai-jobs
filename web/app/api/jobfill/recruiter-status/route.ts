@@ -16,11 +16,7 @@ export async function POST(req: Request) {
   const firm = String(body.firm || "").slice(0, 200);
   if (!firm) return NextResponse.json({ error: "no firm" }, { status: 400 });
 
-  const d = db();
-  d.prepare("CREATE TABLE IF NOT EXISTS recruiter_status (firm TEXT PRIMARY KEY, status TEXT, note TEXT, updated_at TEXT)").run();
-  try { d.prepare("ALTER TABLE recruiter_status ADD COLUMN note TEXT").run(); } catch { /* already there */ }
-  try { d.prepare("ALTER TABLE recruiter_status ADD COLUMN meeting_at TEXT").run(); } catch { /* already there */ }
-  try { d.prepare("ALTER TABLE recruiter_status ADD COLUMN bad_phone INTEGER DEFAULT 0").run(); } catch { /* already there */ }
+  const d = db(); // recruiter_status is created by lib/schema.sql on db init - no per-request DDL
 
   // Mark the firm's phone as broken/disconnected (or clear it).
   if (typeof body.badPhone === "boolean") {

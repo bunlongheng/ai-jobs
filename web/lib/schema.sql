@@ -66,3 +66,14 @@ CREATE TABLE IF NOT EXISTS logos (
   data_uri   TEXT,
   updated_at TEXT DEFAULT (datetime('now'))
 );
+
+-- per-firm recruiter call-sheet state (outreach flags CSV, spoke-to note, next-meeting datetime,
+-- dead-phone flag). Rendered at /jobs/recruiters. Created here so the page/API never run DDL per request.
+CREATE TABLE IF NOT EXISTS recruiter_status (
+  firm       TEXT PRIMARY KEY,
+  status     TEXT,             -- CSV of called,emailed,voicemail
+  note       TEXT,             -- who you spoke to
+  meeting_at TEXT,             -- next-meeting datetime (ISO local)
+  bad_phone  INTEGER DEFAULT 0,
+  updated_at TEXT
+);

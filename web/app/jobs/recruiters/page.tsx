@@ -16,11 +16,7 @@ export const dynamic = "force-dynamic"; // reads cached firm logos + outreach st
 // Per-firm outreach state (flags + "spoke to" note), keyed by "name|city". (owner 2026-08-09)
 type FirmState = { flags: string[]; note: string; meeting: string; badPhone: boolean };
 function flagsMap(): Record<string, FirmState> {
-  const d = db();
-  d.prepare("CREATE TABLE IF NOT EXISTS recruiter_status (firm TEXT PRIMARY KEY, status TEXT, note TEXT, updated_at TEXT)").run();
-  try { d.prepare("ALTER TABLE recruiter_status ADD COLUMN note TEXT").run(); } catch { /* already there */ }
-  try { d.prepare("ALTER TABLE recruiter_status ADD COLUMN meeting_at TEXT").run(); } catch { /* already there */ }
-  try { d.prepare("ALTER TABLE recruiter_status ADD COLUMN bad_phone INTEGER DEFAULT 0").run(); } catch { /* already there */ }
+  const d = db(); // recruiter_status is created by lib/schema.sql on db init - no per-request DDL
   const rows = d.prepare("SELECT firm, status, note, meeting_at, bad_phone FROM recruiter_status").all() as { firm: string; status: string; note: string; meeting_at: string; bad_phone: number }[];
   return Object.fromEntries(rows.map((r) => [r.firm, { flags: (r.status || "").split(",").filter(Boolean), note: r.note || "", meeting: r.meeting_at || "", badPhone: !!r.bad_phone }]));
 }

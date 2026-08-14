@@ -2,22 +2,28 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
 
-// Whole-row click -> job detail page, for EVERY status (New, Ready, Manual, Applied,
-// Interviewing, Rejected, Archived - no exceptions). The entire <tr> is the hit target,
-// so there are no dead zones. Clicking the external "open posting" arrow (marked
-// data-external) opens the source site instead of navigating. Carries the current
-// ?min filter into the detail URL so "back to board" returns to the same filter you
-// were on, not the default. (owner request 2026-08-05)
-export default function RowLink({ id, className, children }: { id: string; className?: string; children: ReactNode }) {
+// Whole-row link -> job detail page, for EVERY status. The entire <tr> is the hit target (no dead
+// zones) AND it is keyboard-accessible: role=link + tabIndex so it focuses, Enter/Space activate it,
+// aria-label names the job for screen readers, and a focus ring shows keyboard focus. Clicking the
+// external "open posting" arrow (data-external) opens the source instead. Carries the ?min filter
+// so "back to board" returns to the same view. (owner request 2026-08-05; a11y 2026-08-14)
+export default function RowLink({ id, className, label, children }: { id: string; className?: string; label?: string; children: ReactNode }) {
   const router = useRouter();
   const sp = useSearchParams();
+  const go = () => {
+    const min = sp.get("min");
+    router.push(`/jobs/${id}${min !== null ? `?min=${min}` : ""}`);
+  };
   return (
     <tr
-      className={className}
-      onClick={(e) => {
-        if ((e.target as HTMLElement).closest("a[data-external]")) return;
-        const min = sp.get("min");
-        router.push(`/jobs/${id}${min !== null ? `?min=${min}` : ""}`);
+      className={`${className || ""} focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-400`}
+      role="link"
+      tabIndex={0}
+      aria-label={label ? `Open ${label}` : "Open job detail"}
+      onClick={(e) => { if ((e.target as HTMLElement).closest("a[data-external]")) return; go(); }}
+      onKeyDown={(e) => {
+        if ((e.target as HTMLElement).closest("a")) return; // let real links inside handle their own keys
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); }
       }}
     >
       {children}

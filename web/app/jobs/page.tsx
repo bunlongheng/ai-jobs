@@ -420,7 +420,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
               </tr></thead>
               <tbody>
                 {g.rows.map((r) => (
-                  <RowLink key={r.id} id={r.id} className={`border-t border-gray-100 cursor-pointer ${HOVER[g.status] || "hover:bg-gray-50"}`}>
+                  <RowLink key={r.id} id={r.id} label={`${r.company || ""} ${r.title || ""}`.trim()} className={`border-t border-gray-100 cursor-pointer ${HOVER[g.status] || "hover:bg-gray-50"}`}>
                     <td className="pl-3 pr-1 py-2">
                       {(() => {
                         const src = jobSource(r.url);
