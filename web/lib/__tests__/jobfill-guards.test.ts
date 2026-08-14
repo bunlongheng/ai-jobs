@@ -12,7 +12,7 @@ describe("isLoopback", () => {
     expect(isLoopback(req({ host: "[::1]:3017" }))).toBe(true);
   });
   it("is false for LAN / public hosts", () => {
-    expect(isLoopback(req({ host: "10.0.0.218:3017" }))).toBe(false);
+    expect(isLoopback(req({ host: "10.1.2.3:3017" }))).toBe(false);
     expect(isLoopback(req({ host: "192.168.1.9:3017" }))).toBe(false);
     expect(isLoopback(req({ host: "remote.example.com" }))).toBe(false);
   });
@@ -33,7 +33,7 @@ describe("originBlocked (extension-only routes)", () => {
     expect(originBlocked(req({ ...loop, origin: "null" }))?.status).toBe(403);
   });
   it("blocks a non-loopback (LAN) client even with no Origin", () => {
-    expect(originBlocked(req({ host: "10.0.0.218:3017" }))?.status).toBe(403);
+    expect(originBlocked(req({ host: "10.1.2.3:3017" }))?.status).toBe(403);
   });
 });
 
