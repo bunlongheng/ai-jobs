@@ -1,4 +1,4 @@
-import { getBoard, getTrends, SCORE_TIERS } from "@/lib/queries";
+import { getBoard, getTrends, getSearchIndex, SCORE_TIERS } from "@/lib/queries";
 import type { AppRow } from "@/lib/db";
 import { getLogo } from "@/lib/logos";
 import RowLink from "./RowLink";
@@ -308,10 +308,9 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
   // work sits at 60+. Opening there puts focus straight on the Ready panel. (owner 2026-08-05)
   const min = sp.min !== undefined ? parseInt(sp.min) || 0 : 60;
   const { groups, counts, buckets } = getBoard(min);
-  // Full job index for the Cmd+K search (ALL scores/statuses, independent of the min filter).
-  const searchJobs = getBoard(0).groups.flatMap((g) => g.rows.map((r) => ({
-    id: r.id, title: r.title || "", company: r.company || "", score: r.score ?? 0, status: r.status || "",
-  })));
+  // Full job index for the Cmd+K search (ALL scores/statuses, independent of the min filter) - a
+  // light direct query, not a second full getBoard() grouping pass.
+  const searchJobs = getSearchIndex();
   // Deduped company -> real logo data-URI for the Cmd+K palette (avg ~1.4KB each, one per
   // distinct company). Real brand icons, not colored initials. (owner request 2026-08-05)
   const cmdkLogos: Record<string, string> = {};

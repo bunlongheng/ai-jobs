@@ -119,3 +119,12 @@ export function getApp(id: string): { app: AppRow | undefined; events: EventRow[
   const events = db().prepare("SELECT * FROM events WHERE app_id = ? ORDER BY id DESC").all(id) as EventRow[];
   return { app, events };
 }
+
+/** Light index for the Cmd+K palette - every non-deleted job, id/company/title/score/status only.
+ *  Avoids a second full getBoard() (grouping + counts) just to build the search list. */
+export function getSearchIndex(): { id: string; company: string; title: string; score: number; status: string }[] {
+  return (db().prepare(
+    "SELECT id, company, title, score, status FROM applications WHERE status != 'deleted'"
+  ).all() as { id: string; company: string | null; title: string | null; score: number | null; status: string | null }[])
+    .map((r) => ({ id: r.id, company: r.company || "", title: r.title || "", score: r.score ?? 0, status: r.status || "" }));
+}

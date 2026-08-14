@@ -47,10 +47,13 @@ async function fetchFaviconDataUri(dom: string): Promise<string | null> {
   }
 }
 
-/** Read a cached logo data URI (or null). Never downloads. */
+/** Read a cached logo data URI (or null). Never downloads. The prepared statement is memoized so a
+ *  board render (one getLogo per row) reuses it instead of re-preparing the same SQL each call. */
+let _logoStmt: import("better-sqlite3").Statement | null = null;
 export function getLogo(company: string | null | undefined): string | null {
   if (!company) return null;
-  const row = db().prepare("SELECT data_uri FROM logos WHERE company = ?").get(company) as { data_uri: string | null } | undefined;
+  _logoStmt ??= db().prepare("SELECT data_uri FROM logos WHERE company = ?");
+  const row = _logoStmt.get(company) as { data_uri: string | null } | undefined;
   return row?.data_uri ?? null;
 }
 
