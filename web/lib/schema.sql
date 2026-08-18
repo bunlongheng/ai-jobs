@@ -77,20 +77,3 @@ CREATE TABLE IF NOT EXISTS recruiter_status (
   bad_phone  INTEGER DEFAULT 0,
   updated_at TEXT
 );
-
--- document builder: named, editable resume AND cover-letter versions, each stored as markdown.
--- kind = 'resume' | 'cover'. is_master marks the default PER KIND (one master resume, one master
--- cover). pdf holds the rendered BLOB (make_resume_pdf.mjs, Playwright) so /api/resume/[id]/pdf
--- serves from the DB with no re-render at request time. The AI writes these via /api/resume; the
--- app itself renders 0 AI tokens. Nothing here is user-specific - a fresh clone starts empty and
--- fills from its own profile.json. (owner request 2026-08-18: public-friendly, covers too)
-CREATE TABLE IF NOT EXISTS resume_versions (
-  id         TEXT PRIMARY KEY,   -- slug of name
-  kind       TEXT DEFAULT 'resume',
-  name       TEXT NOT NULL,
-  content    TEXT,               -- markdown (source of truth)
-  is_master  INTEGER DEFAULT 0,
-  pdf        BLOB,               -- rendered PDF bytes
-  has_pdf    INTEGER DEFAULT 0,
-  updated_at TEXT DEFAULT (datetime('now'))
-);

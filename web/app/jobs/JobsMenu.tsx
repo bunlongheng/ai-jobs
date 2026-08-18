@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 const LINKS = [
-  { href: "/jobs/resume", label: "Resume & cover builder" },
   { href: "/jobs/skills", label: "Skills" },
   { href: "/jobs/answers", label: "Screening answers" },
   { href: "/jobs/recruiters", label: "Recruiters - call sheet" },
