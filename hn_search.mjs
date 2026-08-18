@@ -91,10 +91,10 @@ async function main() {
   const db = openDb();
   const profile = loadProfile();
   const today = new Date().toISOString().slice(0, 10);
-  const { results, deduped, inserted, skippedNoUrl } = await scoreDedupeInsert(
+  const { results, deduped, inserted, skippedNoUrl, blockedSkipped } = await scoreDedupeInsert(
     db, jobs, profile, `hackernews-${today}`, "HN Who is Hiring"
   );
-  printSummary(results, { fetched: 1, parsed: jobs.length, deduped, inserted }, []);
+  printSummary(results, { fetched: 1, parsed: jobs.length, deduped, inserted, blockedSkipped }, []);
   console.log(`skipped (no url): ${skippedNoUrl}`);
 }
 

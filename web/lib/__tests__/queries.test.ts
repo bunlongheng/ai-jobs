@@ -6,6 +6,8 @@ import path from "path";
 // point the DB at a throwaway file BEFORE importing anything that opens it
 const TMP = path.join(os.tmpdir(), `jobs-test-${Date.now()}.db`);
 process.env.JOBS_DB = TMP;
+// isolate from the real company blocklist.json (a missing path => empty blocklist)
+process.env.JOBS_BLOCKLIST = TMP + ".blocklist.json";
 
 let getBoard: typeof import("../queries").getBoard;
 let dbFn: typeof import("../db").db;

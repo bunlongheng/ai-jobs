@@ -520,7 +520,8 @@
       // frame has one input and must not receive the resume. (owner bug 2026-08-05)
       if (!resumeDone && (isResume || (fileInputs.length === 1 && !isCover))) {
         if (chip) report.push(["resume", "already attached: " + chip.trim(), "file"]);
-        else attach(fi, b64ToFile(resumeB64, pname + " - Senior Full-Stack Engineer.pdf"), "resume");
+        else if (resumeB64) attach(fi, b64ToFile(resumeB64, pname + " - Senior Full-Stack Engineer.pdf"), "resume");
+        else report.push(["resume", "MANUAL - attach your resume (no kit for this job)", "file"]);
         resumeDone = true;
         continue;
       }

@@ -28,9 +28,12 @@ const QUERIES = [
   "staff frontend engineer react",
   "principal software engineer node",
   "senior software engineer react node",
-  // PHP / Laravel full-stack (owner: Laravel 4->13, 12+ yrs; wants these surfaced 2026-08-05)
+  // PHP / Laravel full-stack (owner: Laravel 4->13, 12+ yrs; wants these surfaced more 2026-08-05, 2026-08-17)
   "senior php laravel engineer",
   "full stack laravel developer",
+  "senior laravel engineer",
+  "php backend engineer",
+  "laravel software engineer",
   // AI-assisted / build-with-AI product roles (owner target 2026-08-03, e.g. Origami "AI Product Engineer")
   "AI product engineer",
   "AI engineer full stack",
@@ -135,10 +138,10 @@ async function main() {
     await sleep(RATE_MS);
   }
 
-  const { results, deduped, inserted } = await scoreDedupeInsert(
+  const { results, deduped, inserted, blockedSkipped } = await scoreDedupeInsert(
     db, jobs, profile, `linkedin-${today}`, "from LinkedIn guest scrape"
   );
-  printSummary(results, { fetched, parsed, deduped, inserted }, walls);
+  printSummary(results, { fetched, parsed, deduped, inserted, blockedSkipped }, walls);
   db.close();
 }
 
