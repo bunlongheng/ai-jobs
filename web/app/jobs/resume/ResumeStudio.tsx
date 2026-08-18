@@ -5,6 +5,7 @@ import { useMemo, useRef, useState } from "react";
 import { marked } from "marked";
 import DOMPurify from "isomorphic-dompurify";
 import TurndownService from "turndown";
+import { confirmDialog } from "../ConfirmModal";
 
 marked.setOptions({ gfm: true, breaks: false });
 function render(md: string): string {
@@ -130,7 +131,9 @@ export default function ResumeStudio({ versions: initV, selected, defaults }: {
     } finally { setBusy(false); }
   }
   async function del() {
-    if (!cur || !confirm(`Delete "${cur.name}"? This can't be undone.`)) return;
+    if (!cur) return;
+    const ok = await confirmDialog({ title: `Delete "${cur.name}"?`, body: "This resume version will be permanently removed. This can't be undone.", confirmLabel: "Delete", tone: "danger" });
+    if (!ok) return;
     cancelPending();
     setBusy(true);
     try {
