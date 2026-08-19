@@ -95,10 +95,7 @@ export default function Hidelist({ initial }: { initial: Match[] }) {
 
       <div className="px-4 py-3.5">
         <p className="text-[12px] text-gray-500 mb-3">
-          A soft hide: hidden companies vanish from every panel, search, and trend, <strong>but the scraper keeps scanning
-          them</strong> - their new jobs still land in the DB, just out of sight. Existing jobs are only hidden (kept in the
-          DB), so <strong>Unhide brings them right back</strong> with history intact. Want to stop the scrapes too? Use the
-          <em> Block list</em> below instead.
+          Soft hide: gone from the board <strong>but still scraped</strong>. Reversible - Unhide restores its jobs. Want to stop scraping too? Block it.
         </p>
 
         <div className="flex gap-2 mb-3">

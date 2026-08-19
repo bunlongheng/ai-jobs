@@ -95,10 +95,7 @@ export default function Blocklist({ initial }: { initial: Match[] }) {
 
       <div className="px-4 py-3.5">
         <p className="text-[12px] text-gray-500 mb-3">
-          A hard block: blocked companies vanish from every panel, search, and trend, <strong>and the scraper never scans or
-          adds them again</strong> - no wasted scrapes on companies you never want to see. Existing jobs are only hidden (kept in
-          the DB), so <strong>Unblock brings them right back</strong> with history intact. Different from <em>Hold</em> (per-company,
-          from a job&apos;s page), which just declutters a company you&apos;re still sizing up into the Archived pile.
+          Hard block: hidden everywhere <strong>and never scraped again</strong>. Reversible - Unblock restores its jobs with history intact.
         </p>
 
         <div className="flex gap-2 mb-3">
