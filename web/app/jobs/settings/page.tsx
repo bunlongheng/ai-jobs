@@ -80,13 +80,11 @@ export default function Settings() {
     <main className="min-h-screen bg-[#f6f8fa] text-[#1f2328]">
       <div className="max-w-[920px] mx-auto px-5 py-4 pb-10">
         <Link href="/jobs" className="text-xs text-blue-700 no-underline">&larr; board</Link>
-        <h1 className="text-[16px] font-medium text-gray-800 mt-1.5 mb-3">Settings</h1>
+        <h1 className="text-[16px] font-medium text-gray-800 mt-1.5 mb-3">Settings <span className="text-[12px] font-normal text-gray-400">- hide/block companies + scheduled automations (read live from LaunchAgents, 0 AI tokens)</span></h1>
 
-        <Hidelist initial={withLogos(getHidelist())} />
-        <Blocklist initial={withLogos(getBlocklist())} />
-
-        <h2 className="text-[13px] font-medium text-gray-700 mt-4 mb-2">Scheduled automations <span className="text-gray-400 font-normal">- read live from macOS LaunchAgents, 0 AI tokens</span></h2>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3.5 items-start">
+          <Hidelist initial={withLogos(getHidelist())} />
+          <Blocklist initial={withLogos(getBlocklist())} />
           {rows.map((r) => (
             <div key={r.label} className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
               <div className={`bg-gradient-to-r ${r.grad} px-3 py-2 flex items-center justify-between gap-2`}>

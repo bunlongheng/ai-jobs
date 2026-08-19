@@ -82,7 +82,7 @@ export default function Blocklist({ initial }: { initial: Match[] }) {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden mb-3.5">
+    <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
       <div className="bg-gradient-to-r from-rose-500 to-red-600 px-4 py-2.5 flex items-center justify-between gap-2">
         <h2 className="text-sm text-white tracking-wide flex items-center gap-2">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white shrink-0" aria-hidden>
