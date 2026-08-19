@@ -20,11 +20,11 @@ function HIcon({ d }: { d: string }) {
   return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white shrink-0" aria-hidden><path d={d} /></svg>;
 }
 // Human descriptions + gradient + icon per known job (plists don't self-describe).
-const INFO: Record<string, { what: string; tokens: string; grad: string; icon: string }> = {
-  "com.bheng.jobs": { what: "Jobs web app + JobFill API - always-on service on :3017", tokens: "none", grad: "from-slate-600 to-slate-800", icon: "M4 4h16v6H4zM4 14h16v6H4zM8 7h.01M8 17h.01" },
-  "com.bheng.linkedin-search": { what: "Scrapes new LinkedIn/Indeed matches onto the board", tokens: "none (keyword scrape + rule scoring)", grad: "from-blue-500 to-blue-700", icon: "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3" },
-  "com.bheng.jobs-backup": { what: "Backs up jobs.db to a timestamped copy", tokens: "none", grad: "from-amber-500 to-orange-600", icon: "M12 3c4.4 0 8 1.3 8 3s-3.6 3-8 3-8-1.3-8-3 3.6-3 8-3zM4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6" },
-  "com.bheng.jobs-prescan": { what: "Headless-prescans the Not-ready pile (Not ready → Ready), 2 lanes", tokens: "none (browser automation, no AI)", grad: "from-green-600 to-emerald-700", icon: "M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7zM15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0" },
+const INFO: Record<string, { title: string; what: string; tokens: string; grad: string; icon: string }> = {
+  "com.bheng.jobs": { title: "Jobs service", what: "Jobs web app + JobFill API - always-on service on :3017", tokens: "none", grad: "from-slate-600 to-slate-800", icon: "M4 4h16v6H4zM4 14h16v6H4zM8 7h.01M8 17h.01" },
+  "com.bheng.linkedin-search": { title: "Scraper", what: "Scrapes new LinkedIn/Indeed matches onto the board", tokens: "none (keyword scrape + rule scoring)", grad: "from-blue-500 to-blue-700", icon: "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3" },
+  "com.bheng.jobs-backup": { title: "DB backup", what: "Backs up jobs.db to a timestamped copy", tokens: "none", grad: "from-amber-500 to-orange-600", icon: "M12 3c4.4 0 8 1.3 8 3s-3.6 3-8 3-8-1.3-8-3 3.6-3 8-3zM4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6" },
+  "com.bheng.jobs-prescan": { title: "Prescan", what: "Headless-prescans the Not-ready pile (Not ready → Ready), 2 lanes", tokens: "none (browser automation, no AI)", grad: "from-green-600 to-emerald-700", icon: "M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7zM15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0" },
 };
 
 function pick(xml: string, key: string): string {
@@ -68,7 +68,7 @@ export default function Settings() {
     try { if (log) { const st = fs.statSync(log); logAge = new Date(st.mtime).toISOString().slice(0, 16).replace("T", " "); } } catch { /* no log */ }
     return {
       label, installed: !!xml, running: loaded.has(label),
-      what: INFO[label]?.what || "-", tokens: INFO[label]?.tokens || "-",
+      title: INFO[label]?.title || label, what: INFO[label]?.what || "", tokens: INFO[label]?.tokens || "-",
       grad: INFO[label]?.grad || "from-gray-500 to-gray-700", icon: INFO[label]?.icon || "",
       when: xml ? schedule(xml) : "not installed", script: scriptPath,
       exists: scriptPath !== "-" && (() => { try { return fs.existsSync(scriptPath); } catch { return false; } })(),
@@ -88,7 +88,7 @@ export default function Settings() {
           {rows.map((r) => (
             <div key={r.label} className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
               <div className={`bg-gradient-to-r ${r.grad} px-3 py-2 flex items-center justify-between gap-2`}>
-                <h2 className="text-[12.5px] text-white tracking-wide flex items-center gap-1.5 min-w-0">{r.icon ? <HIcon d={r.icon} /> : null}<span className="truncate">{r.what}</span></h2>
+                <h2 className="text-[12.5px] text-white tracking-wide flex items-center gap-1.5 min-w-0">{r.icon ? <HIcon d={r.icon} /> : null}<span className="truncate">{r.title}</span>{r.what ? <span title={r.what} aria-label={r.title} className="cursor-help opacity-75 hover:opacity-100 shrink-0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" /></svg></span> : null}</h2>
                 <span className="text-[10px] font-semibold text-white bg-white/25 rounded-full px-2 py-0.5 shrink-0 whitespace-nowrap">{r.when}</span>
               </div>
               <div className="px-3 py-2 flex items-center gap-2 text-[11.5px]">
