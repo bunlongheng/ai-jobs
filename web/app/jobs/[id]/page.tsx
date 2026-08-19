@@ -3,6 +3,7 @@ import { getKit } from "@/lib/kit";
 import { extractAllTech, techMeta, techCategory } from "@/lib/tech";
 import { getLogo } from "@/lib/logos";
 import { nearHome } from "@/lib/near-home";
+import { resumeVersion } from "@/lib/resumeVersion";
 import { altitude, ALT_META } from "@/lib/altitude";
 import JobDescription from "../JobDescription";
 import FindEmailButton from "../FindEmailButton";
@@ -91,6 +92,7 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
   const backHref = sp.min !== undefined ? `/jobs?min=${sp.min}` : "/jobs";
   const { app, events } = getApp(id);
   if (!app) notFound();
+  const rv = resumeVersion();
   const kit = getKit(id);
 
   // Apply-by-email (Hacker News / direct recruiter outreach): the email IS the application.
@@ -216,7 +218,20 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
   return (
     <main className="min-h-screen bg-[#f6f8fa] text-[#1f2328]" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
       <div className="max-w-[900px] mx-auto px-5 py-6 pb-16" style={{ zoom: 0.85 }}>
-        <Link href={backHref} className="text-xs text-blue-700 no-underline">&larr; back to board</Link>
+        <div className="flex items-center gap-2 mb-1">
+          <span className="relative inline-block shrink-0">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/icon.png" alt="AI-Jobs" width={30} height={30} className="block w-[30px] h-[30px] rounded-[8px] shadow-sm" />
+            {/* private hint: current resume revision. green = injecting the latest master, amber = stale. */}
+            {rv.rev !== null ? (
+              <span title={rv.fresh ? `resume rev ${rv.rev} - latest` : `resume rev ${rv.rev} - STALE (run: node pull_master_resume.mjs)`}
+                className={`absolute -top-1 -right-1 min-w-[14px] h-[14px] px-0.5 rounded-full text-[8px] font-bold leading-[14px] text-center text-white shadow ${rv.fresh ? "bg-emerald-500" : "bg-amber-500"}`}>
+                {rv.rev}
+              </span>
+            ) : null}
+          </span>
+          <Link href={backHref} className="text-xs text-blue-700 no-underline">&larr; back to board</Link>
+        </div>
 
         <div className="bg-white border border-gray-200 rounded-2xl px-6 py-5 mt-3 mb-4 shadow-sm">
           <div className="flex items-start justify-between gap-4 flex-wrap">

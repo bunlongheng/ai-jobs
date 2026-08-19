@@ -344,8 +344,17 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
         <AutoRefresh />
         <div className="mb-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
           <div className="flex items-center gap-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/icon.png" alt="AI-Jobs" width={52} height={52} className="block w-11 h-11 sm:w-[52px] sm:h-[52px] rounded-[12px] shadow-sm shrink-0" />
+            <span className="relative inline-block shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/icon.png" alt="AI-Jobs" width={52} height={52} className="block w-11 h-11 sm:w-[52px] sm:h-[52px] rounded-[12px] shadow-sm" />
+              {/* private hint: current resume revision. green = injecting the latest master, amber = stale. */}
+              {rv.rev !== null ? (
+                <span title={rv.fresh ? `resume rev ${rv.rev} - latest` : `resume rev ${rv.rev} - STALE (run: node pull_master_resume.mjs)`}
+                  className={`absolute -top-1 -right-1 min-w-[15px] h-[15px] px-0.5 rounded-full text-[9px] font-bold leading-[15px] text-center text-white shadow ${rv.fresh ? "bg-emerald-500" : "bg-amber-500"}`}>
+                  {rv.rev}
+                </span>
+              ) : null}
+            </span>
             <div className="min-w-0">
               <h1 className="text-2xl sm:text-3xl font-bold text-[#1f2328] mb-0.5 whitespace-nowrap">AI-Jobs</h1>
               <div className="text-[12px] sm:text-[13px] text-gray-500">{total} tracked &middot; live &middot; zero-token</div>
@@ -397,7 +406,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
           const breakdownPills = breakdown.map(([src, n]) => {
             const uri = markUri(src);
             return (
-              <span key={src} title={src} className="inline-flex items-center justify-center gap-1 min-w-[46px] text-[11px] font-bold rounded-full pl-1 pr-2 py-0.5 whitespace-nowrap text-white bg-white/20">
+              <span key={src} data-src-filter={src} title={`Click to show only ${src} in this pile`} className="inline-flex items-center justify-center gap-1 min-w-[46px] text-[11px] font-bold rounded-full pl-1 pr-2 py-0.5 whitespace-nowrap text-white bg-white/20 cursor-pointer select-none ring-white transition-all">
                 {uri
                   /* eslint-disable-next-line @next/next/no-img-element */
                   ? <img src={uri} alt={src} width={16} height={16} className="w-4 h-4 rounded-full bg-white object-contain shrink-0" />
@@ -422,7 +431,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
               </tr></thead>
               <tbody>
                 {g.rows.map((r) => (
-                  <RowLink key={r.id} id={r.id} label={`${r.company || ""} ${r.title || ""}`.trim()} className={`border-t border-gray-100 cursor-pointer ${HOVER[g.status] || "hover:bg-gray-50"}`}>
+                  <RowLink key={r.id} id={r.id} label={`${r.company || ""} ${r.title || ""}`.trim()} dataSrc={jobSource(r.url)} className={`border-t border-gray-100 cursor-pointer ${HOVER[g.status] || "hover:bg-gray-50"}`}>
                     <td className="pl-3 pr-1 py-2">
                       {(() => {
                         const src = jobSource(r.url);
