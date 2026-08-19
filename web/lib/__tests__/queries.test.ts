@@ -6,15 +6,17 @@ import path from "path";
 // point the DB at a throwaway file BEFORE importing anything that opens it
 const TMP = path.join(os.tmpdir(), `jobs-test-${Date.now()}.db`);
 process.env.JOBS_DB = TMP;
-// isolate from the real company blocklist.json (a missing path => empty blocklist)
+// isolate from the real blocklist.json / hidelist.json (a missing path => empty list)
 process.env.JOBS_BLOCKLIST = TMP + ".blocklist.json";
+process.env.JOBS_HIDELIST = TMP + ".hidelist.json";
 
 let getBoard: typeof import("../queries").getBoard;
+let getSearchIndex: typeof import("../queries").getSearchIndex;
 let dbFn: typeof import("../db").db;
 
 beforeAll(async () => {
   ({ db: dbFn } = await import("../db"));
-  ({ getBoard } = await import("../queries"));
+  ({ getBoard, getSearchIndex } = await import("../queries"));
   const d = dbFn();
   const ins = d.prepare(
     "INSERT INTO applications (id, company, title, score, status, pf_ats, pf_status, pf_total, pf_covered) VALUES (?,?,?,?,?,?,?,?,?)"
@@ -60,6 +62,30 @@ describe("getBoard", () => {
     expect(order.indexOf("applied")).toBeLessThan(order.indexOf("archived"));
     const archived = getBoard().groups.find((g) => g.status === "archived");
     expect(archived?.rows.map((r) => r.company)).toContain("Old Co"); // the rejected row lives here now
+  });
+
+  it("HIDE list filters a company out of every panel (scraper still scans, board does not show)", () => {
+    fs.writeFileSync(process.env.JOBS_HIDELIST!, JSON.stringify(["Coinbase"]));
+    try {
+      const { groups, counts } = getBoard();
+      expect(counts.kit_ready).toBe(0); // Coinbase was the only Ready -> gone from the board
+      expect(groups.find((g) => g.status === "kit_ready")).toBeUndefined();
+      expect(groups.flatMap((g) => g.rows).map((r) => r.company)).not.toContain("Coinbase");
+      // the Cmd+K search feed must hide it too (regression: it filtered blocklist but not hidelist)
+      expect(getSearchIndex().map((r) => r.company)).not.toContain("Coinbase");
+    } finally {
+      fs.unlinkSync(process.env.JOBS_HIDELIST!);
+    }
+  });
+
+  it("BLOCK list excludes a company ENTIRELY, including its rejected/archived row (no reminder exception)", () => {
+    fs.writeFileSync(process.env.JOBS_BLOCKLIST!, JSON.stringify(["Old Co"]));
+    try {
+      const archived = getBoard().groups.find((g) => g.status === "archived");
+      expect(archived?.rows.map((r) => r.company) || []).not.toContain("Old Co");
+    } finally {
+      fs.unlinkSync(process.env.JOBS_BLOCKLIST!);
+    }
   });
 });
 

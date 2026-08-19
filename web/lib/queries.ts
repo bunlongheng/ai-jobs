@@ -1,5 +1,6 @@
 import { db, STAGES, type AppRow } from "./db";
 import { blockedSet, isBlocked } from "./blocklist";
+import { hiddenSet, isHidden } from "./hidelist";
 
 export type BoardGroup = { status: string; label: string; rows: AppRow[] };
 export type Field = [label: string, value: string, type?: string, options?: string[]];
@@ -22,18 +23,17 @@ export function getBoard(minScore = 0): {
   // Only the light columns the board list needs - never the resume_pdf BLOB or the resume/cover/
   // screening markdown / raw / jd text (those are per-detail, loaded by getApp). SELECT * pulled
   // megabytes of PDF blobs into memory on every board render. (perf 2026-08-14)
-  // Blocked companies are filtered out of the whole board (never deleted) so they vanish from
-  // every panel at once, yet un-blocking restores them instantly. (owner request 2026-08-17)
-  // EXCEPTION: a REJECTED job from a blocked company still shows - it only surfaces in the muted
-  // Archived pile (rejected rows are excluded from the work panels below), so the company stays
-  // out of New matches/Ready while the rejection stays on record as the reminder of why it was
-  // blocked. (owner request 2026-08-17)
+  // Blocked AND hidden companies are filtered out of the whole board (never deleted) so they vanish
+  // from every panel at once - INCLUDING rejected/archived rows - yet un-blocking / un-hiding
+  // restores them instantly with full history. Block = view-hidden + scraper skips it; Hide =
+  // view-hidden only (scraper keeps scanning). Both hide the same in the view. (owner request 2026-08-19)
   const blocked = blockedSet();
+  const hidden = hiddenSet();
   const all = (db().prepare(`SELECT id, company, title, score, status, verdict, ats, ai_able, url,
       location, kit_path, source_run, applied_at, rejected_at, liveness_checked, notes, pf_status,
       pf_ats, pf_covered, pf_total, pf_date, pf_direct_url, has_resume_pdf, tech, liked, easy_apply,
       easy_apply_checked, updated_at
-    FROM applications`).all() as AppRow[]).filter((r) => r.status !== "deleted" && (r.status === "rejected" || !isBlocked(r.company, blocked)));
+    FROM applications`).all() as AppRow[]).filter((r) => r.status !== "deleted" && !isBlocked(r.company, blocked) && !isHidden(r.company, hidden));
   // "Archived" bucket = disliked (liked = -1) OR rejected - one muted panel at the bottom,
   // each row tagged rejected/disliked in the UI. Rejected gets NO separate red panel.
   // (owner request 2026-07-24)
@@ -107,9 +107,10 @@ export function getBoard(minScore = 0): {
 // newest so the last point is today. (owner request 2026-08-05)
 export function getTrends(days = 7): { detected: number[]; ready: number[]; applied: number[] } {
   const blocked = blockedSet();
+  const hidden = hiddenSet();
   const rows = (db().prepare("SELECT company, source_run, pf_date, applied_at FROM applications WHERE status!='deleted'").all() as
     { company: string | null; source_run: string | null; pf_date: string | null; applied_at: string | null }[])
-    .filter((r) => !isBlocked(r.company, blocked));
+    .filter((r) => !isBlocked(r.company, blocked) && !isHidden(r.company, hidden));
   const labels: string[] = [];
   const now = new Date();
   for (let i = days - 1; i >= 0; i--) { const d = new Date(now); d.setDate(d.getDate() - i); labels.push(d.toISOString().slice(0, 10)); }
@@ -146,9 +147,10 @@ export function getApp(id: string): { app: AppRow | undefined; events: EventRow[
  *  Avoids a second full getBoard() (grouping + counts) just to build the search list. */
 export function getSearchIndex(): { id: string; company: string; title: string; score: number; status: string }[] {
   const blocked = blockedSet();
+  const hidden = hiddenSet();
   return (db().prepare(
     "SELECT id, company, title, score, status FROM applications WHERE status != 'deleted'"
   ).all() as { id: string; company: string | null; title: string | null; score: number | null; status: string | null }[])
-    .filter((r) => !isBlocked(r.company, blocked))
+    .filter((r) => !isBlocked(r.company, blocked) && !isHidden(r.company, hidden))
     .map((r) => ({ id: r.id, company: r.company || "", title: r.title || "", score: r.score ?? 0, status: r.status || "" }));
 }

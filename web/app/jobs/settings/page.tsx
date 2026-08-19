@@ -4,7 +4,9 @@ import os from "os";
 import path from "path";
 import { execSync } from "child_process";
 import Blocklist from "./Blocklist";
+import Hidelist from "./Hidelist";
 import { getBlocklist, withLogos } from "@/lib/blocklist";
+import { getHidelist } from "@/lib/hidelist";
 
 export const dynamic = "force-dynamic";
 
@@ -81,6 +83,7 @@ export default function Settings() {
         <h1 className="text-[16px] font-medium text-gray-800 mt-2 mb-0.5">Settings - scheduled automations</h1>
         <p className="text-[12px] text-gray-500 mb-5">Everything the job hunt runs on its own, read live from macOS LaunchAgents. All background jobs cost 0 AI tokens (only writing brand-new kits uses AI, and that stays manual).</p>
 
+        <Hidelist initial={withLogos(getHidelist())} />
         <Blocklist initial={withLogos(getBlocklist())} />
 
         <h2 className="text-[13px] font-medium text-gray-700 mt-6 mb-2">Scheduled automations</h2>
