@@ -360,7 +360,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
               <div className="text-[12px] sm:text-[13px] text-gray-500">{total} tracked &middot; live &middot; zero-token</div>
             </div>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex flex-wrap items-center justify-end gap-2 shrink-0 max-w-full">
             <CommandK jobs={searchJobs} logos={cmdkLogos} />
             <ScoreMenu min={min} buckets={buckets} tiers={[...SCORE_TIERS]} />
             <JobsMenu />
@@ -375,6 +375,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
             <div className="min-w-0">
               <div className="text-[17px] sm:text-[26px] font-bold leading-none">{total}</div>
               <div className="text-[9px] sm:text-xs text-white/85 mt-0.5 truncate">Total</div>
+              {todayOf(TREND.total) > 0 ? <div className="sm:hidden text-[9px] font-bold text-white/90 leading-none mt-0.5">+{todayOf(TREND.total)} today</div> : null}
             </div>
             <div className="hidden sm:flex flex-col items-end shrink-0">
               <Sparkline data={TREND.total} />
@@ -386,6 +387,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
               <div className="min-w-0">
                 <div className="text-[17px] sm:text-[26px] font-bold leading-none">{s === "applied" ? (counts.applied || 0) + (counts.rejected || 0) : counts[s]}</div>
                 <div className="text-[9px] sm:text-xs text-white/85 mt-0.5 truncate">{s === "planned" ? "New" : s === "kit_ready" ? "Ready" : s === "kit_only" ? "Not ready" : s === "manual_only" ? "Manual" : s[0].toUpperCase() + s.slice(1)}</div>
+                {todayOf(TREND[s] || trends.detected) > 0 ? <div className="sm:hidden text-[9px] font-bold text-white/90 leading-none mt-0.5">+{todayOf(TREND[s] || trends.detected)} today</div> : null}
               </div>
               <div className="hidden sm:flex flex-col items-end shrink-0">
                 <Sparkline data={TREND[s] || trends.detected} />
