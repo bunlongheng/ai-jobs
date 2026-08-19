@@ -307,7 +307,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
   const sp = await searchParams;
   // Default to 60+ - owner has already applied to everything 70+/80+/90+, so the live
   // work sits at 60+. Opening there puts focus straight on the Ready panel. (owner 2026-08-05)
-  const min = sp.min !== undefined ? parseInt(sp.min) || 0 : 70;
+  const min = sp.min !== undefined ? parseInt(sp.min) || 0 : 60;
   const { groups, counts, buckets } = getBoard(min);
   const rv = resumeVersion();
   // Full job index for the Cmd+K search (ALL scores/statuses, independent of the min filter) - a
