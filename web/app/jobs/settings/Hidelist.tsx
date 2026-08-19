@@ -83,7 +83,7 @@ export default function Hidelist({ initial }: { initial: Match[] }) {
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden mb-3.5">
-      <div className="bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-2.5 flex items-center justify-between gap-2">
+      <div className="bg-gradient-to-r from-violet-500 to-violet-600 px-4 py-2.5 flex items-center justify-between gap-2">
         <h2 className="text-sm text-white tracking-wide flex items-center gap-2">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white shrink-0" aria-hidden>
             <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 10 8 10 8a13.16 13.16 0 0 1-1.67 2.68M6.61 6.61A13.53 13.53 0 0 0 2 12s3 8 10 8a9.74 9.74 0 0 0 5.39-1.61M14.12 14.12a3 3 0 1 1-4.24-4.24M1 1l22 22" />
@@ -114,7 +114,7 @@ export default function Hidelist({ initial }: { initial: Match[] }) {
               role="combobox"
               aria-expanded={open}
               aria-controls="hidelist-suggest"
-              className="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-[13px] outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-200"
+              className="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-[13px] outline-none focus:border-violet-400 focus:ring-1 focus:ring-violet-200"
             />
             {open && matches.length > 0 && (
               <ul id="hidelist-suggest" className="absolute z-30 top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-72 overflow-auto py-1">
@@ -124,7 +124,7 @@ export default function Hidelist({ initial }: { initial: Match[] }) {
                       type="button"
                       onMouseDown={(e) => { e.preventDefault(); pick(m.company); }}
                       onMouseEnter={() => setHi(i)}
-                      className={`w-full flex items-center gap-2 px-3 py-1.5 text-left text-[13px] ${i === hi ? "bg-amber-50 text-amber-800" : "text-gray-700"}`}
+                      className={`w-full flex items-center gap-2 px-3 py-1.5 text-left text-[13px] ${i === hi ? "bg-violet-50 text-violet-800" : "text-gray-700"}`}
                     >
                       <LogoMark m={m} />
                       <span className="truncate">{m.company}</span>
@@ -138,7 +138,7 @@ export default function Hidelist({ initial }: { initial: Match[] }) {
             type="button"
             onClick={() => { const c = input.trim(); if (c) pick(c); }}
             disabled={busy || !input.trim()}
-            className="rounded-lg bg-amber-500 text-white text-[13px] font-medium px-3.5 py-1.5 disabled:opacity-40 hover:bg-amber-600"
+            className="rounded-lg bg-violet-500 text-white text-[13px] font-medium px-3.5 py-1.5 disabled:opacity-40 hover:bg-violet-600"
           >
             Hide
           </button>
