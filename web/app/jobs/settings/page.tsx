@@ -78,32 +78,28 @@ export default function Settings() {
 
   return (
     <main className="min-h-screen bg-[#f6f8fa] text-[#1f2328]">
-      <div className="max-w-[920px] mx-auto px-5 py-7 pb-16">
+      <div className="max-w-[920px] mx-auto px-5 py-4 pb-10">
         <Link href="/jobs" className="text-xs text-blue-700 no-underline">&larr; board</Link>
-        <h1 className="text-[16px] font-medium text-gray-800 mt-2 mb-0.5">Settings - scheduled automations</h1>
-        <p className="text-[12px] text-gray-500 mb-5">Everything the job hunt runs on its own, read live from macOS LaunchAgents. All background jobs cost 0 AI tokens (only writing brand-new kits uses AI, and that stays manual).</p>
+        <h1 className="text-[16px] font-medium text-gray-800 mt-1.5 mb-3">Settings</h1>
 
         <Hidelist initial={withLogos(getHidelist())} />
         <Blocklist initial={withLogos(getBlocklist())} />
 
-        <h2 className="text-[13px] font-medium text-gray-700 mt-6 mb-2">Scheduled automations</h2>
-        <div>
+        <h2 className="text-[13px] font-medium text-gray-700 mt-4 mb-2">Scheduled automations <span className="text-gray-400 font-normal">- read live from macOS LaunchAgents, 0 AI tokens</span></h2>
+        <div className="grid grid-cols-2 gap-3">
           {rows.map((r) => (
-            <div key={r.label} className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden mb-3.5">
-              <div className={`bg-gradient-to-r ${r.grad} px-4 py-2.5 flex items-center justify-between gap-2`}>
-                <h2 className="text-sm text-white tracking-wide flex items-center gap-2">{r.icon ? <HIcon d={r.icon} /> : null}{r.what}</h2>
-                <span className="text-[11px] font-semibold text-white bg-white/25 rounded-full px-2.5 py-0.5 shrink-0 whitespace-nowrap">{r.when}</span>
+            <div key={r.label} className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+              <div className={`bg-gradient-to-r ${r.grad} px-3 py-2 flex items-center justify-between gap-2`}>
+                <h2 className="text-[12.5px] text-white tracking-wide flex items-center gap-1.5 min-w-0">{r.icon ? <HIcon d={r.icon} /> : null}<span className="truncate">{r.what}</span></h2>
+                <span className="text-[10px] font-semibold text-white bg-white/25 rounded-full px-2 py-0.5 shrink-0 whitespace-nowrap">{r.when}</span>
               </div>
-              <table className="w-full text-[13px] border-collapse">
-                <tbody>
-                  <tr className="border-t border-gray-100"><td className="px-4 py-1.5 pr-3 text-gray-400 w-[22%]">Status</td><td className="px-4 py-1.5"><span className={`inline-flex items-center gap-1.5 ${r.running ? "text-green-600" : r.installed ? "text-amber-600" : "text-gray-400"}`}><span className={`inline-block w-2 h-2 rounded-full ${r.running ? "bg-green-500" : r.installed ? "bg-amber-400" : "bg-gray-300"}`} />{r.running ? "loaded & active" : r.installed ? "installed (not loaded)" : "not installed"}</span></td></tr>
-                  <tr className="border-t border-gray-100"><td className="px-4 py-1.5 pr-3 text-gray-400">Label</td><td className="px-4 py-1.5 text-gray-700 font-mono">{r.label}</td></tr>
-                  <tr className="border-t border-gray-100"><td className="px-4 py-1.5 pr-3 text-gray-400">Mechanism</td><td className="px-4 py-1.5 text-gray-700">macOS LaunchAgent</td></tr>
-                  <tr className="border-t border-gray-100"><td className="px-4 py-1.5 pr-3 text-gray-400">Script</td><td className="px-4 py-1.5 text-gray-700 font-mono break-all">{r.script} {r.exists ? "" : <span className="text-red-500">(missing)</span>}</td></tr>
-                  <tr className="border-t border-gray-100"><td className="px-4 py-1.5 pr-3 text-gray-400">Tokens</td><td className="px-4 py-1.5 text-gray-700">{r.tokens}</td></tr>
-                  {r.lastLog ? <tr className="border-t border-gray-100"><td className="px-4 py-1.5 pr-3 text-gray-400">Last activity</td><td className="px-4 py-1.5 text-gray-700">{r.lastLog}</td></tr> : null}
-                </tbody>
-              </table>
+              <div className="px-3 py-2 flex items-center gap-2 text-[11.5px]">
+                <span className={`inline-flex items-center gap-1 shrink-0 ${r.running ? "text-green-600" : r.installed ? "text-amber-600" : "text-gray-400"}`}>
+                  <span className={`inline-block w-2 h-2 rounded-full ${r.running ? "bg-green-500" : r.installed ? "bg-amber-400" : "bg-gray-300"}`} />{r.running ? "active" : r.installed ? "idle" : "off"}
+                </span>
+                <span className="text-gray-400 font-mono truncate">{r.script.split("/").pop()}{r.exists ? "" : <span className="text-red-500"> (missing)</span>}</span>
+                {r.lastLog ? <span className="text-gray-400 ml-auto shrink-0">{r.lastLog.slice(5)}</span> : null}
+              </div>
             </div>
           ))}
         </div>

@@ -88,18 +88,17 @@ export default function Blocklist({ initial }: { initial: Match[] }) {
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white shrink-0" aria-hidden>
             <circle cx="12" cy="12" r="9" /><path d="M5.6 5.6l12.8 12.8" />
           </svg>
-          Company blocklist - hidden from the board
+          Block list
+          <span title="Hard block: hidden everywhere and never scraped again. Reversible - Unblock restores its jobs with history intact." aria-label="About the block list" className="cursor-help opacity-75 hover:opacity-100">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" /></svg>
+          </span>
         </h2>
         <span className="text-[11px] font-semibold text-white bg-white/25 rounded-full px-2.5 py-0.5 shrink-0">{companies.length} blocked</span>
       </div>
 
-      <div className="px-4 py-3.5">
-        <p className="text-[12px] text-gray-500 mb-3">
-          Hard block: hidden everywhere <strong>and never scraped again</strong>. Reversible - Unblock restores its jobs with history intact.
-        </p>
-
+      <div className="px-4 py-3">
         <div className="flex gap-2 mb-3">
-          <div className="relative flex-1">
+          <div className="relative w-64">
             <input
               value={input}
               onChange={(e) => onInput(e.target.value)}

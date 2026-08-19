@@ -88,18 +88,17 @@ export default function Hidelist({ initial }: { initial: Match[] }) {
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white shrink-0" aria-hidden>
             <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 10 8 10 8a13.16 13.16 0 0 1-1.67 2.68M6.61 6.61A13.53 13.53 0 0 0 2 12s3 8 10 8a9.74 9.74 0 0 0 5.39-1.61M14.12 14.12a3 3 0 1 1-4.24-4.24M1 1l22 22" />
           </svg>
-          Company hide list - hidden from the board
+          Hide list
+          <span title="Soft hide: gone from the board but still scraped. Reversible - Unhide restores its jobs. Want to stop scraping too? Block it." aria-label="About the hide list" className="cursor-help opacity-75 hover:opacity-100">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" /></svg>
+          </span>
         </h2>
         <span className="text-[11px] font-semibold text-white bg-white/25 rounded-full px-2.5 py-0.5 shrink-0">{companies.length} hidden</span>
       </div>
 
-      <div className="px-4 py-3.5">
-        <p className="text-[12px] text-gray-500 mb-3">
-          Soft hide: gone from the board <strong>but still scraped</strong>. Reversible - Unhide restores its jobs. Want to stop scraping too? Block it.
-        </p>
-
+      <div className="px-4 py-3">
         <div className="flex gap-2 mb-3">
-          <div className="relative flex-1">
+          <div className="relative w-64">
             <input
               value={input}
               onChange={(e) => onInput(e.target.value)}
