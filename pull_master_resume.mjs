@@ -30,6 +30,17 @@ try {
   if (!content.trim()) { console.error(`Master markdown (${master.id}.md) is empty.`); process.exit(1); }
   fs.writeFileSync(path.join(ROOT, "resume-master.md"), HEADER + content.trim() + "\n");
   console.log(`OK pulled Resume++ master "${master.name || master.id}" (${master.id}, ${content.length} chars) -> resume-master.md`);
+  // Also sync the RENDERED master PDF so JobFill injects the CURRENT resume, not a stale copy.
+  // Resume++ renders it to pdf/<id>.pdf; copy it to resume-bunlong.pdf (the file profile.json points
+  // JobFill at). Without this, editing the master left the injected PDF stale. (owner bug 2026-08-19)
+  const pdfSrc = path.join(WEB, "pdf", `${master.id}.pdf`);
+  const pdfDst = path.join(ROOT, "resume-bunlong.pdf");
+  if (fs.existsSync(pdfSrc)) {
+    fs.copyFileSync(pdfSrc, pdfDst);
+    console.log(`   + synced rendered PDF (${fs.statSync(pdfDst).size} B) -> resume-bunlong.pdf (what JobFill injects)`);
+  } else {
+    console.log(`   ! NO rendered PDF at ${pdfSrc} - open the master in Resume++ and export once so JobFill gets the latest.`);
+  }
   console.log("   per-job prep now tailors from this. (re-run after changing the master in Resume++)");
 } catch (e) {
   console.error(`Could not read Resume++ workspace at ${WEB} (${e.message}). Set RESUME_PLUS_WORKSPACE if it lives elsewhere.`);

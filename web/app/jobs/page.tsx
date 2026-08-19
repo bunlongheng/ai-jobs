@@ -1,4 +1,5 @@
 import { getBoard, getTrends, getSearchIndex, SCORE_TIERS } from "@/lib/queries";
+import { resumeVersion } from "@/lib/resumeVersion";
 import type { AppRow } from "@/lib/db";
 import { getLogo } from "@/lib/logos";
 import RowLink from "./RowLink";
@@ -308,6 +309,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
   // work sits at 60+. Opening there puts focus straight on the Ready panel. (owner 2026-08-05)
   const min = sp.min !== undefined ? parseInt(sp.min) || 0 : 70;
   const { groups, counts, buckets } = getBoard(min);
+  const rv = resumeVersion();
   // Full job index for the Cmd+K search (ALL scores/statuses, independent of the min filter) - a
   // light direct query, not a second full getBoard() grouping pass.
   const searchJobs = getSearchIndex();
@@ -469,7 +471,19 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
           </CollapsiblePanel>
           );
         })}
-        <div className="mt-8 text-center text-xs text-gray-400">Jobs &middot; reads jobs.db &middot; localhost/jobs</div>
+        <div className="mt-8 text-center text-xs text-gray-400">
+          Jobs &middot; reads jobs.db
+          {rv.rev !== null ? (
+            <>
+              {" "}&middot;{" "}
+              <span title={rv.fresh ? `Injecting the current master (rev ${rv.rev}, updated ${rv.updatedAt ?? "?"})` : "Injected resume is STALE vs the master - run: node pull_master_resume.mjs"}
+                className={rv.fresh ? "text-emerald-600 font-medium" : "text-amber-600 font-semibold"}>
+                resume v{rv.rev} {rv.fresh ? "✓" : "⚠ stale"}
+              </span>
+            </>
+          ) : null}
+          {" "}&middot; localhost/jobs
+        </div>
       </div>
       <PanelNav />
     </main>
