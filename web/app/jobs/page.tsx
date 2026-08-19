@@ -360,8 +360,10 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
               <div className="text-[12px] sm:text-[13px] text-gray-500">{total} tracked &middot; live &middot; zero-token</div>
             </div>
           </div>
-          <div className="flex flex-wrap items-center justify-end gap-2 shrink-0 max-w-full">
-            <CommandK jobs={searchJobs} logos={cmdkLogos} />
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Search is hidden on phones (it overflowed the row) - Cmd+K is a desktop affordance
+                anyway; the other controls now fit on one line. (owner request 2026-08-19) */}
+            <div className="hidden sm:block"><CommandK jobs={searchJobs} logos={cmdkLogos} /></div>
             <ScoreMenu min={min} buckets={buckets} tiers={[...SCORE_TIERS]} />
             <JobsMenu />
             <ViewTabs />
