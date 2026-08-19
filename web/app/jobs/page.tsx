@@ -436,7 +436,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
               <tbody>
                 {g.rows.map((r) => (
                   <RowLink key={r.id} id={r.id} label={`${r.company || ""} ${r.title || ""}`.trim()} dataSrc={jobSource(r.url)} className={`border-t border-gray-100 cursor-pointer ${HOVER[g.status] || "hover:bg-gray-50"}`}>
-                    <td className="pl-3 pr-1 py-2">
+                    <td className="pl-3 pr-1 py-2 align-middle">
                       {(() => {
                         const src = jobSource(r.url);
                         const uri = markUri(src, r.company);
@@ -452,11 +452,11 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
                           </span>
                         );
                         return r.url
-                          ? <a data-external href={r.url} target="_blank" rel="noopener noreferrer" title={`Open on ${src}`} className="inline-flex no-underline">{mark}</a>
-                          : mark;
+                          ? <a data-external href={r.url} target="_blank" rel="noopener noreferrer" title={`Open on ${src}`} className="flex items-center no-underline">{mark}</a>
+                          : <span className="flex items-center">{mark}</span>;
                       })()}
                     </td>
-                    <td className="pl-2 pr-1 py-2.5 sm:pl-1 truncate">
+                    <td className="pl-2 pr-1 py-2 sm:pl-1 truncate align-middle">
                       <span className="flex items-center gap-2 text-[#1f2328]">
                         <span className="hidden sm:inline text-gray-300 font-normal select-none leading-none">|</span>
                         <Logo company={r.company} />
