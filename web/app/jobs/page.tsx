@@ -365,8 +365,8 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
                 anyway; the other controls now fit on one line. (owner request 2026-08-19) */}
             <div className="hidden sm:block"><CommandK jobs={searchJobs} logos={cmdkLogos} /></div>
             <ScoreMenu min={min} buckets={buckets} tiers={[...SCORE_TIERS]} />
-            <JobsMenu />
             <ViewTabs />
+            <JobsMenu />
           </div>
         </div>
 
