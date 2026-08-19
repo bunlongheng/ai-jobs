@@ -4,7 +4,6 @@ import { extractAllTech, techMeta, techCategory } from "@/lib/tech";
 import { getLogo } from "@/lib/logos";
 import { nearHome } from "@/lib/near-home";
 import { altitude, ALT_META } from "@/lib/altitude";
-import ReachOut from "../ReachOut";
 import JobDescription from "../JobDescription";
 import FindEmailButton from "../FindEmailButton";
 import Reactions from "../Reactions";
@@ -288,7 +287,7 @@ export default async function JobDetail({ params, searchParams }: { params: Prom
             <div className="text-right shrink-0">
               <span className={`inline-block text-[11px] px-2.5 py-1 rounded-md uppercase font-bold tracking-wide border ${STPILL[app.status || "planned"] || "bg-gray-100 text-gray-500 border-gray-200"}`}>{app.status}</span>
               <div className="text-[26px] font-extrabold text-blue-700 mt-2 leading-none">{app.score ?? "-"}</div>
-              <div className="mt-2.5 flex justify-end items-center gap-2 flex-wrap"><ReachOut company={app.company || ""} title={app.title || ""} jd={typeof app.jd === "string" ? app.jd : ""} me={me} /><Reactions id={app.id} liked={app.liked} status={app.status} appliedAt={app.applied_at} company={app.company} /></div>
+              <div className="mt-2.5 flex justify-end items-center gap-2 flex-wrap"><Reactions id={app.id} liked={app.liked} status={app.status} appliedAt={app.applied_at} company={app.company} /></div>
             </div>
           </div>
           {/* Every action now lives in the icon row above (Applied + Hold-off included), so the
