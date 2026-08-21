@@ -1,4 +1,6 @@
 import { db, STAGES, type AppRow } from "./db";
+import { blockedSet, isBlocked } from "./blocklist";
+import { hiddenSet, isHidden } from "./hidelist";
 
 export type BoardGroup = { status: string; label: string; rows: AppRow[] };
 export type Field = [label: string, value: string, type?: string, options?: string[]];
@@ -21,11 +23,17 @@ export function getBoard(minScore = 0): {
   // Only the light columns the board list needs - never the resume_pdf BLOB or the resume/cover/
   // screening markdown / raw / jd text (those are per-detail, loaded by getApp). SELECT * pulled
   // megabytes of PDF blobs into memory on every board render. (perf 2026-08-14)
+  // Blocked AND hidden companies are filtered out of the whole board (never deleted) so they vanish
+  // from every panel at once - INCLUDING rejected/archived rows - yet un-blocking / un-hiding
+  // restores them instantly with full history. Block = view-hidden + scraper skips it; Hide =
+  // view-hidden only (scraper keeps scanning). Both hide the same in the view. (owner request 2026-08-19)
+  const blocked = blockedSet();
+  const hidden = hiddenSet();
   const all = (db().prepare(`SELECT id, company, title, score, status, verdict, ats, ai_able, url,
       location, kit_path, source_run, applied_at, rejected_at, liveness_checked, notes, pf_status,
       pf_ats, pf_covered, pf_total, pf_date, pf_direct_url, has_resume_pdf, tech, liked, easy_apply,
       easy_apply_checked, updated_at
-    FROM applications`).all() as AppRow[]).filter((r) => r.status !== "deleted");
+    FROM applications`).all() as AppRow[]).filter((r) => r.status !== "deleted" && !isBlocked(r.company, blocked) && !isHidden(r.company, hidden));
   // "Archived" bucket = disliked (liked = -1) OR rejected - one muted panel at the bottom,
   // each row tagged rejected/disliked in the UI. Rejected gets NO separate red panel.
   // (owner request 2026-07-24)
@@ -98,8 +106,11 @@ export function getBoard(minScore = 0): {
 // (source_run date), made ready (pf_date), and applied (applied_at) each day. Oldest ->
 // newest so the last point is today. (owner request 2026-08-05)
 export function getTrends(days = 7): { detected: number[]; ready: number[]; applied: number[] } {
-  const rows = db().prepare("SELECT source_run, pf_date, applied_at FROM applications WHERE status!='deleted'").all() as
-    { source_run: string | null; pf_date: string | null; applied_at: string | null }[];
+  const blocked = blockedSet();
+  const hidden = hiddenSet();
+  const rows = (db().prepare("SELECT company, source_run, pf_date, applied_at FROM applications WHERE status!='deleted'").all() as
+    { company: string | null; source_run: string | null; pf_date: string | null; applied_at: string | null }[])
+    .filter((r) => !isBlocked(r.company, blocked) && !isHidden(r.company, hidden));
   const labels: string[] = [];
   const now = new Date();
   for (let i = days - 1; i >= 0; i--) { const d = new Date(now); d.setDate(d.getDate() - i); labels.push(d.toISOString().slice(0, 10)); }
@@ -114,6 +125,18 @@ export function getTrends(days = 7): { detected: number[]; ready: number[]; appl
   return { detected, ready, applied };
 }
 
+/** Distinct company names across the whole pipeline (deleted excluded), sorted - for the
+ *  blocklist autocomplete so you pick a real company instead of typing. Blocked ones stay in
+ *  the list so you can still see/target them. (owner request 2026-08-17) */
+export function getCompanies(): string[] {
+  return (db().prepare(
+    "SELECT DISTINCT company FROM applications WHERE company IS NOT NULL AND status != 'deleted'"
+  ).all() as { company: string }[])
+    .map((r) => r.company)
+    .filter((c) => c && c.trim())
+    .sort((a, b) => a.localeCompare(b));
+}
+
 export function getApp(id: string): { app: AppRow | undefined; events: EventRow[] } {
   const app = db().prepare("SELECT * FROM applications WHERE id = ?").get(id) as AppRow | undefined;
   const events = db().prepare("SELECT * FROM events WHERE app_id = ? ORDER BY id DESC").all(id) as EventRow[];
@@ -123,8 +146,11 @@ export function getApp(id: string): { app: AppRow | undefined; events: EventRow[
 /** Light index for the Cmd+K palette - every non-deleted job, id/company/title/score/status only.
  *  Avoids a second full getBoard() (grouping + counts) just to build the search list. */
 export function getSearchIndex(): { id: string; company: string; title: string; score: number; status: string }[] {
+  const blocked = blockedSet();
+  const hidden = hiddenSet();
   return (db().prepare(
     "SELECT id, company, title, score, status FROM applications WHERE status != 'deleted'"
   ).all() as { id: string; company: string | null; title: string | null; score: number | null; status: string | null }[])
+    .filter((r) => !isBlocked(r.company, blocked) && !isHidden(r.company, hidden))
     .map((r) => ({ id: r.id, company: r.company || "", title: r.title || "", score: r.score ?? 0, status: r.status || "" }));
 }

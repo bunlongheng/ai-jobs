@@ -72,3 +72,6 @@ web/public/scan-status.json
 apply_bot.mjs
 dropbox_apply.mjs
 login_greenhouse.mjs
+
+# per-install company blocklist (personal state)
+blocklist.json

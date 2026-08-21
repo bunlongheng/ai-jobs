@@ -16,7 +16,7 @@ export default function PhonePitch({ pitch }: { pitch: string }) {
   if (!expanded) {
     return (
       <button onClick={() => setOpen(true)} title="What to say on the call"
-        className="fixed top-4 left-4 z-50 w-14 h-14 rounded-full border-[3px] border-white shadow-lg overflow-hidden hover:scale-105 transition-transform bg-white">
+        className="fixed bottom-4 right-4 z-50 w-14 h-14 rounded-full border-[3px] border-white shadow-lg overflow-hidden hover:scale-105 transition-transform bg-white">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/me.png" alt="Profile" width={56} height={56} className="w-full h-full object-cover" />
       </button>
@@ -24,7 +24,7 @@ export default function PhonePitch({ pitch }: { pitch: string }) {
   }
 
   return (
-    <div className="fixed top-1/2 -translate-y-1/2 left-4 sm:left-[max(1rem,calc(50vw-49rem))] z-50 w-[calc(100vw-2rem)] sm:w-[320px]">
+    <div className="fixed bottom-4 right-4 sm:right-[max(1rem,calc(50vw-49rem))] z-50 w-[calc(100vw-2rem)] sm:w-[320px]">
       <div className="relative bg-white border border-gray-200 rounded-2xl shadow-xl pl-6 pr-4 pt-6 pb-4">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/me.png" alt="Profile" width={52} height={52} className="absolute -top-5 -left-4 w-[52px] h-[52px] rounded-full border-[3px] border-white shadow-md object-cover" />

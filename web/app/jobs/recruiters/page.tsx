@@ -7,6 +7,7 @@ import RecruiterNote from "../RecruiterNote";
 import RecruiterMeeting from "../RecruiterMeeting";
 import RecruiterPhone from "../RecruiterPhone";
 import ViewTabs from "../ViewTabs";
+import JobsMenu from "../JobsMenu";
 import Backdrop from "../Backdrop";
 import PhonePitch from "../PhonePitch";
 import { FocusProvider, FocusCard } from "../CardFocus";
@@ -184,16 +185,26 @@ function Section({ icon, title, grad, firms, accent, fmap, home }: { icon: strin
   );
 }
 
-function Tile({ n, label, grad, icon }: { n: number; label: string; grad: string; icon: string }) {
+function Tile({ n, label, grad, icon, today }: { n: number; label: string; grad: string; icon: string; today?: number }) {
   return (
     <div className={`flex-1 min-w-0 sm:min-w-[88px] rounded-[10px] px-2 py-1.5 sm:px-4 sm:py-3 text-white shadow-sm bg-gradient-to-r ${grad} flex items-start justify-between gap-2`}>
       <div className="min-w-0">
         <div className="text-[17px] sm:text-[26px] font-bold leading-none">{n}</div>
         <div className="text-[9px] sm:text-xs text-white/85 mt-0.5 truncate">{label}</div>
+        {today && today > 0 ? <div className="text-[9px] font-bold text-white/90 leading-none mt-0.5">+{today} today</div> : null}
       </div>
       <span className="text-white/45 shrink-0"><Ic k={icon} s={16} /></span>
     </div>
   );
+}
+
+// Recruiters contacted TODAY (row touched today AND currently carries the flag) - the recruiter-mode
+// analog of the board's "+N today". (owner request 2026-08-19)
+function todayOutreach(): { called: number; emailed: number } {
+  const rows = db().prepare("SELECT status FROM recruiter_status WHERE substr(updated_at,1,10)=date('now')").all() as { status: string }[];
+  let called = 0, emailed = 0;
+  for (const r of rows) { const f = (r.status || "").split(","); if (f.includes("called")) called++; if (f.includes("emailed")) emailed++; }
+  return { called, emailed };
 }
 
 export default function RecruitersPage() {
@@ -202,6 +213,7 @@ export default function RecruitersPage() {
   const { pitch, home } = loadProfileBits();
   const all = [...NH, ...BOUTIQUE, ...NATIONAL, ...US];
   const has = (flag: string) => all.filter((f) => (fmap[firmKey(f)]?.flags || []).includes(flag)).length;
+  const outreach = todayOutreach();
   return (
     <FocusProvider>
     <div className="min-h-screen">
@@ -216,13 +228,16 @@ export default function RecruitersPage() {
               <div className="text-[12px] sm:text-[13px] text-gray-500">{all.length} recruiters &middot; NH &middot; Boston &middot; US</div>
             </div>
           </div>
-          <ViewTabs />
+          <div className="flex items-center gap-2 shrink-0">
+            <ViewTabs />
+            <JobsMenu />
+          </div>
         </div>
 
         <div className="flex flex-nowrap sm:flex-wrap gap-1.5 sm:gap-2 mb-2">
           <Tile n={all.length} label="Firms" grad="from-gray-700 to-gray-900" icon="users" />
-          <Tile n={has("called")} label="Called" grad="from-emerald-500 to-green-600" icon="phone" />
-          <Tile n={has("emailed")} label="Emailed" grad="from-indigo-500 to-violet-600" icon="mail" />
+          <Tile n={has("called")} label="Called" grad="from-emerald-500 to-green-600" icon="phone" today={outreach.called} />
+          <Tile n={has("emailed")} label="Emailed" grad="from-indigo-500 to-violet-600" icon="mail" today={outreach.emailed} />
         </div>
 
 

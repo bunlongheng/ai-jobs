@@ -11,7 +11,10 @@
     "logos": "tsx scripts/logos.ts",
     "test:e2e": "playwright test",
     "dev:lan": "next dev -p 3017 -H 0.0.0.0",
-    "start:lan": "next start -p 3017 -H 0.0.0.0"
+    "start:lan": "next start -p 3017 -H 0.0.0.0",
+    "sync-drive": "node ../sync_resumes_to_drive.mjs",
+    "pull-master": "node ../pull_master_resume.mjs",
+    "verify-resume": "node ../verify_resume.mjs"
   },
   "dependencies": {
     "better-sqlite3": "^13.0.1",
