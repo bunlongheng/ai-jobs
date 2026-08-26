@@ -1,4 +1,14 @@
 <div align="center">
+  <img src="docs/icon.png" alt="AI-Jobs" width="96" height="96" />
+  <h1>AI-Jobs</h1>
+  <p><em>AI-native job-hunt pipeline: scrape, score, tailor kits, pre-scan forms, track applications</em></p>
+  <p><a href="https://github.com/bunlongheng/ai-jobs">Repo</a> &middot; <a href="https://bunlongheng.com/projects?name=ai-jobs">Portfolio</a></p>
+  <img src="docs/social-preview.png" alt="AI-Jobs - preview" width="820" />
+</div>
+
+---
+
+<div align="center">
 
 <img src="docs/screenshots/logo.png" alt="AI-Jobs" width="88" height="88" />
 
