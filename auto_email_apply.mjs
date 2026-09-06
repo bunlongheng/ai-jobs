@@ -18,7 +18,7 @@
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 const require = createRequire(import.meta.url);
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const Database = require(join(ROOT, "web/node_modules/better-sqlite3"));
@@ -30,7 +30,7 @@ const id = profile.identity || {};
 
 const ENV_PATH = join(ROOT, "web/.env.local");
 const DB_PATH = process.env.JOBS_DB || join(ROOT, "web/jobs.db");
-const RESUME_PDF = process.env.RESUME_PDF || join(ROOT, id.resume_pdf || "resume.pdf");
+const RESUME_PDF = process.env.RESUME_PDF || resolve(ROOT, id.resume_pdf || "resume.pdf");
 const LOG = process.env.AUTO_EMAIL_LOG || "/tmp/auto-email-apply.log";
 const FROM_NAME = process.env.FROM_NAME || id.name || "";
 const FROM_EMAIL = process.env.FROM_EMAIL || id.email || "";
@@ -39,6 +39,7 @@ const GAPI = "https://gmail.googleapis.com/gmail/v1/users/me";
 const ALGOLIA = "https://hn.algolia.com/api/v1";
 
 const SEND = process.argv.includes("--send") && process.env.JOBS_AUTOSEND_OFF !== "1";
+const DIRECT = process.argv.includes("--direct");
 const MAX = Number((process.argv.find((a) => a.startsWith("--max=")) || "").split("=")[1]) || 20;
 
 function readEnv() {
@@ -139,53 +140,129 @@ async function hnCommentText(url) {
 // ---------- email body ----------
 const dedash = (s) => String(s || "").replace(/[–—‑]/g, "-");
 
-function buildBody(coverMd, title) {
+// Every outreach leads with the same positioning line - senior full-stack, 12+ years - so the
+// recruiter sees the headline before the cover text. (owner rule 2026-09-06)
+const HEADLINE = id.headline || "Senior Full-Stack Developer";
+const YEARS = id.years || "12+";
+// The header line is the NAME + TITLE only - short, never a sentence. The years belong in the
+// opening line of the message instead, where they read as a person talking. (owner rule 2026-09-06)
+const SUMMARY = `${FROM_NAME} - ${HEADLINE}`;
+const INTRO = `With ${YEARS} years building and shipping production web applications end to end, I wanted to put my name in for this one.`;
+// Do not repeat the years if the tailored cover already works them in.
+const needsIntro = (cover) => !/\b12\+?\s*years|\b\d{2}\+\s*years/i.test(String(cover || ""));
+
+// url = the real href, label = what the reader sees. Both are needed: the plain-text part prints
+// the bare URL, the HTML part wraps it in a real <a> so GitHub/Projects are CLICKABLE. Sending
+// text/plain only was why the links arrived as dead text. (owner bug 2026-09-06)
+function buildLinks() {
+  const site = String(id.site || "").replace(/\/$/, "");
+  return [
+    id.site && { label: "Portfolio", url: id.site },
+    id.projects ? { label: "Projects", url: id.projects } : (site && { label: "Projects", url: site + "/projects" }),
+    site && { label: "Resume", url: site + "/resume" },
+    id.github && { label: "GitHub", url: id.github },
+    id.linkedin && { label: "LinkedIn", url: id.linkedin },
+  ].filter(Boolean);
+}
+
+function coverText(coverMd) {
   let b = dedash(coverMd || "").trim();
   const i = b.search(/with great excitement|best regard|sincerely/i); // drop any existing sign-off
   if (i >= 0) b = b.slice(0, i).trim();
-  const links = [
-    id.site && `Portfolio - ${id.site}`,
-    id.site && `Resume - ${String(id.site).replace(/\/$/, "")}/resume`,
-    id.github && `GitHub - ${id.github}`,
-    id.linkedin && `LinkedIn - ${id.linkedin}`,
-  ].filter(Boolean);
+  return b;
+}
+
+const WALKTHROUGH = "Happy to walk through any of these projects if one catches your eye - just let me know and we can find a time.";
+
+// Split the cover into its salutation ("Dear X,") and the rest, so the intro line can sit right
+// after the greeting instead of above it.
+function splitCover(coverMd) {
+  const t = coverText(coverMd);
+  const m = t.match(/^\s*(dear[^\n]{0,80}?,)\s*\n?/i);
+  return m ? { hello: m[1].trim(), rest: t.slice(m[0].length).trim() } : { hello: "", rest: t };
+}
+
+function buildBody(coverMd, title) {
+  const links = buildLinks();
+  const { hello, rest } = splitCover(coverMd);
   return [
-    b,
+    SUMMARY,
     "",
-    ...(links.length ? ["A few links if useful:", ...links, ""] : []),
-    "Happy to walk through any of these projects if one catches your eye - just let me know and we can find a time.",
+    ...(hello ? [hello, ""] : []),
+    ...(needsIntro(coverMd) ? [INTRO, ""] : []),
+    rest,
+    "",
+    ...(links.length ? ["A few links if useful:", ...links.map((l) => `${l.label} - ${l.url}`), ""] : []),
+    WALKTHROUGH,
     "",
     "With great excitement,",
     FROM_NAME,
   ].join("\n");
 }
 
-function buildRaw({ to, subject, body, pdfB64 }) {
+const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+function buildHtmlBody(coverMd, title) {
+  const links = buildLinks();
+  const { hello, rest } = splitCover(coverMd);
+  const paras = rest.split(/\n\s*\n/).filter((x) => x.trim());
+  return [
+    '<div style="font-family:Georgia,\'Times New Roman\',serif;font-size:15px;line-height:1.6;color:#1a2129;max-width:640px;">',
+    `<p style="margin:0 0 16px;font-weight:bold;">${esc(SUMMARY)}</p>`,
+    hello ? `<p style="margin:0 0 14px;">${esc(hello)}</p>` : "",
+    needsIntro(coverMd) ? `<p style="margin:0 0 14px;">${esc(INTRO)}</p>` : "",
+    ...paras.map((x) => `<p style="margin:0 0 14px;">${esc(x).replace(/\n/g, "<br/>")}</p>`),
+    links.length
+      ? '<p style="margin:18px 0 6px;">A few links if useful:</p><ul style="margin:0 0 16px;padding-left:20px;">' +
+        links.map((l) => `<li style="margin:0 0 5px;"><a href="${esc(l.url)}" style="color:#2563eb;">${esc(l.label)}</a></li>`).join("") +
+        "</ul>"
+      : "",
+    `<p style="margin:0 0 16px;">${esc(WALKTHROUGH)}</p>`,
+    '<p style="margin:0;">With great excitement,<br/>' + esc(FROM_NAME) + "</p>",
+    "</div>",
+  ].filter(Boolean).join("\n");
+}
+
+function buildRaw({ to, subject, body, html, pdfB64 }) {
   const nl = "\r\n";
-  const boundary = "b_" + Buffer.from(subject).toString("hex").slice(0, 16) + to.length;
+  const seed = Buffer.from(subject).toString("hex").slice(0, 16) + to.length;
+  const outer = "mix_" + seed;   // multipart/mixed: [alternative, pdf]
+  const inner = "alt_" + seed;   // multipart/alternative: [plain, html]
+  const b64 = (t) => Buffer.from(t, "utf8").toString("base64").match(/.{1,76}/g).join(nl);
   const headers = [
     `From: ${FROM_NAME} <${FROM_EMAIL}>`,
     `To: ${to}`,
     `Bcc: ${FROM_EMAIL}`,
     `Subject: ${subject}`,
     "MIME-Version: 1.0",
-    `Content-Type: multipart/mixed; boundary="${boundary}"`,
+    `Content-Type: multipart/mixed; boundary="${outer}"`,
   ].join(nl);
   const parts = [
-    `--${boundary}`,
+    `--${outer}`,
+    `Content-Type: multipart/alternative; boundary="${inner}"`,
+    "",
+    `--${inner}`,
     "Content-Type: text/plain; charset=UTF-8",
     "Content-Transfer-Encoding: base64",
     "",
-    Buffer.from(body, "utf8").toString("base64").match(/.{1,76}/g).join(nl),
+    b64(body),
     "",
-    `--${boundary}`,
+    `--${inner}`,
+    "Content-Type: text/html; charset=UTF-8",
+    "Content-Transfer-Encoding: base64",
+    "",
+    b64(html),
+    "",
+    `--${inner}--`,
+    "",
+    `--${outer}`,
     `Content-Type: application/pdf; name="${RESUME_FILENAME}"`,
     "Content-Transfer-Encoding: base64",
     `Content-Disposition: attachment; filename="${RESUME_FILENAME}"`,
     "",
     pdfB64.match(/.{1,76}/g).join(nl),
     "",
-    `--${boundary}--`,
+    `--${outer}--`,
   ].join(nl);
   return Buffer.from(headers + nl + nl + parts, "utf8").toString("base64url");
 }
@@ -212,11 +289,17 @@ async function main() {
   }
   const pdfB64 = readFileSync(RESUME_PDF).toString("base64");
   const db = new Database(DB_PATH);
+  // Two lanes. HN: resolve the apply email out of the HN comment at send time (the original path).
+  // DIRECT: any kit_ready job whose found_email was already resolved by the Hunter finder. The
+  // direct lane is OPT-IN via --direct so wiring it up cannot silently arm the cron - the scheduled
+  // run keeps doing HN only until the owner turns it on. (owner rule 2026-09-06)
   const rows = db
     .prepare(
-      "SELECT id, company, title, url, cover_md, jd, notes FROM applications " +
-        "WHERE status='kit_ready' AND url LIKE '%news.ycombinator.com%' AND cover_md IS NOT NULL " +
-        "ORDER BY score DESC"
+      "SELECT id, company, title, url, cover_md, jd, notes, found_email FROM applications " +
+        "WHERE status='kit_ready' AND cover_md IS NOT NULL AND (" +
+        "  url LIKE '%news.ycombinator.com%'" +
+        (DIRECT ? " OR (found_email IS NOT NULL AND found_email <> '')" : "") +
+        ") ORDER BY score DESC"
     )
     .all();
   const cacheJd = db.prepare("UPDATE applications SET jd=? WHERE id=? AND (jd IS NULL OR jd='')");
@@ -234,9 +317,14 @@ async function main() {
   for (const row of rows) {
     if (sent >= MAX) { console.log(`(cap ${MAX} reached, stopping)`); break; }
 
-    // recipient: DB text first, then self-heal from the live HN comment (and cache it)
+    // recipient: a Hunter-resolved found_email wins outright (direct lane); otherwise fall back to
+    // the HN path - DB text first, then self-heal from the live comment (and cache it).
     let text = `${row.jd || ""} ${row.notes || ""}`;
     let { email, why } = resolveRecipient(text, row.company);
+    if (!email && DIRECT && row.found_email && /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(row.found_email.trim())) {
+      email = row.found_email.trim();
+      why = "found_email (Hunter)";
+    }
     if (!email) {
       const live = await hnCommentText(row.url);
       if (live) {
@@ -255,6 +343,7 @@ async function main() {
 
     const subject = `Application: ${row.title}${FROM_NAME ? ` - ${FROM_NAME}` : ""}`;
     const body = buildBody(row.cover_md, row.title);
+    const html = buildHtmlBody(row.cover_md, row.title);
     const line = `${SEND ? "SEND" : "WOULD"} -> ${email}  (${why})  | ${row.company} - ${row.title}`;
 
     if (!SEND) {
@@ -265,7 +354,7 @@ async function main() {
     }
 
     try {
-      const raw = buildRaw({ to: email, subject, body, pdfB64 });
+      const raw = buildRaw({ to: email, subject, body, html, pdfB64 });
       const msgId = await sendMessage(raw, token);
       markApplied.run(email, row.id);
       sent++;

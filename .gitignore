@@ -75,3 +75,7 @@ login_greenhouse.mjs
 
 # per-install company blocklist (personal state)
 blocklist.json
+
+# local DB snapshot + resume freshness marker - PII, never commit
+jobs.db
+resume-bunlong.rev

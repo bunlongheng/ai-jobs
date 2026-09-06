@@ -4,7 +4,8 @@
   "description": "DIY job-hunt engine (see README.md). Playwright is the only node dep - used by scrape_indeed.mjs.",
   "scripts": {
     "setup": "node scripts/setup.mjs",
-    "test": "python3 tests/test_jobfill.py && python3 tests/test_scan.py"
+    "test": "python3 tests/test_jobfill.py && python3 tests/test_scan.py",
+    "pull-master": "node pull_master_resume.mjs"
   },
   "dependencies": {
     "playwright": "^1.59.1"
