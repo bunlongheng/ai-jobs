@@ -28,7 +28,15 @@ async function jdFor(url) {
   const r = await fetch(url, { headers: { "User-Agent": UA }, redirect: "follow" });
   if (!r.ok) return "";
   const html = await r.text();
-  // Greenhouse/Lever/most ATS put the posting in a known container; fall back to the whole body.
+  // Prefer JSON-LD JobPosting - most ATS emit it and it is the actual posting, not chrome.
+  for (const m of html.matchAll(/<script[^>]+application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi)) {
+    try {
+      const blobs = [].concat(JSON.parse(m[1]));
+      for (const b of blobs) {
+        if (b && /JobPosting/i.test(b["@type"] || "") && b.description) return strip(String(b.description)).slice(0, 12000);
+      }
+    } catch { /* not parseable, try the next block */ }
+  }
   const m = html.match(/<div[^>]+(?:id="content"|class="[^"]*(?:job__description|posting|opening|content)[^"]*")[^>]*>([\s\S]*?)<\/div>\s*<\/(?:div|section|main|body)>/i);
   return strip(m ? m[1] : html).slice(0, 12000);
 }
@@ -44,8 +52,11 @@ let ok = 0, bad = 0;
 for (const row of rows) {
   let text = "";
   try { text = await jdFor(row.url); } catch { /* network/parse - counts as a miss */ }
-  if (text && text.length > 400) { save.run(text, row.id); ok++; console.log(`OK   ${String(text.length).padStart(6)}  ${row.company.slice(0,40)}`); }
-  else { bad++; console.log(`MISS ${String(text.length).padStart(6)}  ${row.company.slice(0,40)}`); }
+  // A blob with no responsibilities/requirements language is company boilerplate, not the posting.
+  // Storing it would produce generic kits, which is worse than having no kit at all.
+  const signal = (t) => (String(t).match(/responsib|requirement|qualificat|what you.?ll|you will|experience (with|in)|we.?re looking|skills/gi) || []).length;
+  if (text && text.length > 400 && signal(text) >= 2) { save.run(text, row.id); ok++; console.log(`OK   ${String(text.length).padStart(6)}  ${row.company.slice(0,40)}`); }
+  else { bad++; console.log(`MISS ${String(text.length).padStart(6)} sig=${signal(text)}  ${row.company.slice(0,40)}`); }
   await new Promise((r) => setTimeout(r, 900)); // gentle pacing
 }
 console.log(`\njd fetched: ${ok}   missed: ${bad}   (of ${rows.length})`);
