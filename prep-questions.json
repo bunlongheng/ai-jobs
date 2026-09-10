@@ -1,0 +1,52 @@
+[
+  {
+    "q": "Tell me about yourself.",
+    "a": "I'm a senior full-stack engineer with 12+ years of experience. My strongest stack is React, Next.js, Node.js, TypeScript, PostgreSQL, and AWS. Most recently at Thryv I've been focused on building products, architecture, integrations, and practical AI tools.",
+    "tip": "Keep it under 45 seconds. End on AI tools so they ask about it next."
+  },
+  {
+    "q": "How hands-on are you with coding?",
+    "a": "Very hands-on. Even in architecture and leadership roles, I kept writing code every day - debugging, reviewing implementations, building POCs, and creating AI-powered engineering tools.",
+    "tip": "Have 1 concrete example ready: the AI PR reviewer that runs on every open PR."
+  },
+  {
+    "q": "What's your strongest tech stack?",
+    "a": "JavaScript and TypeScript end to end - React and Next.js on the frontend, Node.js and Express on the backend, PostgreSQL, and AWS.",
+    "tip": "If they ask about PHP: Laravel 4 through 13, real freelance work since 2014."
+  },
+  {
+    "q": "What AI project are you most proud of?",
+    "a": "Repo Recon and Project Recon. I used AI to analyze repositories, Jira, Confluence, and Slack to reconstruct project architecture, dependencies, and context end to end - turning hours of manual onboarding into a repeatable system.",
+    "tip": "Follow-up they'll ask: how do you keep the AI honest? Answer: every finding is pinned to an exact file and line."
+  },
+  {
+    "q": "What product are you most proud of?",
+    "a": "The engineering intelligence tools I built. I identified a real problem, designed the solution, built it, and used AI to significantly reduce manual engineering investigation.",
+    "tip": "Add a number if you can: how much investigation time it saved."
+  },
+  {
+    "q": "Why are you looking for a new role?",
+    "a": "I want to get back into a highly hands-on senior engineering role where I can build products, solve difficult technical problems, and continue working with AI.",
+    "tip": "Stay positive about Thryv. Never lead with what's wrong there."
+  },
+  {
+    "q": "Are you more frontend or backend?",
+    "a": "I'm genuinely full-stack. React and Next.js are probably my strongest frontend technologies, while Node.js, APIs, databases, integrations, and AWS are where I'm strongest on the backend.",
+    "tip": "If pushed to pick: say backend-leaning for systems work, frontend for product polish."
+  },
+  {
+    "q": "Have you worked with AWS?",
+    "a": "Yes, extensively. I'm AWS Solutions Architect and Developer certified, and I've designed and built systems using AWS services around compute, storage, messaging, security, authentication, CDN, and application infrastructure.",
+    "tip": "Name the services if asked: Lambda, S3, SQS/SNS, IAM, Cognito, CloudFront."
+  },
+  {
+    "q": "How do you use AI in your development workflow?",
+    "a": "Beyond coding assistance, I've built AI workflows for repo analysis, project discovery, security auditing, testing, PR reviews, and deployment automation.",
+    "tip": "Mention the deploy assistant enforcing sign-off gates - it shows AI with guardrails."
+  },
+  {
+    "q": "What are you looking for next?",
+    "a": "A senior or staff-level hands-on full-stack role where I can build real products, contribute to architecture, and apply AI to meaningful problems.",
+    "tip": "Tie it to their product in 1 sentence if you know it."
+  }
+]
