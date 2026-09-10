@@ -172,10 +172,10 @@ async function main() {
   console.log(`mode: ${mode}  raw cards: ${jobs.length}`);
 
   const db = openDb();
-  const { results, deduped, inserted } = await scoreDedupeInsert(
+  const { results, deduped, inserted, blockedSkipped } = await scoreDedupeInsert(
     db, jobs, profile, `indeed-${today}`, 'from Indeed Playwright scrape'
   );
-  printSummary(results, { fetched, parsed: jobs.length, deduped, inserted }, walls);
+  printSummary(results, { fetched, parsed: jobs.length, deduped, inserted, blockedSkipped }, walls);
   db.close();
 }
 

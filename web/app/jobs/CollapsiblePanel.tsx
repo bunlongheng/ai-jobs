@@ -1,5 +1,6 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
 // Piles the board expands when the URL carries no ?open= choice. Owner's default landing is
 // the READY pile at 60+ (score default handled server-side) - so a fresh visit opens Ready
@@ -37,11 +38,30 @@ export default function CollapsiblePanel({
   const router = useRouter();
   const sp = useSearchParams();
   const raw = sp.get("open");
+
+  // Source filter: click a source pill in this header to show ONLY that source's rows in this
+  // pile (e.g. focus on LinkedIn applies), hiding the rest. Click it again to clear. Pure client-
+  // side over the already-rendered rows (data-row-src) - no reload, scoped to this panel.
+  // (owner request 2026-08-19)
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [activeSrc, setActiveSrc] = useState<string | null>(null);
   // With no ?open in the URL, use the server-computed default (defaultOpen) when provided - so a
   // fresh board with only "New matches" opens it - else fall back to the static DEFAULT_OPEN list.
   const open = raw === null
     ? (defaultOpen ?? DEFAULT_OPEN.includes(status))
     : new Set(raw.split(",").filter(Boolean)).has(status);
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    root.querySelectorAll<HTMLElement>("tr[data-row-src]").forEach((tr) => {
+      tr.style.display = !activeSrc || tr.getAttribute("data-row-src") === activeSrc ? "" : "none";
+    });
+    root.querySelectorAll<HTMLElement>("[data-src-filter]").forEach((el) => {
+      const on = el.getAttribute("data-src-filter") === activeSrc;
+      el.classList.toggle("ring-2", on);
+      el.style.opacity = !activeSrc || on ? "1" : "0.4";
+    });
+  }, [activeSrc, open, children]);
 
   function toggle() {
     // Base the new open-set on the URL (or DEFAULT_OPEN when absent), then flip THIS panel to
@@ -56,7 +76,7 @@ export default function CollapsiblePanel({
   }
 
   return (
-    <div id={`panel-${status}`} className={`mt-3.5 sm:mt-6 scroll-mt-4 rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden ${archived ? "opacity-75 [&_img]:grayscale" : ""}`}>
+    <div ref={rootRef} id={`panel-${status}`} className={`mt-3.5 sm:mt-6 scroll-mt-4 rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden ${archived ? "opacity-75 [&_img]:grayscale" : ""}`}>
       <button
         onClick={toggle}
         aria-expanded={open}
@@ -75,7 +95,17 @@ export default function CollapsiblePanel({
             security action, floated to the far right so the header line reads consistently
             whether or not the pills are shown. (owner 2026-08-08) */}
         <div className="flex items-center gap-1.5 shrink-0">
-          <div className="hidden sm:flex items-center gap-1.5 flex-wrap justify-end">{breakdown}</div>
+          <div
+            className="hidden sm:flex items-center gap-1.5 flex-wrap justify-end"
+            onClick={(e) => {
+              const el = (e.target as HTMLElement).closest("[data-src-filter]");
+              if (!el) return; // clicks on empty header space fall through to collapse the panel
+              e.stopPropagation();
+              const src = el.getAttribute("data-src-filter") || "";
+              setActiveSrc((cur) => (cur === src ? null : src));
+              if (!open) toggle(); // open the pile so the filtered rows are visible
+            }}
+          >{breakdown}</div>
           {action}
         </div>
       </button>

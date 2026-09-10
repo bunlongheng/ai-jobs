@@ -44,8 +44,10 @@ async function accessToken(env) {
 }
 
 const GAPI = "https://gmail.googleapis.com/gmail/v1/users/me";
+// --days=N widens the lookback for a catch-up sweep; the 12h cron stays at 4. (2026-09-08)
+const DAYS = Number((process.argv.find((a) => a.startsWith('--days=')) || '').split('=')[1]) || 4;
 const QUERY =
-  'newer_than:4d ("won\'t be moving forward" OR "will not be moving" OR "not be moving forward" OR "other candidates" OR "unfortunately" OR "regret to inform" OR "not to move forward" OR "not selected" OR "position has been filled" OR "pursue other" OR "no longer under consideration" OR "decided not to" OR "thanks for your interest" OR "thank you for your interest")';
+  `newer_than:${DAYS}d ` + '("won\'t be moving forward" OR "will not be moving" OR "not be moving forward" OR "other candidates" OR "unfortunately" OR "regret to inform" OR "not to move forward" OR "not selected" OR "position has been filled" OR "pursue other" OR "no longer under consideration" OR "decided not to" OR "thanks for your interest" OR "thank you for your interest")';
 
 const REJECT_RE = /(won'?t be moving|will not be moving|not be moving forward|not moving forward|other candidates|unfortunately|regret to inform|not to move forward|not selected|decided not to (?:move|proceed|advance)|position (?:has been|is) filled|will not be progressing|pursue other|no longer under consideration|not be proceeding|decided to move forward with other|move forward with other candidates|not moving forward with your)/i;
 // confirmations / "received" emails are NOT rejections
@@ -68,7 +70,7 @@ async function main() {
     process.exit(0);
   }
   const token = await accessToken(env);
-  const list = await gmailGet(`${GAPI}/messages?maxResults=40&q=${encodeURIComponent(QUERY)}`, token);
+  const list = await gmailGet(`${GAPI}/messages?maxResults=200&q=${encodeURIComponent(QUERY)}`, token);
   const ids = (list.messages || []).map((m) => m.id);
 
   const db = new Database(DB_PATH);

@@ -1,4 +1,5 @@
 import { getBoard, getTrends, getSearchIndex, SCORE_TIERS } from "@/lib/queries";
+import { resumeVersion } from "@/lib/resumeVersion";
 import type { AppRow } from "@/lib/db";
 import { getLogo } from "@/lib/logos";
 import RowLink from "./RowLink";
@@ -308,6 +309,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
   // work sits at 60+. Opening there puts focus straight on the Ready panel. (owner 2026-08-05)
   const min = sp.min !== undefined ? parseInt(sp.min) || 0 : 60;
   const { groups, counts, buckets } = getBoard(min);
+  const rv = resumeVersion();
   // Full job index for the Cmd+K search (ALL scores/statuses, independent of the min filter) - a
   // light direct query, not a second full getBoard() grouping pass.
   const searchJobs = getSearchIndex();
@@ -342,18 +344,29 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
         <AutoRefresh />
         <div className="mb-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
           <div className="flex items-center gap-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/icon.png" alt="AI-Jobs" width={52} height={52} className="block w-11 h-11 sm:w-[52px] sm:h-[52px] rounded-[12px] shadow-sm shrink-0" />
+            <span className="relative inline-block shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/icon.png" alt="AI-Jobs" width={52} height={52} className="block w-11 h-11 sm:w-[52px] sm:h-[52px] rounded-[12px] shadow-sm" />
+              {/* private hint: current resume revision. green = injecting the latest master, amber = stale. */}
+              {rv.rev !== null ? (
+                <span title={rv.fresh ? `resume rev ${rv.rev} - latest` : `resume rev ${rv.rev} - STALE (run: node pull_master_resume.mjs)`}
+                  className={`absolute -top-1 -right-1 min-w-[15px] h-[15px] px-0.5 rounded-full text-[9px] font-bold leading-[15px] text-center text-white shadow ${rv.fresh ? "bg-emerald-500" : "bg-amber-500"}`}>
+                  {rv.rev}
+                </span>
+              ) : null}
+            </span>
             <div className="min-w-0">
               <h1 className="text-2xl sm:text-3xl font-bold text-[#1f2328] mb-0.5 whitespace-nowrap">AI-Jobs</h1>
               <div className="text-[12px] sm:text-[13px] text-gray-500">{total} tracked &middot; live &middot; zero-token</div>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <CommandK jobs={searchJobs} logos={cmdkLogos} />
+            {/* Search is hidden on phones (it overflowed the row) - Cmd+K is a desktop affordance
+                anyway; the other controls now fit on one line. (owner request 2026-08-19) */}
+            <div className="hidden sm:block"><CommandK jobs={searchJobs} logos={cmdkLogos} /></div>
             <ScoreMenu min={min} buckets={buckets} tiers={[...SCORE_TIERS]} />
-            <JobsMenu />
             <ViewTabs />
+            <JobsMenu />
           </div>
         </div>
 
@@ -364,6 +377,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
             <div className="min-w-0">
               <div className="text-[17px] sm:text-[26px] font-bold leading-none">{total}</div>
               <div className="text-[9px] sm:text-xs text-white/85 mt-0.5 truncate">Total</div>
+              {todayOf(TREND.total) > 0 ? <div className="sm:hidden text-[9px] font-bold text-white/90 leading-none mt-0.5">+{todayOf(TREND.total)} today</div> : null}
             </div>
             <div className="hidden sm:flex flex-col items-end shrink-0">
               <Sparkline data={TREND.total} />
@@ -375,6 +389,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
               <div className="min-w-0">
                 <div className="text-[17px] sm:text-[26px] font-bold leading-none">{s === "applied" ? (counts.applied || 0) + (counts.rejected || 0) : counts[s]}</div>
                 <div className="text-[9px] sm:text-xs text-white/85 mt-0.5 truncate">{s === "planned" ? "New" : s === "kit_ready" ? "Ready" : s === "kit_only" ? "Not ready" : s === "manual_only" ? "Manual" : s[0].toUpperCase() + s.slice(1)}</div>
+                {todayOf(TREND[s] || trends.detected) > 0 ? <div className="sm:hidden text-[9px] font-bold text-white/90 leading-none mt-0.5">+{todayOf(TREND[s] || trends.detected)} today</div> : null}
               </div>
               <div className="hidden sm:flex flex-col items-end shrink-0">
                 <Sparkline data={TREND[s] || trends.detected} />
@@ -386,7 +401,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
 
 
         {total === 0 ? (
-          <div className="bg-white border border-gray-300 rounded-xl p-8 text-center text-gray-500 text-sm mt-4">No applications yet. Run the engine scan + migrate to populate the board.</div>
+          <div className="bg-white border border-gray-300 rounded-xl p-8 text-center text-gray-500 text-sm mt-4">No applications yet. Run a scraper (e.g. node scrape_linkedin.mjs) to populate the board.</div>
         ) : null}
         {groups.filter((g) => g.status !== "skipped").map((g) => {
           // per-source breakdown for this group's header (LinkedIn 17, Indeed 13, ...)
@@ -395,7 +410,7 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
           const breakdownPills = breakdown.map(([src, n]) => {
             const uri = markUri(src);
             return (
-              <span key={src} title={src} className="inline-flex items-center justify-center gap-1 min-w-[46px] text-[11px] font-bold rounded-full pl-1 pr-2 py-0.5 whitespace-nowrap text-white bg-white/20">
+              <span key={src} data-src-filter={src} title={`Click to show only ${src} in this pile`} className="inline-flex items-center justify-center gap-1 min-w-[46px] text-[11px] font-bold rounded-full pl-1 pr-2 py-0.5 whitespace-nowrap text-white bg-white/20 cursor-pointer select-none ring-white transition-all">
                 {uri
                   /* eslint-disable-next-line @next/next/no-img-element */
                   ? <img src={uri} alt={src} width={16} height={16} className="w-4 h-4 rounded-full bg-white object-contain shrink-0" />
@@ -420,8 +435,8 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
               </tr></thead>
               <tbody>
                 {g.rows.map((r) => (
-                  <RowLink key={r.id} id={r.id} label={`${r.company || ""} ${r.title || ""}`.trim()} className={`border-t border-gray-100 cursor-pointer ${HOVER[g.status] || "hover:bg-gray-50"}`}>
-                    <td className="pl-3 pr-1 py-2">
+                  <RowLink key={r.id} id={r.id} label={`${r.company || ""} ${r.title || ""}`.trim()} dataSrc={jobSource(r.url)} className={`border-t border-gray-100 cursor-pointer ${HOVER[g.status] || "hover:bg-gray-50"}`}>
+                    <td className="pl-3 pr-1 py-2 align-middle">
                       {(() => {
                         const src = jobSource(r.url);
                         const uri = markUri(src, r.company);
@@ -437,11 +452,11 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
                           </span>
                         );
                         return r.url
-                          ? <a data-external href={r.url} target="_blank" rel="noopener noreferrer" title={`Open on ${src}`} className="inline-flex no-underline">{mark}</a>
-                          : mark;
+                          ? <a data-external href={r.url} target="_blank" rel="noopener noreferrer" title={`Open on ${src}`} className="flex items-center no-underline">{mark}</a>
+                          : <span className="flex items-center">{mark}</span>;
                       })()}
                     </td>
-                    <td className="pl-2 pr-1 py-2.5 sm:pl-1 truncate">
+                    <td className="pl-2 pr-1 py-2 sm:pl-1 truncate align-middle">
                       <span className="flex items-center gap-2 text-[#1f2328]">
                         <span className="hidden sm:inline text-gray-300 font-normal select-none leading-none">|</span>
                         <Logo company={r.company} />
@@ -469,7 +484,19 @@ export default async function Board({ searchParams }: { searchParams: Promise<{ 
           </CollapsiblePanel>
           );
         })}
-        <div className="mt-8 text-center text-xs text-gray-400">Jobs &middot; reads jobs.db &middot; localhost/jobs</div>
+        <div className="mt-8 text-center text-xs text-gray-400">
+          Jobs &middot; reads jobs.db
+          {rv.rev !== null ? (
+            <>
+              {" "}&middot;{" "}
+              <span title={rv.fresh ? `Injecting the current master (rev ${rv.rev}, updated ${rv.updatedAt ?? "?"})` : "Injected resume is STALE vs the master - run: node pull_master_resume.mjs"}
+                className={rv.fresh ? "text-emerald-600 font-medium" : "text-amber-600 font-semibold"}>
+                resume v{rv.rev} {rv.fresh ? "✓" : "⚠ stale"}
+              </span>
+            </>
+          ) : null}
+          {" "}&middot; localhost/jobs
+        </div>
       </div>
       <PanelNav />
     </main>

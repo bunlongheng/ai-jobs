@@ -20,7 +20,20 @@ const Database = require(join(ROOT, "web/node_modules/better-sqlite3"));
 
 export const DB_PATH = process.env.JOBS_DB || join(ROOT, "web/jobs.db");
 export const PROFILE_PATH = process.env.PROFILE_PATH || join(ROOT, "profile.json");
+export const BLOCKLIST_PATH = process.env.BLOCKLIST_PATH || join(ROOT, "blocklist.json");
 export const INSERT_THRESHOLD = 50; // score >= 50 inserts
+
+// Company blocklist (web settings -> blocklist.json): these are HARD-blocked - the scraper
+// never even inserts them, so we don't waste scrapes/logo-fetches on companies you never want
+// to see. (Distinct from "hold", which only declutters existing rows.) (owner 2026-08-17)
+export function loadBlocklist() {
+  try {
+    const a = JSON.parse(readFileSync(BLOCKLIST_PATH, "utf8"));
+    return new Set((Array.isArray(a) ? a : []).map((s) => String(s).trim().toLowerCase()));
+  } catch {
+    return new Set();
+  }
+}
 export const SHOW_THRESHOLD = 40;   // summary table shows >= 40
 
 const GENERIC_GLOBE_MD5 = "b8a0bf372c762e966cc99ede8682bc71";
@@ -128,6 +141,13 @@ export function scoreJob(job, profile) {
   // company_quality (15) - unknown at card level; neutral baseline
   score += 8;
 
+  // preferred-stack boost: the owner's explicit tech-of-choice (profile.stack_boost, e.g.
+  // Laravel/PHP) is surfaced higher so those roles don't languish just above the 50 cutoff
+  // and get buried under the TS/React pile. Title-only, so it only fires when the term is
+  // right in the role title. (owner request 2026-08-17: "want to see Laravel jobs more")
+  const boost = profile.stack_boost || [];
+  if (boost.some((w) => wordHit(text, w))) score += 12;
+
   return { score: Math.min(100, score), reason: "" };
 }
 
@@ -171,12 +191,15 @@ export async function scoreDedupeInsert(db, jobs, profile, sourceRun, sourceNote
   );
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-  let deduped = 0, inserted = 0, skippedNoUrl = 0;
+  const blocked = loadBlocklist();
+  let deduped = 0, inserted = 0, skippedNoUrl = 0, blockedSkipped = 0;
   const results = [];
   for (const job of jobs) {
     // never accept an empty/invalid source URL - a job with no real link can't be
     // applied to and shows a "-" src on the board (owner rule 2026-07-24)
     if (!job.url || !/^https?:\/\//i.test(String(job.url))) { skippedNoUrl++; continue; }
+    // HARD blocklist: never scan/insert a company you've blocked. (owner request 2026-08-17)
+    if (blocked.has((job.company || "").trim().toLowerCase())) { blockedSkipped++; continue; }
     const { score } = scoreJob(job, profile);
     const isDupe =
       existingUrls.has(normUrl(job.url).toLowerCase()) ||
@@ -204,7 +227,7 @@ export async function scoreDedupeInsert(db, jobs, profile, sourceRun, sourceNote
     }
     results.push({ ...job, score, insertedThis });
   }
-  return { results, deduped, inserted, skippedNoUrl };
+  return { results, deduped, inserted, skippedNoUrl, blockedSkipped };
 }
 
 export function printSummary(results, counts, walls) {
@@ -217,7 +240,8 @@ export function printSummary(results, counts, walls) {
   }
   if (show.length === 0) console.log(`(no jobs scored >= ${SHOW_THRESHOLD})`);
   console.log(
-    `\nfetched pages: ${counts.fetched}  parsed: ${counts.parsed}  deduped: ${counts.deduped}  inserted: ${counts.inserted}`
+    `\nfetched pages: ${counts.fetched}  parsed: ${counts.parsed}  deduped: ${counts.deduped}  inserted: ${counts.inserted}` +
+    (counts.blockedSkipped ? `  blocked-skipped: ${counts.blockedSkipped}` : "")
   );
   if (walls.length) {
     console.log("\nWALLS ENCOUNTERED:");

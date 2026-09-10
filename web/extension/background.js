@@ -249,9 +249,13 @@ async function doFill(kitId, overwrite, tabId) {
     const th = hostOf(tab.url || "");
     kitId = kits.find((k) => k.url && hostOf(k.url) === th)?.id;
   }
-  if (!kitId) return { ok: false, error: "no kit matched to this tab" };
+  // No kit for this page? Do a PROFILE-ONLY fill (universal fields + canonical rule answers,
+  // no tailored resume/cover) so any job form still gets your info. (owner 2026-08-17)
   const [profile, resumeB64, cover, rules] = await Promise.all([
-    getJSON("/profile"), getResumeB64(kitId), getCover(kitId), getJSON("/rules"),
+    getJSON("/profile"),
+    kitId ? getResumeB64(kitId) : Promise.resolve(null),
+    kitId ? getCover(kitId) : Promise.resolve(null),
+    getJSON("/rules"),
   ]);
   try { await chrome.scripting.executeScript({ target: { tabId: tab.id, allFrames: true }, files: ["content.js"] }); } catch (e) {}
   let frames = [{ frameId: 0 }];
@@ -267,11 +271,14 @@ async function doFill(kitId, overwrite, tabId) {
   return { ok: true, kitId, fields };
 }
 
-// ---- AUTO-FILL on a recognized page: as soon as you land on a job form whose URL
-// confidently matches a kit, fill it automatically (no click). content.js's own banner +
-// focus glow is the "it's working" indication. Only CONFIDENT matches (exact/prefix apply
-// URL, or company slug in the path) auto-run, so we never fire the wrong kit. Never submits.
-// (owner request 2026-08-06) ----
+// ---- AUTO-FILL on a recognized page: as soon as you land on a job form, fill it
+// automatically (no click). content.js's own banner + focus glow is the "it's working"
+// indication. A CONFIDENT kit match (exact/prefix apply URL, or company slug in the path)
+// fills the tailored resume + cover. With NO kit match we still do a PROFILE-ONLY fill -
+// your universal fields (name/email/phone/links/work-auth/EEO) + canonical rule answers -
+// so ANY job form (e.g. one you reached by clicking Apply on Indeed) still gets your info.
+// Only your own data is ever written, so a no-kit fill has no wrong-kit risk. Never submits.
+// (owner request 2026-08-06; profile-only fallback 2026-08-17) ----
 const autoFilled = new Set(); // "tabId|url" dedupe within this service-worker lifetime
 const coTok = (name) => { const t = (name || "").split(/[\s\/]/)[0].toLowerCase().replace(/[^a-z]/g, ""); return t.length >= 3 ? t : ""; };
 const normUrl = (u) => (u || "").toLowerCase().split("?")[0].replace(/\/application\/?$/, "").replace(/\/$/, "");
@@ -287,10 +294,9 @@ async function maybeAutoFill(tabId) {
     if (!tab || pageGuard(tab)) return;                 // job pages only, never personal tabs
     const key = tabId + "|" + normUrl(tab.url);
     if (autoFilled.has(key)) return;                    // already auto-filled this page
-    const kit = await matchKitForUrl(tab.url);
-    if (!kit) return;                                   // no confident match -> leave it for the popup
+    const kit = await matchKitForUrl(tab.url);           // kit match -> tailored; no match -> profile-only
     autoFilled.add(key);
-    setTimeout(() => { doFill(kit.id, [], tabId).catch(() => {}); }, 1600); // let SPA forms render first
+    setTimeout(() => { doFill(kit ? kit.id : null, [], tabId).catch(() => {}); }, 1600); // let SPA forms render first
   } catch (_) {}
 }
 if (chrome.webNavigation?.onCompleted) {

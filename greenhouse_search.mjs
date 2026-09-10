@@ -59,10 +59,10 @@ async function main() {
   const today = new Date().toISOString().slice(0, 10);
   // Direct-ATS boards are a rich source - hold them to a higher bar (60) than the
   // LinkedIn/HN default (50) so only strong remote senior/staff matches land.
-  const { results, deduped, inserted, skippedNoUrl } = await scoreDedupeInsert(
+  const { results, deduped, inserted, skippedNoUrl, blockedSkipped } = await scoreDedupeInsert(
     db, jobs, profile, `greenhouse-${today}`, "Greenhouse boards", 60
   );
-  printSummary(results, { fetched: BOARDS.length, parsed: jobs.length, deduped, inserted }, []);
+  printSummary(results, { fetched: BOARDS.length, parsed: jobs.length, deduped, inserted, blockedSkipped }, []);
   console.log(`skipped (no url): ${skippedNoUrl}`);
 }
 
